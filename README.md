@@ -1,174 +1,126 @@
-# Admin Dashboard - Ambitious Capital
+# Billion InfoTech CRM
 
-A modern, responsive trading dashboard built with React, TypeScript, Tailwind CSS, and Vite. This application provides a comprehensive interface for trading account management, KYC verification, deposits, transfers, and more.
-
-![Dashboard Preview](https://via.placeholder.com/800x400?text=Dashboard+Preview)
+A professional trading platform management system built with React, TypeScript, and Vite.
 
 ## 🚀 Features
 
-### Authentication & Security
-- **Secure Login System** - Email/password authentication with form validation
-- **Two-Factor Authentication (2FA)** - Enhanced security with authenticator app support
-- **Protected Routes** - Authenticated access to dashboard features
-
-### Account Management
-- **Live Trading Accounts** - View and manage multiple trading accounts
-- **Account Creation** - Create new demo or live trading accounts
-- **Account Statistics** - Real-time balance and performance metrics
-
-### Financial Operations
-- **Multi-Method Deposits** - Bank transfer, USDT, and cryptocurrency deposits
-- **Internal Transfers** - Transfer funds between accounts instantly
-- **Transaction History** - Comprehensive transaction tracking
-
-### Verification & Compliance
-- **KYC Verification** - Complete identity verification process
-- **Document Upload** - Secure document management system
-- **Verification Status Tracking** - Real-time status updates
-
-### Business Features
-- **IB Request System** - Introducing Broker application process
-- **Dashboard Analytics** - Trading performance and market overview
+- **Secure Authentication** - JWT-based authentication with route protection
+- **Dashboard Analytics** - Real-time trading metrics and performance charts
+- **Account Management** - Complete trading account lifecycle management
+- **KYC Verification** - Document upload and verification system
+- **Support System** - Ticket-based customer support
+- **Admin Panel** - Comprehensive administrative controls
 - **Responsive Design** - Mobile-first responsive interface
+- **Type Safety** - Full TypeScript implementation
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
-- **Frontend Framework:** React 19 with TypeScript
-- **Build Tool:** Vite 7
-- **Styling:** Tailwind CSS 4
-- **Routing:** React Router DOM
-- **Form Management:** Formik with Yup validation
-- **API Client:** Axios
-- **Mock API:** JSON Server
-- **Icons:** Lucide React
-- **UI Components:** Custom components with Radix UI primitives
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS
+- **Routing**: React Router v7
+- **Forms**: Formik + Yup validation
+- **Icons**: Lucide React, React Icons
+- **HTTP Client**: Axios
+- **Build Tool**: Vite with SWC
 
-## 📁 Project Structure
+## 📦 Installation
 
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # Base UI components (Button, Input, Card)
-│   └── layout/         # Layout components (Sidebar, Header)
-├── pages/              # Route components
-│   ├── LoginPage.tsx
-│   ├── Dashboard.tsx
-│   ├── LiveAccounts.tsx
-│   ├── TradingAccountCreation.tsx
-│   ├── KYCVerification.tsx
-│   ├── Deposits.tsx
-│   ├── InternalTransfer.tsx
-│   ├── IBRequest.tsx
-│   └── TwoFactorAuth.tsx
-├── layouts/            # Page layouts
-│   └── DashboardLayout.tsx
-├── services/           # API services
-│   └── api.ts
-├── types/              # TypeScript type definitions
-│   └── index.ts
-├── utils/              # Utility functions
-│   └── cn.ts
-└── App.tsx             # Main app component
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 16+ and npm
-- Modern web browser
-
-### Installation
-
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Start the development servers**
-   ```bash
-   # Start both API server and development server
-   npm run dev:all
-   
-   # Or start them separately:
-   npm run json-server  # API server (port 3001)
-   npm run dev          # Development server (port 5173)
-   ```
-
-3. **Open your browser**
-   - Application: http://localhost:5173
-   - API Server: http://localhost:3001
-
-### Demo Credentials
-- **Email:** demo@ambitious.com
-- **Password:** password123
-
-## 📱 Responsive Design
-
-The application is fully responsive and optimized for:
-- **Desktop** - Full sidebar navigation and detailed views
-- **Tablet** - Adaptive layout with collapsible sidebar
-- **Mobile** - Mobile-first design with drawer navigation
-
-## 🔧 Development
-
-### Available Scripts
+## 🔧 Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
-- `npm run json-server` - Start mock API server
-- `npm run dev:all` - Start both API and dev servers
+- `npm run lint:fix` - Fix ESLint issues
+- `npm run type-check` - Run TypeScript type checking
+- `npm run clean` - Clean build artifacts
 
-### Code Architecture
+## 🌍 Environment Variables
 
-#### Component Design Principles
-- **DRY (Don't Repeat Yourself)** - Reusable components with props
-- **Single Responsibility** - Each component handles one feature
-- **Code Splitting** - Organized by feature and functionality
+Create a `.env.local` file in the root directory:
 
-#### API Integration
-- **Axios Configuration** - Centralized API client with interceptors
-- **Error Handling** - Consistent error handling across requests
-- **Type Safety** - Full TypeScript integration
+```env
+VITE_API_BASE_URL=https://amf.billioninfotech.com/api/v1
+VITE_APP_NAME=Billion InfoTech CRM
+VITE_APP_VERSION=1.0.0
+VITE_ENABLE_LOGGING=false
+VITE_ENABLE_DEV_TOOLS=false
+```
 
-## 🎨 UI/UX Features
+## 🏗️ Project Structure
 
-### Design System
-- **Consistent Spacing** - Tailwind CSS utility classes
-- **Color Palette** - Professional green and gray theme
-- **Typography** - Clear hierarchy and readability
-- **Interactive Elements** - Hover states and transitions
-
-### User Experience
-- **Loading States** - Skeleton screens and spinners
-- **Error Handling** - User-friendly error messages
-- **Form Validation** - Real-time validation with clear feedback
-- **Success States** - Confirmation messages and visual feedback
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Basic UI components
+│   ├── layout/         # Layout components
+│   └── dashboard/      # Dashboard-specific components
+├── pages/              # Page components
+├── services/           # API services
+├── hooks/              # Custom React hooks
+├── context/            # React context providers
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── constants/          # Application constants
+└── config/             # Configuration files
+```
 
 ## 🔒 Security Features
 
-- **Input Validation** - Client and server-side validation
-- **Authentication Guards** - Protected route components
-- **Token Management** - Secure token storage and refresh
-
-## 📊 Mock Data
-
-The application uses JSON Server with realistic mock data:
-- User accounts and profiles
-- Trading accounts with balances
-- Transaction history
-- KYC documents
-- IB requests
-- Dashboard statistics
+- JWT token-based authentication
+- Automatic token refresh
+- Route protection with ProtectedRoute component
+- Secure API request handling
+- Input validation and sanitization
+- Error boundary implementation
 
 ## 🚀 Deployment
 
-### Build for Production
+### Production Build
+
 ```bash
 npm run build
 ```
 
----
+The build artifacts will be stored in the `dist/` directory.
 
-Built with ❤️ for Ambitious Capital Limited
+### Environment Configuration
+
+Ensure all environment variables are properly configured for your production environment.
+
+## 📱 Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## 📄 License
+
+This project is proprietary software owned by Billion InfoTech.
+
+## 🆘 Support
+
+For technical support, please contact the development team or create a support ticket through the application.
