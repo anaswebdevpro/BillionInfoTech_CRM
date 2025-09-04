@@ -1,0 +1,11 @@
+export const BASE_URL = "https://amf.billioninfotech.com/api/v1";
+export const LOGIN="/login";
+export const SIGNUP="/register";
+export const GET_PROFILE="/profile-data";
+export const PROFILE_UPDATE="/update-profile-data";
+export const UPDATE_PASSWORD="/update-password";
+export const ADD_BANK_ACCOUNT="/add-bankaccount-details";
+export const FETCH_BANK_DETAILS="/fetch-bank-details";
+export const DELETE_BANK_ACCOUNT="/delete-bankaccount-details";
+export const DASHBOARD_DATA="/dashboard-data";
+export const CREATE_SUPPORT_TICKET="/create-support-ticket";
