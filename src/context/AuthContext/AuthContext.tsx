@@ -1,4 +1,4 @@
-import  { createContext,  useState, ReactNode, useEffect } from "react";
+import  { createContext,  useState, ReactNode, useEffect, useContext } from "react";
 import type {User,AuthContextType} from '../../types/index';
 
 
@@ -57,6 +57,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+/**
+ * Custom hook to use the AuthContext
+ * @returns AuthContext value containing user and token
+ */
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
 };
 
 export default AuthContext;

@@ -5,7 +5,7 @@ import { CreditCard, Building, Bitcoin, CheckCircle } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { transactionsAPI } from '../services';
+import { apiRequest } from '../services/api';
 // Using a local form type to match UI fields
 interface DepositFormValues {
   amount: number;
@@ -76,11 +76,15 @@ const Deposits: React.FC = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        await transactionsAPI.deposit({
-          amount: values.amount,
-          method: values.method,
-          currency: values.currency,
-          description: `${values.method} deposit of ${values.amount} ${values.currency}`,
+        await apiRequest({
+          endpoint: '/transactions/deposit',
+          method: 'POST',
+          data: {
+            amount: values.amount,
+            method: values.method,
+            currency: values.currency,
+            description: `${values.method} deposit of ${values.amount} ${values.currency}`,
+          }
         });
         setSuccess(true);
         formik.resetForm();

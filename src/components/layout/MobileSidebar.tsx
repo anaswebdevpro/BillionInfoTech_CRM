@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Add logo import
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 import { 
   X, 
   LayoutDashboard, 

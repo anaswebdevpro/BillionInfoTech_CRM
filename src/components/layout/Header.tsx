@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu, Bell, User } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { COLORS } from '../../constants/colors';
 

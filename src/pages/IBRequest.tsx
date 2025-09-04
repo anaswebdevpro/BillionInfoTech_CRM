@@ -5,7 +5,7 @@ import { Users, Building, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { ibAPI } from '../services';
+import { apiRequest } from '../services/api';
 import type { IBRequest, IBFormData } from '../types/index';
 
 /**
@@ -21,7 +21,10 @@ const IBRequest: React.FC = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const data = await ibAPI.getRequests();
+        const data = await apiRequest<IBRequest[]>({
+          endpoint: '/ib/requests',
+          method: 'GET'
+        }) || [];
         setRequests(data);
       } catch (error) {
         console.error('Failed to fetch IB requests:', error);
@@ -55,17 +58,24 @@ const IBRequest: React.FC = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        await ibAPI.createRequest({
-          companyName: values.companyName,
-          contactPerson: values.contactPerson,
-          email: values.email,
-          phone: values.phone,
-          address: values.address,
-          experience: values.experience,
+        await apiRequest({
+          endpoint: '/ib/requests',
+          method: 'POST',
+          data: {
+            companyName: values.companyName,
+            contactPerson: values.contactPerson,
+            email: values.email,
+            phone: values.phone,
+            address: values.address,
+            experience: values.experience,
+          }
         });
         
         // Refresh requests list
-        const updatedRequests = await ibAPI.getRequests();
+        const updatedRequests = await apiRequest<IBRequest[]>({
+          endpoint: '/ib/requests',
+          method: 'GET'
+        }) || [];
         setRequests(updatedRequests);
         
         setSuccess(true);

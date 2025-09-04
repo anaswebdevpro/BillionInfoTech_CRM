@@ -14,7 +14,7 @@ import logo from "../assets/company-logo 1.png";
 import { COLORS, GRADIENTS } from "../constants/colors";
 import { apiRequest } from "../services/api";
 import { LOGIN } from "../../api/api-variable";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext/AuthContext";
 
 interface LoginPageProps {
   onSwitchToSignup?: () => void;

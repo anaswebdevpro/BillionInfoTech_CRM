@@ -5,7 +5,7 @@ import {  LayoutDashboard,  TrendingUp,  CreditCard,  FileText,  ArrowRightLeft,
   Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle,} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { COLORS, GRADIENTS } from '../../constants/colors';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 
 
 

@@ -5,7 +5,7 @@ import { ArrowRightLeft } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { accountsAPI, transactionsAPI } from '../services';
+import { apiRequest } from '../services/api';
 import type { Account, FundTransferFormData } from '../types';
 
 /**
@@ -21,7 +21,10 @@ const InternalTransfer: React.FC = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await accountsAPI.getAccounts();
+        const data = await apiRequest<Account[]>({
+          endpoint: '/accounts',
+          method: 'GET'
+        }) || [];
         setAccounts(data);
       } catch (error) {
         console.error('Failed to fetch accounts:', error);
@@ -61,11 +64,15 @@ const InternalTransfer: React.FC = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        await transactionsAPI.internalTransfer({
-          fromAccount: values.fromAccount,
-          toAccount: values.toAccount,
-          amount: values.amount,
-          description: `Transfer from ${values.fromAccount} to ${values.toAccount}`,
+        await apiRequest({
+          endpoint: '/transactions/internal-transfer',
+          method: 'POST',
+          data: {
+            fromAccount: values.fromAccount,
+            toAccount: values.toAccount,
+            amount: values.amount,
+            description: `Transfer from ${values.fromAccount} to ${values.toAccount}`,
+          }
         });
         setSuccess(true);
         formik.resetForm();

@@ -5,7 +5,7 @@ import { Upload, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { kycAPI } from '../services';
+import { apiRequest } from '../services/api';
 import type { KYCDocument, KYCFormData } from '../types';
 import { COLORS } from '../constants/colors';
 
@@ -29,7 +29,10 @@ const KYCVerification: React.FC = () => {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const data = await kycAPI.getDocuments();
+        const data = await apiRequest<KYCDocument[]>({
+          endpoint: '/kyc/documents',
+          method: 'GET'
+        }) || [];
         setDocuments(data);
       } catch (error) {
         console.error('Failed to fetch documents:', error);
@@ -63,15 +66,26 @@ const KYCVerification: React.FC = () => {
       setIsSubmitting(true);
       try {
         if (values.file) {
-          await kycAPI.uploadDocument({
-            type: values.documentType,
-            file: values.file,
-            description: `Document number: ${values.documentNumber}, Expiry: ${values.expiryDate}`,
+          const formData = new FormData();
+          formData.append('type', values.documentType);
+          formData.append('file', values.file);
+          formData.append('description', `Document number: ${values.documentNumber}, Expiry: ${values.expiryDate}`);
+          
+          await apiRequest({
+            endpoint: '/kyc/upload',
+            method: 'POST',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
           });
         }
         
         // Refresh documents list
-        const updatedDocuments = await kycAPI.getDocuments();
+        const updatedDocuments = await apiRequest<KYCDocument[]>({
+          endpoint: '/kyc/documents',
+          method: 'GET'
+        }) || [];
         setDocuments(updatedDocuments);
         
         formik.resetForm();

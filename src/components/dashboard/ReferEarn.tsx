@@ -1,4 +1,4 @@
-import { FaTwitter, FaFacebook, FaInstagram, FaWhatsapp } from '../../../index';
+import { Twitter, Facebook, Instagram, MessageCircle } from 'lucide-react';
 
 interface ReferEarnProps {
   referralLink?: string;
@@ -47,22 +47,22 @@ const ReferEarn: React.FC<ReferEarnProps> = ({ referralLink }) => {
 
             <div className="flex flex-wrap gap-2 mt-4">
               <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md flex items-center justify-center space-x-1 text-sm flex-1 min-w-0">
-                <FaTwitter size={16} />
+                <Twitter size={16} />
                 <span className="hidden sm:inline">Twitter</span>
               </button>
 
               <button className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded-md flex items-center justify-center space-x-1 text-sm flex-1 min-w-0">
-                <FaFacebook size={16} />
+                <Facebook size={16} />
                 <span className="hidden sm:inline">Facebook</span>
               </button>
 
               <button className="bg-pink-500 hover:bg-pink-600 text-white px-3 py-2 rounded-md flex items-center justify-center space-x-1 text-sm flex-1 min-w-0">
-                <FaInstagram size={16} />
+                <Instagram size={16} />
                 <span className="hidden sm:inline">Instagram</span>
               </button>
 
               <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md flex items-center justify-center space-x-1 text-sm flex-1 min-w-0">
-                <FaWhatsapp size={16} />
+                <MessageCircle size={16} />
                 <span className="hidden sm:inline">WhatsApp</span>
               </button>
             </div>

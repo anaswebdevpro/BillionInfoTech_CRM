@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Settings } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { accountsAPI } from '../services';
+import { apiRequest } from '../services/api';
 import type { Account } from '../types';
 import { COLORS } from '../constants/colors';
 import { Link } from 'react-router-dom';
@@ -19,7 +19,10 @@ const LiveAccounts: React.FC = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await accountsAPI.getAccounts();
+        const data = await apiRequest<Account[]>({
+          endpoint: '/accounts',
+          method: 'GET'
+        }) || [];
         setAccounts(data);
       } catch (error) {
         console.error('Failed to fetch accounts:', error);

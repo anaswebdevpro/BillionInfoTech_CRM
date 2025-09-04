@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { COLORS } from "../constants/colors";
 import { apiRequest } from "../services";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext/AuthContext";
 import type { DashboardStats, Transaction, Position } from "../types";
 import {
   StatsGrid,
@@ -10,7 +10,7 @@ import {
   MarketTicker,
   TradingPositions,
   ReferEarn,
-} from "../../index";
+} from "../components/dashboard/index";
 import { DASHBOARD_DATA } from "../../api/api-variable";
 
 /**

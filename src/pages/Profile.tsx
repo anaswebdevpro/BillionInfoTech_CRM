@@ -11,7 +11,7 @@ import { apiRequest } from '../services/api';
 import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../api/api-variable';
 import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, User as UserType } from '../types';
 import { COLORS } from '../constants/colors';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext/AuthContext';
 
 // Tab types
 type TabType = 'profile' | 'password' | 'kyc' | 'bank';

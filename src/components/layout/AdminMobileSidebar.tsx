@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { X, ChevronDown, ChevronRight } from 'lucide-react';
 import logo from '../../assets/admin.png';
 import { COLORS, GRADIENTS } from '../../constants/colors';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 import {
   LayoutDashboard,
   Users,

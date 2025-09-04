@@ -5,7 +5,7 @@ import { CheckCircle } from "lucide-react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import { accountsAPI } from "../services";
+import { apiRequest } from "../services/api";
 import type { AccountCreationFormData, AccountType } from "../types/index";
 
 /**
@@ -92,9 +92,13 @@ const TradingAccountCreation: React.FC = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        await accountsAPI.createAccount({
-          ...values,
-          // userId will be handled by the backend from the auth token
+        await apiRequest({
+          endpoint: '/accounts',
+          method: 'POST',
+          data: {
+            ...values,
+            // userId will be handled by the backend from the auth token
+          }
         });
         setSuccess(true);
         formik.resetForm();
