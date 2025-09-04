@@ -19,13 +19,14 @@ import ManageAccounts from '../pages/ManageAccounts';
 import Profile from '../pages/Profile';
 import Support from '../pages/Support';
 import CreateTicket from '../pages/CreateTicket';
+import NotFound from '../pages/NotFound';
 
 // Import Admin Pages
 import {
   AdminDashboard,
   AdminSupport,
   AdminUsers,
-  AdminAccounts,
+  // AdminAccounts,
   AdminTransactions,
   AdminKYC,
   AdminReports,
@@ -156,10 +157,10 @@ export const router = createBrowserRouter([
             path: 'users',
             element: <AdminUsers />,
           },
-          {
-            path: 'accounts',
-            element: <AdminAccounts />,
-          },
+          // {
+          //   path: 'accounts',
+          //   element: <AdminAccounts />,
+          // },
           {
             path: 'transactions',
             element: <AdminTransactions />,
@@ -213,6 +214,11 @@ export const router = createBrowserRouter([
             element: <AdminSalesManagers />,
           },
         ],
+      },
+      // 404 Not Found Route - Catch all unmatched routes
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
   },

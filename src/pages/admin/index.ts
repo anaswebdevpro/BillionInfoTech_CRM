@@ -2,7 +2,7 @@
 export { default as AdminDashboard } from './AdminDashboard';
 export { default as AdminSupport } from '../AdminSupport'; // Re-export existing AdminSupport
 export { default as AdminUsers } from './AdminUsers';
-export { default as AdminAccounts } from './AdminAccounts';
+// export { default as AdminAccounts } from './AdminAccounts';
 export { default as AdminTransactions } from './AdminTransactions';
 export { default as AdminKYC } from './AdminKYC';
 export { default as AdminReports } from './AdminReports';

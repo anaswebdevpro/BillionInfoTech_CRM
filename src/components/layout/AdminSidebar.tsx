@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext/AuthContext';
 import {
   LayoutDashboard,
   Users,
-  CreditCard,
+
   FileText,
   BarChart3,
   Settings,
@@ -57,24 +57,16 @@ const AdminSidebar: React.FC = () => {
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Support', href: '/admin/support', icon: MessageCircle, badge: '12' },
-    {
-      name: 'User Management',
-      icon: Users,
-      submenu: [
-        { name: 'All Users', href: '/admin/users', icon: Users },
-        { name: 'User Verification', href: '/admin/users/verification', icon: UserCheck, badge: '8' },
-        { name: 'User Roles', href: '/admin/users/roles', icon: Shield },
-      ]
-    },
-    {
-      name: 'Account Management',
-      icon: CreditCard,
-      submenu: [
-        { name: 'All Accounts', href: '/admin/accounts', icon: CreditCard },
-        { name: 'Account Approval', href: '/admin/accounts/approval', icon: UserCheck, badge: '5' },
-        { name: 'Account Types', href: '/admin/accounts/types', icon: Settings },
-      ]
-    },
+    // {
+    //   name: 'User Management',
+    //   icon: Users,
+    //   submenu: [
+    //     { name: 'All Users', href: '/admin/users', icon: Users },
+    //     { name: 'User Verification', href: '/admin/users/verification', icon: UserCheck, badge: '8' },
+    //     { name: 'User Roles', href: '/admin/users/roles', icon: Shield },
+    //   ]
+    // },
+    
     {
       name: 'Transactions',
       icon: DollarSign,
@@ -83,9 +75,11 @@ const AdminSidebar: React.FC = () => {
         { name: 'Pending Approvals', href: '/admin/transactions/pending', icon: AlertTriangle, badge: '3' },
         { name: 'Deposits', href: '/admin/transactions/deposits', icon: TrendingUp },
         { name: 'Withdrawals', href: '/admin/transactions/withdrawals', icon: TrendingUp },
+        { name: 'Financial Management', href: '/admin/financial', icon: DollarSign },
+        { name: 'IB Partners', href: '/admin/ib-partners', icon: Briefcase },
       ]
     },
-    { name: 'KYC Management', href: '/admin/kyc', icon: FileText, badge: '15' },
+   
     {
       name: 'Reports & Analytics',
       icon: BarChart3,
@@ -95,17 +89,17 @@ const AdminSidebar: React.FC = () => {
         { name: 'System Logs', href: '/admin/reports/logs', icon: Database },
       ]
     },
-    { name: 'Notifications', href: '/admin/notifications', icon: Bell, badge: '7' },
+    
     {
       name: 'Client Management',
       icon: Users,
       submenu: [
         { name: 'Clients & Leads', href: '/admin/clients-leads', icon: Target },
         { name: 'Leads Management', href: '/admin/leads', icon: Target },
+        { name: 'KYC Management', href: '/admin/kyc', icon: FileText, badge: '15' },
       ]
     },
-    { name: 'Financial Management', href: '/admin/financial', icon: DollarSign },
-    { name: 'IB Partners', href: '/admin/ib-partners', icon: Briefcase },
+   
     { name: 'Configurations', href: '/admin/configurations', icon: Settings },
     {
       name: 'Marketing',

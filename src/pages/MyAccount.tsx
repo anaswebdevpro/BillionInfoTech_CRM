@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Eye, Settings, TrendingUp } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { apiRequest } from '../services/api';
+// import { apiRequest } from '../services/api';
 import type { Account } from '../types';
 import { COLORS } from '../constants/colors';
 
@@ -22,11 +22,75 @@ const MyAccounts: React.FC = () => {
   const loadAccounts = async () => {
     try {
       setLoading(true);
-      const data = await apiRequest<Account[]>({
-        endpoint: '/accounts',
-        method: 'GET'
-      }) || [];
-      setAccounts(data);
+      
+      // Dummy data for demonstration
+      const dummyAccounts: Account[] = [
+        {
+          id: '1',
+          userId: 'user123',
+          accountNumber: 'MT5-001234',
+          accountType: 'Live',
+          balance: 15420.50,
+          currency: 'USD',
+          leverage: '1:100',
+          status: 'Active'
+        },
+        {
+          id: '2',
+          userId: 'user123',
+          accountNumber: 'MT5-001235',
+          accountType: 'Demo',
+          balance: 10000.00,
+          currency: 'EUR',
+          leverage: '1:200',
+          status: 'Active'
+        },
+        {
+          id: '3',
+          userId: 'user123',
+          accountNumber: 'MT5-001236',
+          accountType: 'Live',
+          balance: 8750.25,
+          currency: 'GBP',
+          leverage: '1:50',
+          status: 'Pending'
+        },
+        {
+          id: '4',
+          userId: 'user123',
+          accountNumber: 'MT5-001237',
+          accountType: 'Live',
+          balance: 0.00,
+          currency: 'USD',
+          leverage: '1:100',
+          status: 'Inactive'
+        },
+        {
+          id: '5',
+          userId: 'user123',
+          accountNumber: 'MT5-001238',
+          accountType: 'Demo',
+          balance: 50000.00,
+          currency: 'USD',
+          leverage: '1:500',
+          status: 'Active'
+        },
+        {
+          id: '6',
+          userId: 'user123',
+          accountNumber: 'MT5-001239',
+          accountType: 'Live',
+          balance: 22350.75,
+          currency: 'JPY',
+          leverage: '1:100',
+          status: 'Active'
+        }
+      ];
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setAccounts(dummyAccounts);
     } catch (error) {
       console.error('Failed to load accounts:', error);
     } finally {
