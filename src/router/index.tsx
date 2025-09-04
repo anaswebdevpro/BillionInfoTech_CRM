@@ -3,6 +3,8 @@ import App from '../App';
 import LoginPageWrapper from '../components/LoginPageWrapper';
 import SignupPageWrapper from '../components/SignupPageWrapper';
 import DashboardLayoutWrapper from '../components/DashboardLayoutWrapper';
+import ProtectedRoute from '../components/ProtectedRoute';
+import PublicRoute from '../components/PublicRoute';
 
 import Dashboard from '../pages/Dashboard';
 import LiveAccounts from '../pages/LiveAccounts';
@@ -53,15 +55,27 @@ export const router = createBrowserRouter([
       },
       {
         path: 'login',
-        element: <LoginPageWrapper />,
+        element: (
+          <PublicRoute>
+            <LoginPageWrapper />
+          </PublicRoute>
+        ),
       },
       {
         path: 'signup',
-        element: <SignupPageWrapper />,
+        element: (
+          <PublicRoute>
+            <SignupPageWrapper />
+          </PublicRoute>
+        ),
       },
       {
         path: 'dashboard',
-        element: <DashboardLayoutWrapper />,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayoutWrapper />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,
@@ -120,7 +134,11 @@ export const router = createBrowserRouter([
       // Admin Routes - Separate top-level section
       {
         path: 'admin',
-        element: <AdminLayoutWrapper />,
+        element: (
+          <ProtectedRoute>
+            <AdminLayoutWrapper />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,

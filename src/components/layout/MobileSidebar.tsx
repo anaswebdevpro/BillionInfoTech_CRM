@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Add logo import
+import { useAuth } from '../../hooks/useAuth';
 import { 
   X, 
   LayoutDashboard, 
@@ -43,6 +44,7 @@ interface SubMenuItem {
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const navigation: NavigationItem[] = [
@@ -207,8 +209,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                     <li>
                       <button
                         onClick={() => {
-                          localStorage.clear();
-                          navigate('/');
+                          logout();
+                          navigate('/login');
                           onClose();
                         }}
                         className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-red-700 hover:bg-red-50`}

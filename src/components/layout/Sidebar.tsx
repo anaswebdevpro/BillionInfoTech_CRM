@@ -5,6 +5,7 @@ import {  LayoutDashboard,  TrendingUp,  CreditCard,  FileText,  ArrowRightLeft,
   Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle,} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { COLORS, GRADIENTS } from '../../constants/colors';
+import { useAuth } from '../../hooks/useAuth';
 
 
 
@@ -27,7 +28,8 @@ interface SubMenuItem {
  */
 const Sidebar: React.FC = () => {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -182,8 +184,8 @@ const Sidebar: React.FC = () => {
               <li>
                 <button
                   onClick={() => {
-                    localStorage.clear();
-                    Navigate('/');
+                    logout();
+                    navigate('/login');
                   }}
                   className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-red-700 hover:bg-red-50`}
                 >

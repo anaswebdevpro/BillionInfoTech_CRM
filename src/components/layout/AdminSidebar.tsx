@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import logo from '../../assets/admin.png'; // Admin logo
+import { useAuth } from '../../hooks/useAuth';
 import {
   LayoutDashboard,
   Users,
@@ -50,7 +51,8 @@ interface SubMenuItem {
  */
 const AdminSidebar: React.FC = () => {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -276,8 +278,8 @@ const AdminSidebar: React.FC = () => {
               <li>
                 <button
                   onClick={() => {
-                    localStorage.clear();
-                    Navigate('/');
+                    logout();
+                    navigate('/login');
                   }}
                   className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT} transition-colors`}
                 >

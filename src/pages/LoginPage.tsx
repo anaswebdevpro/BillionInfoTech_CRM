@@ -14,9 +14,9 @@ import logo from "../assets/company-logo 1.png";
 import { COLORS, GRADIENTS } from "../constants/colors";
 import { apiRequest } from "../services/api";
 import { LOGIN } from "../../api/api-variable";
+import { useAuth } from "../hooks/useAuth";
 
 interface LoginPageProps {
-  onLogin: (token: string) => void;
   onSwitchToSignup?: () => void;
 }
 
@@ -31,6 +31,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Validation schema using Yup
   const validationSchema = Yup.object({
@@ -62,8 +63,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
           data: payload,
         })
           .then((response: any) => {
-            localStorage.setItem("token", response?.token);
-            localStorage.setItem("user", JSON.stringify(response?.user));
+            // Use the login function from AuthContext
+            login(response?.user, response?.token);
             setIsLoading(false);
             navigate("/dashboard");
             console.log(response);

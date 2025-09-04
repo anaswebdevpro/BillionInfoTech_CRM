@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { X, ChevronDown, ChevronRight } from 'lucide-react';
 import logo from '../../assets/admin.png';
 import { COLORS, GRADIENTS } from '../../constants/colors';
+import { useAuth } from '../../hooks/useAuth';
 import {
   LayoutDashboard,
   Users,
@@ -20,7 +21,7 @@ import {
   Database,
   Bell
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 
 interface AdminMobileSidebarProps {
   isOpen: boolean;
@@ -48,7 +49,8 @@ interface SubMenuItem {
  */
 const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose }) => {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -264,8 +266,8 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose
                     <li>
                       <button
                         onClick={() => {
-                          localStorage.clear();
-                          Navigate('/');
+                          logout();
+                          navigate('/login');
                           onClose();
                         }}
                         className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.GRAY} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT} transition-colors`}

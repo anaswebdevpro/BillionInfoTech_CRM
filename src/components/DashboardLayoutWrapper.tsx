@@ -1,15 +1,10 @@
 import React from 'react';
-import { useOutletContext, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
-import {  OutletContext} from '../types';
-
-
 
 const DashboardLayoutWrapper: React.FC = () => {
-  useOutletContext<OutletContext>();
-
   return (
-  <DashboardLayout>
+    <DashboardLayout>
       <Outlet />
     </DashboardLayout>
   );
