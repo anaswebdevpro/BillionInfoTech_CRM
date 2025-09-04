@@ -13,7 +13,7 @@ const AdminAccounts: React.FC = () => {
             <li>Trading account status</li>
             <li>Account balance monitoring</li>
             <li>Risk management</li>
-            <li>Account restrictions</li>
+            <li>Account restriction</li>
           </ul>
         </div>
       </div>
