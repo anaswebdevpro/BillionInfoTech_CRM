@@ -25,7 +25,7 @@ export const DELETE_BANK="/delete-bank"
 
 //Bonus and promotions
 export const FETCH_BONUS="/fetch-bonuses";
-export const CLAIM_BONUS ="claim-bonus";
+export const CLAIM_BONUS = "/claim-bonus";
 
 //support 
 export const CREATE_SUPPORT_TICKET="/create-support-ticket";

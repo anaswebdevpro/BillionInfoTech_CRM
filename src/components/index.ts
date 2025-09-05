@@ -1,5 +1,4 @@
 // Main Components Exports
-export { default as AccountTypeGrid } from './AccountTypeGrid';
 export { default as AdminLayoutWrapper } from './AdminLayoutWrapper';
 export { default as DashboardLayoutWrapper } from './DashboardLayoutWrapper';
 export { default as LoginPageWrapper } from './LoginPageWrapper';
