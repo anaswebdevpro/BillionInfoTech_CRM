@@ -13,13 +13,13 @@ import {
   ChevronDown,
   ChevronRight,
   MessageCircle,
-  Shield,
-  UserCheck,
+
+  
   DollarSign,
   TrendingUp,
   AlertTriangle,
   Database,
-  Bell,
+  
   Target,
   Briefcase,
   Gift,

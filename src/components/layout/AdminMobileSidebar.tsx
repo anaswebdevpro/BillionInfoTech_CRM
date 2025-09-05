@@ -115,7 +115,7 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay  */}
       <div className="fixed inset-0 z-50 lg:hidden">
         <div className="fixed inset-0 bg-gray-900/80" onClick={onClose} />
         
