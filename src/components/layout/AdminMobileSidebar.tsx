@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { X, ChevronDown, ChevronRight } from 'lucide-react';
 import logo from '../../assets/admin.png';
 import { COLORS, GRADIENTS } from '../../constants/colors';
@@ -42,6 +42,94 @@ interface SubMenuItem {
   icon: React.ComponentType<{ className?: string }>;
   badge?: string | number;
 }
+
+const NavLinkItem: React.FC<{
+  item: NavigationItem | SubMenuItem;
+  onClose: () => void;
+  isSubItem?: boolean;
+}> = ({ item, onClose, isSubItem = false }) => {
+  const { name, href, icon: Icon, badge } = item;
+  const fontClass = isSubItem ? 'font-medium' : 'font-semibold';
+  const iconSize = isSubItem ? 'h-4 w-4' : 'h-5 w-5';
+
+  return (
+    <NavLink
+      to={href!}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `group flex gap-x-3 rounded-md p-2 text-sm leading-6 ${fontClass} transition-colors ${
+          isActive
+            ? `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
+            : `text-${COLORS.GRAY} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`
+        }`
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            className={`${iconSize} shrink-0 ${
+              isActive ? `text-${COLORS.WHITE}` : `text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`
+            }`}
+          />
+          <span className="flex-1">{name}</span>
+          {badge && (
+            <span
+              className={`text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center ${
+                isActive
+                  ? `bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.WHITE}`
+                  : `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
+              }`}
+            >
+              {badge}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+};
+
+const SubMenuItemComponent: React.FC<{
+    item: NavigationItem;
+    onClose: () => void;
+    toggleSubmenu: (name: string) => void;
+    isSubmenuExpanded: (name: string) => boolean;
+}> = ({ item, onClose, toggleSubmenu, isSubmenuExpanded }) => {
+    const { name, icon: Icon, submenu, badge } = item;
+    const isExpanded = isSubmenuExpanded(name);
+
+    return (
+        <li key={name}>
+            <button
+                onClick={() => toggleSubmenu(name)}
+                className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT} transition-colors`}
+            >
+                <Icon className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`} />
+                <span className="flex-1 text-left">{name}</span>
+                {badge && (
+                    <span className={`bg-${COLORS.PRIMARY} text-${COLORS.WHITE} text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center`}>
+                        {badge}
+                    </span>
+                )}
+                {isExpanded ? (
+                    <ChevronDown className={`h-4 w-4 text-${COLORS.GRAY}`} />
+                ) : (
+                    <ChevronRight className={`h-4 w-4 text-${COLORS.GRAY}`} />
+                )}
+            </button>
+            {isExpanded && submenu && (
+                <ul className="mt-1 pl-6 space-y-1">
+                    {submenu.map((subItem) => (
+                        <li key={subItem.name}>
+                            <NavLinkItem item={subItem} onClose={onClose} isSubItem />
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
+}
+
 
 /**
  * Admin mobile sidebar component
@@ -96,12 +184,10 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose
     { name: 'Notifications', href: '/admin/notifications', icon: Bell, badge: '7' },
   ];
 
-  const location = useLocation();
-
   const toggleSubmenu = (menuName: string) => {
     const lowerMenuName = menuName.toLowerCase();
-    setExpandedMenus(prev => 
-      prev.includes(lowerMenuName) 
+    setExpandedMenus(prev =>
+      prev.includes(lowerMenuName)
         ? prev.filter(name => name !== lowerMenuName)
         : [...prev, lowerMenuName]
     );
@@ -118,7 +204,7 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose
       {/* Overlay  */}
       <div className="fixed inset-0 z-50 lg:hidden">
         <div className="fixed inset-0 bg-gray-900/80" onClick={onClose} />
-        
+
         {/* Sidebar */}
         <div className={`fixed inset-y-0 left-0 z-50 w-64 ${GRADIENTS.SIDEBAR}`}>
           <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
@@ -145,109 +231,21 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({ isOpen, onClose
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((item) => {
-                      const Icon = item.icon;
-                      const hasSubmenu = 'submenu' in item && item.submenu;
-                      const isExpanded = hasSubmenu && isSubmenuExpanded(item.name);
-                      
-                      if (hasSubmenu) {
-                        return (
-                          <li key={item.name}>
-                            {/* Parent menu item with submenu */}
-                            <button
-                              onClick={() => toggleSubmenu(item.name)}
-                              className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT} transition-colors`}
-                            >
-                              <Icon className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`} />
-                              <span className="flex-1 text-left">{item.name}</span>
-                              {item.badge && (
-                                <span className={`bg-${COLORS.PRIMARY} text-${COLORS.WHITE} text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center`}>
-                                  {item.badge}
-                                </span>
-                              )}
-                              {isExpanded ? (
-                                <ChevronDown className={`h-4 w-4 text-${COLORS.GRAY}`} />
-                              ) : (
-                                <ChevronRight className={`h-4 w-4 text-${COLORS.GRAY}`} />
-                              )}
-                            </button>
-                            
-                            {/* Submenu items */}
-                            {isExpanded && item.submenu && (
-                              <ul className="mt-1 pl-6 space-y-1">
-                                {item.submenu.map((subItem) => {
-                                  const SubIcon = subItem.icon;
-                                  const isActive = location.pathname === subItem.href;
-                                  
-                                  return (
-                                    <li key={subItem.name}>
-                                      <NavLink
-                                        to={subItem.href}
-                                        onClick={onClose}
-                                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors ${
-                                          isActive
-                                            ? `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
-                                            : `text-${COLORS.GRAY} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`
-                                        }`}
-                                      >
-                                        <SubIcon
-                                          className={`h-4 w-4 shrink-0 ${
-                                            isActive ? `text-${COLORS.WHITE}` : `text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`
-                                          }`}
-                                        />
-                                        <span className="flex-1">{subItem.name}</span>
-                                        {subItem.badge && (
-                                          <span className={`text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center ${
-                                            isActive 
-                                              ? `bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.WHITE}` 
-                                              : `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
-                                          }`}>
-                                            {subItem.badge}
-                                          </span>
-                                        )}
-                                      </NavLink>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            )}
-                          </li>
-                        );
-                      } else {
-                        // Regular menu item without submenu
-                        const isActive = location.pathname === item.href;
-                        
-                        return (
-                          <li key={item.name}>
-                            <NavLink
-                              to={item.href!}
-                              onClick={onClose}
-                              className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors ${
-                                isActive
-                                  ? `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
-                                  : `text-${COLORS.GRAY} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`
-                              }`}
-                            >
-                              <Icon
-                                className={`h-5 w-5 shrink-0 ${
-                                  isActive ? `text-${COLORS.WHITE}` : `text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`
-                                }`}
-                              />
-                              <span className="flex-1">{item.name}</span>
-                              {item.badge && (
-                                <span className={`text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center ${
-                                  isActive 
-                                    ? `bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.WHITE}` 
-                                    : `bg-${COLORS.PRIMARY} text-${COLORS.WHITE}`
-                                }`}>
-                                  {item.badge}
-                                </span>
-                              )}
-                            </NavLink>
-                          </li>
-                        );
-                      }
-                    })}
+                    {navigation.map((item) =>
+                      item.submenu ? (
+                        <SubMenuItemComponent
+                          key={item.name}
+                          item={item}
+                          onClose={onClose}
+                          toggleSubmenu={toggleSubmenu}
+                          isSubmenuExpanded={isSubmenuExpanded}
+                        />
+                      ) : (
+                        <li key={item.name}>
+                          <NavLinkItem item={item} onClose={onClose} />
+                        </li>
+                      )
+                    )}
                   </ul>
                 </li>
 

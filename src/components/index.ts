@@ -7,9 +7,6 @@ export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as PublicRoute } from './PublicRoute';
 export { default as SignupPageWrapper } from './SignupPageWrapper';
 
-// Dashboard Components
-export * from './dashboard';
-
 // Layout Components
 export * from './layout/index';
 

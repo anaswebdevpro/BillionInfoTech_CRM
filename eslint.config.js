@@ -20,4 +20,13 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    files: [
+        'src/context/AuthContext/AuthContext.tsx',
+        'src/pages/CreateTicket.tsx'
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

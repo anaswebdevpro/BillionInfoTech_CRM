@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Add logo import
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { 
@@ -37,12 +37,82 @@ interface SubMenuItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+const NavLinkItem: React.FC<{
+  item: NavigationItem | SubMenuItem;
+  onClose: () => void;
+  isSubItem?: boolean;
+}> = ({ item, onClose, isSubItem = false }) => {
+  const { name, href, icon: Icon } = item;
+  const fontClass = isSubItem ? 'font-medium' : 'font-semibold';
+  const iconSize = isSubItem ? 'h-4 w-4' : 'h-5 w-5';
+
+  return (
+    <NavLink
+      to={href!}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `group flex gap-x-3 rounded-md p-2 text-sm leading-6 ${fontClass} transition-colors ${
+          isActive
+            ? 'bg-green-50 text-green-700'
+            : `text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`
+        }`
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            className={`${iconSize} shrink-0 ${
+              isActive ? 'text-green-700' : 'text-gray-400 group-hover:text-green-700'
+            }`}
+          />
+          {name}
+        </>
+      )}
+    </NavLink>
+  );
+};
+
+const SubMenuItemComponent: React.FC<{
+  item: NavigationItem;
+  onClose: () => void;
+  toggleSubmenu: (name: string) => void;
+  isSubmenuExpanded: (name: string) => boolean;
+}> = ({ item, onClose, toggleSubmenu, isSubmenuExpanded }) => {
+  const { name, icon: Icon, submenu } = item;
+  const isExpanded = isSubmenuExpanded(name);
+
+  return (
+    <li key={name}>
+      <button
+        onClick={() => toggleSubmenu(name)}
+        className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`}
+      >
+        <Icon className="h-5 w-5 shrink-0 text-gray-400 group-hover:text-green-700" />
+        {name}
+        {isExpanded ? (
+          <ChevronDown className="ml-auto h-4 w-4 text-gray-400" />
+        ) : (
+          <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />
+        )}
+      </button>
+      {isExpanded && submenu && (
+        <ul className="mt-1 pl-6 space-y-1">
+          {submenu.map((subItem) => (
+            <li key={subItem.name}>
+              <NavLinkItem item={subItem} onClose={onClose} isSubItem />
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+};
+
 /**
  * Mobile sidebar component for responsive navigation
  * Slides in from the left on mobile devices
  */
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
@@ -67,8 +137,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
 
   const toggleSubmenu = (menuName: string) => {
     const lowerMenuName = menuName.toLowerCase();
-    setExpandedMenus(prev => 
-      prev.includes(lowerMenuName) 
+    setExpandedMenus(prev =>
+      prev.includes(lowerMenuName)
         ? prev.filter(name => name !== lowerMenuName)
         : [...prev, lowerMenuName]
     );
@@ -84,10 +154,10 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* Overlay */}
       <div className="fixed inset-0 z-50 lg:hidden">
-  <div className="fixed inset-0 bg-gray-900/80" onClick={onClose} />
-        
+        <div className="fixed inset-0 bg-gray-900/80" onClick={onClose} />
+
         {/* Sidebar */}
-        <div 
+        <div
           className="fixed inset-y-0 left-0 z-50 w-64"
           style={{
             background: 'linear-gradient(349deg, rgba(12, 247, 114, 1) 0%, rgba(87, 199, 133, 1) 26%, rgba(255, 240, 240, 1) 100%)'
@@ -111,86 +181,21 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((item) => {
-                      const Icon = item.icon;
-                      const hasSubmenu = 'submenu' in item && item.submenu;
-                      const isExpanded = hasSubmenu && isSubmenuExpanded(item.name);
-                      
-                      if (hasSubmenu) {
-                        return (
-                          <li key={item.name}>
-                            {/* Parent menu item with submenu */}
-                            <button
-                              onClick={() => toggleSubmenu(item.name)}
-                              className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`}
-                            >
-                              <Icon className="h-5 w-5 shrink-0 text-gray-400 group-hover:text-green-700" />
-                              {item.name}
-                              {isExpanded ? (
-                                <ChevronDown className="ml-auto h-4 w-4 text-gray-400" />
-                              ) : (
-                                <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />
-                              )}
-                            </button>
-                            
-                            {/* Submenu items */}
-                            {isExpanded && item.submenu && (
-                              <ul className="mt-1 pl-6 space-y-1">
-                                {item.submenu.map((subItem) => {
-                                  const SubIcon = subItem.icon;
-                                  const isActive = location.pathname === subItem.href;
-                                  
-                                  return (
-                                    <li key={subItem.name}>
-              <NavLink
-                                        to={subItem.href}
-                                        onClick={onClose}
-                                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors ${
-                                          isActive
-                                            ? 'bg-green-50 text-green-700'
-                : `text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`
-                                        }`}
-                                      >
-                                        <SubIcon
-                                          className={`h-4 w-4 shrink-0 ${
-                                            isActive ? 'text-green-700' : 'text-gray-400 group-hover:text-green-700'
-                                          }`}
-                                        />
-                                        {subItem.name}
-                                      </NavLink>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            )}
-                          </li>
-                        );
-                      } else {
-                        // Regular menu item without submenu
-                        const isActive = location.pathname === item.href;
-                        
-                        return (
-                          <li key={item.name}>
-            <NavLink
-                              to={item.href!}
-                              onClick={onClose}
-                              className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors ${
-                                isActive
-                                  ? 'bg-green-50 text-green-700'
-              : `text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`
-                              }`}
-                            >
-                              <Icon
-                                className={`h-5 w-5 shrink-0 ${
-                                  isActive ? 'text-green-700' : 'text-gray-400 group-hover:text-green-700'
-                                }`}
-                              />
-                              {item.name}
-                            </NavLink>
-                          </li>
-                        );
-                      }
-                    })}
+                    {navigation.map((item) =>
+                      item.submenu ? (
+                        <SubMenuItemComponent
+                          key={item.name}
+                          item={item}
+                          onClose={onClose}
+                          toggleSubmenu={toggleSubmenu}
+                          isSubmenuExpanded={isSubmenuExpanded}
+                        />
+                      ) : (
+                        <li key={item.name}>
+                          <NavLinkItem item={item} onClose={onClose} />
+                        </li>
+                      )
+                    )}
                   </ul>
                 </li>
 
