@@ -19,6 +19,7 @@ import ManageAccounts from '../pages/ManageAccounts';
 import Profile from '../pages/Profile';
 import Support from '../pages/Support';
 import CreateTicket from '../pages/CreateTicket';
+import BonusPromotion from '../pages/BonusPromotion';
 import NotFound from '../pages/NotFound';
 
 // Import Admin Pages
@@ -129,6 +130,10 @@ export const router = createBrowserRouter([
           {
             path: 'support/create-ticket',
             element: <CreateTicket />,
+          },
+          {
+            path: 'bonus-promotion',
+            element: <BonusPromotion />,
           },
         ],
       },

@@ -14,6 +14,7 @@ export { default as MyAccount } from './MyAccount';
 export { default as Profile } from './Profile';
 export { default as SignupPage } from './SignupPage';
 export { default as Support } from './Support';
+export { default as BonusPromotion } from './BonusPromotion';
 
 export { default as TradingAccountCreation } from './TradingAccountCreation';
 export { default as TwoFactorAuth } from './TwoFactorAuth';
