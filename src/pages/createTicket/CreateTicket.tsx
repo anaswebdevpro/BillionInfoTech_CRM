@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -15,125 +15,22 @@ import {
   CheckCircle
 } from 'lucide-react';
 import Card from '../../components/ui/Card';
-import { CREATE_SUPPORT_TICKET } from '../../../api/api-variable';
+import { HELP_DEPARTMENT } from '../../../api/api-variable';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
+import { useAuth } from '@/context';
+import { createSupportTicket, validateFileUploads, CreateTicketPayload } from './supportTicketUtils';
 
 // Support ticket interfaces
-export interface CreateTicketPayload {
-  department: string;
-  subject: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+export interface Department {
+  id: string;
+  name: string;
   description: string;
-  attachments?: File[];
-}
-
-export interface CreateTicketResponse {
-  success: boolean;
-  message: string;
-  ticket?: {
-    id: string;
-    ticketNumber: string;
-    status: string;
-    createdAt: string;
-  };
-}
-
-// Support ticket functions
-export async function createSupportTicket(
-  ticketData: CreateTicketPayload
-): Promise<CreateTicketResponse | null> {
-  try {
-    // If there are attachments, we need to send as FormData
-    if (ticketData.attachments && ticketData.attachments.length > 0) {
-      const formData = new FormData();
-      
-      // Add text fields
-      formData.append('department', ticketData.department);
-      formData.append('subject', ticketData.subject);
-      formData.append('priority', ticketData.priority);
-      formData.append('description', ticketData.description);
-      
-      // Add files
-      ticketData.attachments.forEach((file, index) => {
-        formData.append(`attachments[${index}]`, file);
-      });
-
-      // Make API call with FormData
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://amf.billioninfotech.com/api/v1'}${CREATE_SUPPORT_TICKET}`, {
-        method: 'POST',
-        headers: {
-          // Don't set Content-Type for FormData, let the browser set it
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-        },
-        body: formData,
-      });
-
-      const result = await response.json();
-      console.log("✅ Support Ticket Created:", result);
-      return result;
-    } else {
-      // No files, send as JSON
-      const payload = {
-        department: ticketData.department,
-        subject: ticketData.subject,
-        priority: ticketData.priority,
-        description: ticketData.description,
-      };
-
-      const response = await apiRequest<CreateTicketResponse, typeof payload>({
-        endpoint: CREATE_SUPPORT_TICKET,
-        method: "POST",
-        data: payload,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-        },
-      });
-
-      return response;
-    }
-  } catch (error) {
-    console.error("❌ Error creating support ticket:", error);
-    return null;
-  }
-}
-
-export function validateFileUploads(files: File[]) {
-  const maxFileSize = 5 * 1024 * 1024; // 5MB
-  const allowedTypes = [
-    'image/jpeg',
-    'image/png', 
-    'image/gif',
-    'application/pdf',
-    'text/plain'
-  ];
-  const maxFiles = 5;
-
-  const errors: string[] = [];
-  const validFiles: File[] = [];
-
-  if (files.length > maxFiles) {
-    errors.push(`Maximum ${maxFiles} files allowed`);
-    return { errors, validFiles: [] };
-  }
-
-  files.forEach((file, index) => {
-    if (!allowedTypes.includes(file.type)) {
-      errors.push(`File ${index + 1}: Invalid file type. Only JPG, PNG, GIF, PDF, and TXT files are allowed.`);
-      return;
-    }
-
-    if (file.size > maxFileSize) {
-      errors.push(`File ${index + 1}: File size exceeds 5MB limit.`);
-      return;
-    }
-
-    validFiles.push(file);
-  });
-
-  return { errors, validFiles };
+  status: 'online' | 'offline';
+  responseTime: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 interface CreateTicketFormData {
@@ -143,38 +40,6 @@ interface CreateTicketFormData {
   description: string;
 }
 
-const departments = [
-  { 
-    value: '1', 
-    label: 'Technical Support',
-    description: 'Technical issues, platform bugs, API problems',
-    icon: SettingsIcon
-  },
-  { 
-    value: '2', 
-    label: 'Account Management',
-    description: 'Account verification, profile issues, security',
-    icon: Users
-  },
-  { 
-    value: '3', 
-    label: 'Trading Support',
-    description: 'Trading questions, platform guidance, orders',
-    icon: HeadphonesIcon
-  },
-  { 
-    value: '4', 
-    label: 'Financial Services',
-    description: 'Deposits, withdrawals, payment issues',
-    icon: CreditCard
-  },
-  { 
-    value: '5', 
-    label: 'Documentation',
-    description: 'KYC, compliance, document verification',
-    icon: FileText
-  }
-];
 
 const validationSchema = Yup.object({
   department: Yup.string().required('Department is required'),
@@ -195,10 +60,66 @@ const validationSchema = Yup.object({
  */
 const CreateTicket: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string>('');
   const [submitSuccess, setSubmitSuccess] = useState<string>('');
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch departments from API
+  const fetchDepartments = useCallback(async () => {
+    // Icon mapping for departments
+    const departmentIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
+      '1': SettingsIcon,
+      '2': Users,
+      '3': HeadphonesIcon,
+      '4': CreditCard,
+      '5': FileText,
+    };
+
+    try {
+      const response = await apiRequest<{
+        success: boolean;
+        data: Array<{
+          id: string;
+          name: string;
+          description: string;
+          status: 'online' | 'offline';
+          responseTime: string;
+        }>;
+      }>({
+        endpoint: HELP_DEPARTMENT,
+        method: 'POST',
+        data: {},
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response && response.success && response.data) {
+        const departmentsWithIcons = response.data.map(dept => ({
+          ...dept,
+          icon: departmentIcons[dept.id] || SettingsIcon
+        }));
+        setDepartments(departmentsWithIcons);
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      setSubmitError('Failed to load departments');
+    }
+  }, [token]);
+
+  // Load departments on component mount
+  useEffect(() => {
+    const loadDepartments = async () => {
+      setLoading(true);
+      await fetchDepartments();
+      setLoading(false);
+    };
+    loadDepartments();
+  }, [fetchDepartments]);
 
   const formik = useFormik<CreateTicketFormData>({
     initialValues: {
@@ -232,7 +153,12 @@ const CreateTicket: React.FC = () => {
         };
 
         // Call API
-        const response = await createSupportTicket(ticketPayload);
+        if (!token) {
+          setSubmitError('Authentication token not found. Please log in again.');
+          setIsSubmitting(false);
+          return;
+        }
+        const response = await createSupportTicket(ticketPayload, token);
         
         if (response && response.success) {
           setSubmitSuccess(response.message || 'Support ticket created successfully!');
@@ -333,39 +259,46 @@ const CreateTicket: React.FC = () => {
                 <label className={`block text-sm font-medium text-${COLORS.SECONDARY} mb-3`}>
                   Department *
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {departments.map((dept) => {
-                    const IconComponent = dept.icon;
-                    return (
-                      <button
-                        key={dept.value}
-                        type="button"
-                        onClick={() => formik.setFieldValue('department', dept.value)}
-                        className={`p-4 border-2 rounded-lg text-left transition-all ${
-                          formik.values.department === dept.value
-                            ? `border-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`
-                            : `border-${COLORS.BORDER} hover:border-${COLORS.GRAY_BORDER}`
-                        }`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <IconComponent className={`h-5 w-5 mt-1 ${
-                            formik.values.department === dept.value 
-                              ? `text-${COLORS.PRIMARY_TEXT}` 
-                              : `text-${COLORS.GRAY}`
-                          }`} />
-                          <div>
-                            <h3 className={`font-medium text-sm text-${COLORS.SECONDARY}`}>
-                              {dept.label}
-                            </h3>
-                            <p className={`text-xs text-${COLORS.SECONDARY_TEXT} mt-1`}>
-                              {dept.description}
-                            </p>
+                {loading ? (
+                  <div className="flex items-center justify-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-gray-600">Loading departments...</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {departments.map((dept) => {
+                      const IconComponent = dept.icon;
+                      return (
+                        <button
+                          key={dept.id}
+                          type="button"
+                          onClick={() => formik.setFieldValue('department', dept.id)}
+                          className={`p-4 border-2 rounded-lg text-left transition-all ${
+                            formik.values.department === dept.id
+                              ? `border-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`
+                              : `border-${COLORS.BORDER} hover:border-${COLORS.GRAY_BORDER}`
+                          }`}
+                        >
+                          <div className="flex items-start space-x-3">
+                            <IconComponent className={`h-5 w-5 mt-1 ${
+                              formik.values.department === dept.id 
+                                ? `text-${COLORS.PRIMARY_TEXT}` 
+                                : `text-${COLORS.GRAY}`
+                            }`} />
+                            <div>
+                              <h3 className={`font-medium text-sm text-${COLORS.SECONDARY}`}>
+                                {dept.name}
+                              </h3>
+                              <p className={`text-xs text-${COLORS.SECONDARY_TEXT} mt-1`}>
+                                {dept.description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
                 {formik.touched.department && formik.errors.department && (
                   <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle className="h-4 w-4" />
