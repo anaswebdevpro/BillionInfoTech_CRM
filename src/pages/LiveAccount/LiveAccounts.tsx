@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Settings } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import { apiRequest } from '../services/api';
-import type { Account } from '../types';
-import { COLORS } from '../constants/colors';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import { apiRequest } from '../../services/api';
+import type { Account } from '../../types';
+import { COLORS } from '../../constants/colors';
 import { Link } from 'react-router-dom';
 
 /**

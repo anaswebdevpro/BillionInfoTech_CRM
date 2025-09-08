@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Eye, Settings, TrendingUp } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 // import { apiRequest } from '../services/api';
-import type { Account } from '../types';
-import { COLORS } from '../constants/colors';
+import type { Account } from '../../types';
+import { COLORS } from '../../constants/colors';
 
 /**
  * Manage Account page component

@@ -1,6 +1,6 @@
 import React from 'react';
 import AdminLayout from '../layouts/AdminLayout';
-import AdminSupport from './AdminSupport';
+import AdminSupport from './admin/AdminSupport';
 
 const AdminDashboard: React.FC = () => {
   return (

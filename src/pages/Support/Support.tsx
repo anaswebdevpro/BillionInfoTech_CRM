@@ -13,9 +13,9 @@ import {
   Settings as SettingsIcon,
   FileText
 } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import { COLORS } from '../constants/colors';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import { COLORS } from '../../constants/colors';
 
 // Support types
 interface Department {

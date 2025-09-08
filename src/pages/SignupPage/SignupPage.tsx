@@ -3,17 +3,17 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Eye, EyeOff, Mail, Lock, User, CheckSquare, Square } from 'lucide-react';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import { apiRequest } from '../services/api';
-import laptop from '../assets/lapi.png';
-import logo from '../assets/company-logo 1.png';
-import type { SignupFormData } from '../types';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import { apiRequest } from '../../services/api';
+import laptop from '../../assets/lapi.png';
+import logo from '../../assets/company-logo 1.png';
+import type { SignupFormData } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { RiSecurePaymentLine } from "react-icons/ri";
 import { IoMdTime } from "react-icons/io";
-import { SIGNUP } from '../../api/api-variable';
-import { COLORS, GRADIENTS } from '../constants/colors';
+import { SIGNUP } from '../../../api/api-variable';
+import { COLORS, GRADIENTS } from '../../constants/colors';
 
 
 interface SignupPageProps {

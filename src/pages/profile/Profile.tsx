@@ -4,14 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { User, CreditCard, Camera, Building2, Hash, Lock, FileText, Trash2 } from 'lucide-react';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
-import { apiRequest } from '../services/api';
-import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../api/api-variable';
-import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, User as UserType } from '../types';
-import { COLORS } from '../constants/colors';
-import { useAuth } from '../context/AuthContext/AuthContext';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import { apiRequest } from '../../services/api';
+import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../../api/api-variable';
+import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, User as UserType } from '../../types';
+import { COLORS } from '../../constants/colors';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 
 // Tab types
 type TabType = 'profile' | 'password' | 'kyc' | 'bank';

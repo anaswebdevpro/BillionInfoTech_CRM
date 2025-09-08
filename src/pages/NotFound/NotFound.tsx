@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft, Search } from 'lucide-react';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
-import { COLORS } from '../constants/colors';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import { COLORS } from '../../constants/colors';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Users, Building, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { apiRequest } from '../services/api';
-import type { IBRequest, IBFormData } from '../types/index';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { apiRequest } from '../../services/api';
+import type { IBRequest, IBFormData } from '../../types/index';
 
 /**
  * IB Request page component

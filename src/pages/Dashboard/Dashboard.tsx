@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { COLORS } from "../constants/colors";
-import { apiRequest } from "../services";
-import { useAuth } from "../context/AuthContext/AuthContext";
-import type { DashboardStats, Transaction, Position } from "../types";
-import { DASHBOARD_DATA } from "../../api/api-variable";
+import { COLORS } from "../../constants/colors";
+import { apiRequest } from "../../services";
+import { useAuth } from "../../context/AuthContext/AuthContext";
+import type { DashboardStats, Transaction, Position } from "../../types";
+import { DASHBOARD_DATA } from "../../../api/api-variable";
 import { TrendingUp, DollarSign, Activity, Users, ArrowUpRight, ArrowDownRight, Rss, Twitter, Facebook, Instagram, MessageCircle } from 'lucide-react';
-import Card from '../components/ui/Card';
-import TickerDisplay from '../components/ui/TickerDisplay';
-import { GRADIENTS } from '../constants/colors';
+import Card from '../../components/ui/Card';
+import TickerDisplay from '../../components/ui/TickerDisplay';
+import { GRADIENTS } from '../../constants/colors';
 
 // StatsGrid Component
 interface StatsGridProps {

@@ -3,18 +3,18 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import Input from "../components/ui/Input";
+import Input from "../../components/ui/Input";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/ui/Button";
-import type { LoginFormData } from "../types";
+import Button from "../../components/ui/Button";
+import type { LoginFormData } from "../../types";
 import { IoMdTime } from "react-icons/io";
 import { RiSecurePaymentLine } from "react-icons/ri";
-import laptop from "../assets/lapi.png";
-import logo from "../assets/company-logo 1.png";
-import { COLORS, GRADIENTS } from "../constants/colors";
-import { apiRequest } from "../services/api";
-import { LOGIN } from "../../api/api-variable";
-import { useAuth } from "../context/AuthContext/AuthContext";
+import laptop from "../../assets/lapi.png";
+import logo from "../../assets/company-logo 1.png";
+import { COLORS, GRADIENTS } from "../../constants/colors";
+import { apiRequest } from "../../services/api";
+import { LOGIN } from "../../../api/api-variable";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 interface LoginPageProps {
   onSwitchToSignup?: () => void;

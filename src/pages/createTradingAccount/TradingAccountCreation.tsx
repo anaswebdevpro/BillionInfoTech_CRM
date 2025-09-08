@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CheckCircle } from "lucide-react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
-import { apiRequest } from "../services/api";
-import type { AccountCreationFormData, AccountType } from "../types/index";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import { apiRequest } from "../../services/api";
+import type { AccountCreationFormData, AccountType } from "../../types/index";
 
 /**
  * Trading Account Creation page component

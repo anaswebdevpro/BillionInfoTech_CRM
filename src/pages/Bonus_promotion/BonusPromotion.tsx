@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { COLORS } from '../constants/colors';
-import { apiRequest } from '../services';
-import { useAuth } from '../context/AuthContext/AuthContext';
-import { FETCH_BONUS, CLAIM_BONUS } from '../../api/api-variable';
+import { COLORS } from '../../constants/colors';
+import { apiRequest } from '../../services';
+import { useAuth } from '../../context/AuthContext/AuthContext';
+import { FETCH_BONUS, CLAIM_BONUS } from '../../../api/api-variable';
 
 
 // Types

@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Settings, TrendingUp, Eye, Filter, Search } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { AccountType } from '../types';
-import { COLORS } from '../constants/colors';
+import Card from '../../components/ui/Card';
+  import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { AccountType } from '../../types';
+import { COLORS } from '../../constants/colors';
 
 const ManageAccounts: React.FC = () => {
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);

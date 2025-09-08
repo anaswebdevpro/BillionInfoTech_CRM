@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import SignupPage from '../pages/SignupPage';
+import SignupPage from '../pages/SignupPage/SignupPage';
 
 interface OutletContext {
   isAuthenticated: boolean;

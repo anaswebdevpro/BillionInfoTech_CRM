@@ -14,12 +14,12 @@ import {
   Settings as SettingsIcon,
   CheckCircle
 } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { COLORS } from '../constants/colors';
-import { apiRequest } from '../services/api';
-import { CREATE_SUPPORT_TICKET } from '../../api/api-variable';
+import Card from '../../components/ui/Card';
+import { CREATE_SUPPORT_TICKET } from '../../../api/api-variable';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { COLORS } from '../../constants/colors';
+import { apiRequest } from '../../services/api';
 
 // Support ticket interfaces
 export interface CreateTicketPayload {

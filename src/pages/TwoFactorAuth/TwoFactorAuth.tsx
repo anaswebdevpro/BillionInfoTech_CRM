@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Shield, Smartphone, Key, QrCode, Copy, CheckCircle } from 'lucide-react';
-import { COLORS } from '../constants/colors';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
+import { COLORS } from '../../constants/colors';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 /**
  * Two Factor Authentication page component

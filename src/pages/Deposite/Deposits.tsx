@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { CreditCard, Building, Bitcoin, CheckCircle } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { apiRequest } from '../services/api';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { apiRequest } from '../../services/api';
 // Using a local form type to match UI fields
 interface DepositFormValues {
   amount: number;
   method: 'bank' | 'usdt' | 'crypto';
   currency: string;
 }
-import { COLORS } from '../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 /**
  * Deposits page component

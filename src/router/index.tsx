@@ -6,21 +6,21 @@ import DashboardLayoutWrapper from '../components/DashboardLayoutWrapper';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PublicRoute from '../components/PublicRoute';
 
-import Dashboard from '../pages/Dashboard';
-import LiveAccounts from '../pages/LiveAccounts';
-import TradingAccountCreation from '../pages/TradingAccountCreation';
+import Dashboard from '../pages/Dashboard/Dashboard';
+import LiveAccounts from '../pages/LiveAccount/LiveAccounts';
+import TradingAccountCreation from '../pages/createTradingAccount/TradingAccountCreation';
 // import KYCVerification from '../pages/KYCVerification';
-import Deposits from '../pages/Deposits';
-import InternalTransfer from '../pages/InternalTransfer';
-import IBRequest from '../pages/IBRequest';
-import TwoFactorAuth from '../pages/TwoFactorAuth';
-import MyAccounts from '../pages/MyAccount';
-import ManageAccounts from '../pages/ManageAccounts';
-import Profile from '../pages/Profile';
-import Support from '../pages/Support';
-import CreateTicket from '../pages/CreateTicket';
-import BonusPromotion from '../pages/BonusPromotion';
-import NotFound from '../pages/NotFound';
+import Deposits from '../pages/Deposite/Deposits';
+import InternalTransfer from '../pages/internalTransfer/InternalTransfer';
+import IBRequest from '../pages/IBRequest/IBRequest';
+import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
+import MyAccounts from '../pages/MyAccount/MyAccount';
+import ManageAccounts from '../pages/ManageAccounts/ManageAccounts';
+import Profile from '../pages/profile/Profile';
+import Support from '../pages/Support/Support';
+import CreateTicket from '../pages/createTicket/CreateTicket';
+import BonusPromotion from '../pages/Bonus_promotion/BonusPromotion';
+import NotFound from '../pages/NotFound/NotFound';
 
 // Import Admin Pages
 import {
