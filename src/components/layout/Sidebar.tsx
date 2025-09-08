@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Adjust the path as necessary
-import {  LayoutDashboard,  TrendingUp,  CreditCard,  FileText,  ArrowRightLeft,  Users,
+import {  LayoutDashboard,  TrendingUp,  CreditCard,   ArrowRightLeft,  Users,
   Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,} from 'lucide-react';
 import { COLORS, GRADIENTS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext/AuthContext';
@@ -107,7 +107,7 @@ const Sidebar: React.FC = () => {
         { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
       ]
     },
-    { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
+    // { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
     { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
     { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
     { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },

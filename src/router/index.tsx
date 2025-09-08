@@ -9,7 +9,7 @@ import PublicRoute from '../components/PublicRoute';
 import Dashboard from '../pages/Dashboard';
 import LiveAccounts from '../pages/LiveAccounts';
 import TradingAccountCreation from '../pages/TradingAccountCreation';
-import KYCVerification from '../pages/KYCVerification';
+// import KYCVerification from '../pages/KYCVerification';
 import Deposits from '../pages/Deposits';
 import InternalTransfer from '../pages/InternalTransfer';
 import IBRequest from '../pages/IBRequest';
@@ -103,10 +103,10 @@ export const router = createBrowserRouter([
             path: 'trading-account',
             element: <TradingAccountCreation />,
           },
-          {
-            path: 'kyc',
-            element: <KYCVerification />,
-          },
+          // {
+          //   path: 'kyc',
+          //   element: <KYCVerification />,
+          // },
           {
             path: 'deposits',
             element: <Deposits />,

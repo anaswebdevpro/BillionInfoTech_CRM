@@ -24,16 +24,17 @@ export async function apiRequest<TResponse = unknown, TPayload = unknown>(
     data,
   };
 
-  try {
+  try { 
     const response = await axios.request<TResponse>(config);
     console.log("✅ API Response:", response.data);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("❌ API Error:", error.response?.data || error.message);
+      console.error(" API Error:", error.response?.data || error.message);
     } else {
-      console.error("❌ Unexpected Error:", error);
+      console.error(" Unexpected Error:", error);
     }
     return null;
   }
 }
+
