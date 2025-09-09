@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, MessageCircle, AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import { Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
 import {
   ALL_TICKETS,
   SHOW_ALL_SPECIFIC_COMMENT,
-  NEW_COMMENTS
+  // NEW_COMMENTS
 } from '../../../api/api-variable';
 import { useAuth } from '@/context';
 import { Card } from '@/components';
