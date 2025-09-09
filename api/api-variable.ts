@@ -30,7 +30,6 @@ export const CLAIM_BONUS = "/claim-bonus";
 //support 
 export const CREATE_SUPPORT_TICKET="/create-support-ticket";
 export const HELP_DEPARTMENT ="/help-departments";
-
 export const TICKET_ENQUIRY_LIST ="/ticket-enquery-list";
 export const ALL_TICKETS ="/view-tickets";
 export const NEW_COMMENTS="/new-comment"
