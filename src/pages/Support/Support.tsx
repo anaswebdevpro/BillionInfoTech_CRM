@@ -4,10 +4,10 @@ import { Plus } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
-import { 
-  ALL_TICKETS, 
-  NEW_COMMENTS, 
-  SHOW_ALL_SPECIFIC_COMMENT 
+import {
+  ALL_TICKETS,
+  NEW_COMMENTS,
+  SHOW_ALL_SPECIFIC_COMMENT
 } from '../../../api/api-variable';
 
 // Import Support Components
@@ -17,6 +17,7 @@ import {
   SupportFilters
 } from './components';
 import { useAuth } from '@/context';
+import { Card } from '@/components';
 
 // Support types
 interface SupportTicket {
@@ -40,158 +41,103 @@ interface ChatMessage {
   message: string;
   timestamp: string;
   status: 'sent' | 'delivered' | 'read';
+
+}
+
+interface NewMessage {
+  message: string;
+  image: string;
 }
 
 const Support: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
-  
+
   // State management
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
-  const [newMessage, setNewMessage] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterDepartment, setFilterDepartment] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-
-
+  const [messages, setMessages] = useState<Array<ChatMessage>>([]);
+  const [newMessages, setNewMessages] = useState<NewMessage>()
   // Fetch tickets from API
-  const fetchTickets = useCallback(async () => {
+  const fetchTickets = () => {
+    setLoading(true);
     try {
-      const response = await apiRequest<{
-        success: boolean;
-        data: SupportTicket[];
-      }>({
+      apiRequest({
         endpoint: ALL_TICKETS,
         method: 'POST',
-        data: {},
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
 
-      });
-
-      if (response && response.success && response.data) {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: any) => {
+        // setIsLoading(false);
         setTickets(response.data);
-        // Select first ticket if available
-        if (response.data.length > 0) {
-          setSelectedTicket(response.data[0].id);
-        }
-      }
+        console.log(response);
+      })
+        .catch((error: any) => {
+          console.error("Login failed:", error);
+        });
     } catch (error) {
-      console.error('Error fetching tickets:', error);
-      setError('Failed to load tickets');
-    }
-  }, [token]);
-
-  // Fetch messages for a specific ticket
-  const fetchTicketMessages = useCallback(async (ticketId: string) => {
-    try {
-      const response = await apiRequest<{
-        success: boolean;
-        data: ChatMessage[];
-      }>({
-        endpoint: SHOW_ALL_SPECIFIC_COMMENT,
-        method: 'POST',
-        data: { ticketId },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response && response.success && response.data) {
-        setMessages(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  }, [token]);
-
-  // Load data on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await fetchTickets();
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
       setLoading(false);
-    };
-    loadData();
-  }, [fetchTickets]);
-
-  // Fetch messages when ticket is selected
-  useEffect(() => {
-    if (selectedTicket) {
-      fetchTicketMessages(selectedTicket);
     }
-  }, [selectedTicket, fetchTicketMessages]);
+  };
+  useEffect(() => {
+    fetchTickets();
+  }, []);
 
-  // Message handling
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedTicket) return;
-
+  const fetchTicketsmessage = () => {
+    setLoading(true);
     try {
-      const response = await apiRequest<{
-        success: boolean;
-        data: ChatMessage;
-      }>({
-        endpoint: NEW_COMMENTS,
+      apiRequest({
+        endpoint: `${SHOW_ALL_SPECIFIC_COMMENT}/${selectedTicket}`,
         method: 'POST',
-        data: {
-          ticketId: selectedTicket,
-          message: newMessage.trim()
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      if (response && response.success && response.data) {
-        setMessages(prev => [...prev, response.data]);
-        setNewMessage('');
-        
-        // Update ticket last activity
-        setTickets(prev => prev.map(ticket =>
-          ticket.id === selectedTicket
-            ? { ...ticket, lastActivity: new Date().toISOString() }
-            : ticket
-        ));
-      }
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: any) => {
+        // setIsLoading(false);
+setMessages(response.ticket.comment)
+        console.log(response);
+      })
+        .catch((error: any) => {
+          console.error("Login failed:", error);
+        });
     } catch (error) {
-      console.error('Error sending message:', error);
-      setError('Failed to send message');
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    console.log(selectedTicket)
+    fetchTicketsmessage();
+  }, [selectedTicket]);
+
+const handleSendMessage =()=>{
+  
+}
+
+
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'text-red-600 bg-red-100';
+      case 'high': return 'text-orange-600 bg-orange-100';
+      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'low': return 'text-green-600 bg-green-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
-  const selectedTicketData = tickets.find(ticket => ticket.id === selectedTicket);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className={`text-${COLORS.SECONDARY_TEXT}`}>Loading support data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className={`text-red-600 mb-4`}>{error}</p>
-            <Button onClick={() => window.location.reload()}>
-              Retry
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -201,7 +147,7 @@ const Support: React.FC = () => {
           <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>Support Center</h1>
           <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>Get help from our expert support team</p>
         </div>
-        <Button 
+        <Button
           onClick={() => navigate('/dashboard/support/create-ticket')}
           className="flex items-center gap-2"
         >
@@ -225,14 +171,57 @@ const Support: React.FC = () => {
           />
 
           {/* Ticket List */}
-          <TicketList
-            tickets={tickets}
-            selectedTicket={selectedTicket}
-            onSelectTicket={setSelectedTicket}
-            filterStatus={filterStatus}
-            filterDepartment={filterDepartment}
-            departments={[]}
-          />
+            <Card title="Support Tickets" subtitle="Your recent support requests">
+      <div className="space-y-3">
+          {tickets.length > 0 ? (
+          tickets.map((ticket) => (
+            <div
+              key={ticket.id}
+              onClick={() => setSelectedTicket(ticket.id)}
+              className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                selectedTicket === ticket.id
+                  ? `border-${COLORS.PRIMARY} bg-${COLORS.PRIMARY}50`
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {ticket.status}
+                    <h3 className={`font-medium text-${COLORS.SECONDARY} truncate`}>
+                      {ticket.subject}
+                    </h3>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(ticket.priority)}`}>
+                      {ticket.priority}
+                    </span>
+                  </div>
+                  <p className={`text-sm text-${COLORS.SECONDARY_TEXT} mb-2`}>
+                    {ticket.departmentId}
+                  </p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <span>Created {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                    <span>Last activity {formatTime(ticket.lastActivity)}</span>
+                    {ticket.assignedAgent && (
+                      <span>Assigned to {ticket.assignedAgent}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            {/* <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" /> */}
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
+            <p className="text-gray-500">
+              {filterStatus !== 'all' || filterDepartment !== 'all'
+                ? 'No tickets match your current filters.'
+                : 'You haven\'t created any support tickets yet.'}
+            </p>
+          </div>
+        )}
+        </div>
+        </Card>
         </div>
 
         {/* Right Side - Chat Interface Only */}
@@ -243,11 +232,12 @@ const Support: React.FC = () => {
             newMessage={newMessage}
             setNewMessage={setNewMessage}
             onSendMessage={handleSendMessage}
-            ticketData={selectedTicketData}
+            ticketData={selectedTicket}
           />
         </div>
       </div>
     </div>
+   
   );
 };
 
