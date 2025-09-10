@@ -24,22 +24,19 @@ interface SupportTicket {
   created_on: string;
 }
 
-interface ChatMessage {
-  id: number;
-  message: string;
-  attachment: string | null;
-  user_type: string;
-  user_name: string;
-}
+
 
 const Support: React.FC = () => {
+  
   const navigate = useNavigate();
   const { token } = useAuth();
+
+
 
   // Simplified state management
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+ 
   
   // message input now handled inside ChatInterface
   const [loading, setLoading] = useState(true);
@@ -81,7 +78,7 @@ const Support: React.FC = () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: any) => {
-        setMessages(response.ticket?.comments || []);
+        // setMessages(response.ticket?.comments || []);
         console.log('Messages:', response);
       })
         .catch((error: any) => {
@@ -209,7 +206,7 @@ const Support: React.FC = () => {
 
 export default Support;
 
-
+                                                      
 
 
 

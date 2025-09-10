@@ -22,6 +22,10 @@ import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
 import { useAuth } from '@/context';
 import { createSupportTicket, validateFileUploads, CreateTicketPayload } from './supportTicketUtils';
+import Priority from './Components/Priority';
+
+import Tips from './Components/Tips';
+import EmergencyContact from './Components/EmergencyContact';
 
 // Support ticket interfaces
 export interface Department {
@@ -468,68 +472,13 @@ const CreateTicket: React.FC = () => {
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           {/* Response Times */}
-          <Card className="p-6">
-            <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY} mb-4`}>Response Times</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Low Priority:</span>
-                <span className="text-sm font-medium">24-48 hours</span>
-              </div>
-              <div className="flex justify-between">
-                <span className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Medium Priority:</span>
-                <span className="text-sm font-medium">12-24 hours</span>
-              </div>
-              <div className="flex justify-between">
-                <span className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>High Priority:</span>
-                <span className="text-sm font-medium">4-8 hours</span>
-              </div>
-              <div className="flex justify-between">
-                <span className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Urgent:</span>
-                <span className="text-sm font-medium text-red-600">1-2 hours</span>
-              </div>
-            </div>
-          </Card>
+          <Priority />
 
           {/* Tips */}
-          <Card className="p-6">
-            <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY} mb-4`}>Tips for Better Support</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start space-x-2">
-                <div className={`w-2 h-2 rounded-full bg-${COLORS.PRIMARY} mt-2 flex-shrink-0`} />
-                <p className={`text-${COLORS.SECONDARY_TEXT}`}>
-                  Be specific about the issue you're experiencing
-                </p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className={`w-2 h-2 rounded-full bg-${COLORS.PRIMARY} mt-2 flex-shrink-0`} />
-                <p className={`text-${COLORS.SECONDARY_TEXT}`}>
-                  Include screenshots or error messages when possible
-                </p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className={`w-2 h-2 rounded-full bg-${COLORS.PRIMARY} mt-2 flex-shrink-0`} />
-                <p className={`text-${COLORS.SECONDARY_TEXT}`}>
-                  Mention what steps you've already tried
-                </p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className={`w-2 h-2 rounded-full bg-${COLORS.PRIMARY} mt-2 flex-shrink-0`} />
-                <p className={`text-${COLORS.SECONDARY_TEXT}`}>
-                  Choose the correct department for faster resolution
-                </p>
-              </div>
-            </div>
-          </Card>
+          <Tips />
 
           {/* Emergency Contact */}
-          <Card className="p-6 bg-red-50 border-red-200">
-            <h3 className="text-lg font-semibold text-red-800 mb-2">Emergency Support</h3>
-            <p className="text-sm text-red-600 mb-3">
-              For critical security issues or urgent account problems, contact our emergency line:
-            </p>
-            <p className="text-lg font-bold text-red-800">+1 (555) 123-4567</p>
-            <p className="text-xs text-red-600 mt-1">Available 24/7</p>
-          </Card>
+         <EmergencyContact/>
         </div>
       </div>
     </div>

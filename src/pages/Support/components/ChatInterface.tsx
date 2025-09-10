@@ -48,7 +48,8 @@ const formatDateTime = (input?: string) => {
   try {
     const d = new Date(input);
     return d.toLocaleString();
-  } catch (e) {
+  } catch (error) {
+    console.log("Date parse error:", error);
     return input;
   }
 };
@@ -58,7 +59,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
 
   const [messageText, setMessageText] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [sending, setSending] = useState(false);
+  // const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<CommentItem[]>(() =>
     ticket?.comments ? [...ticket.comments] : []
   );
@@ -99,7 +100,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
     if (!messageText.trim() && !file) return;
     const formdata = new FormData();
     formdata.append("message", messageText);
-    formdata.append("attachment", file);
+    formdata.append("attachment", file || "");
     apiRequest({
       endpoint: `${NEW_COMMENTS}/${ticket?.id}`,
       method: "POST",
@@ -244,7 +245,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
 
             <Button
               onClick={handleSend}
-              disabled={sending}
+              // disabled={sending}
               className="px-3 py-2"
             >
               <Send className="w-4 h-4" />

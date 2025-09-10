@@ -7,7 +7,7 @@ import {
   LayoutDashboard, 
   TrendingUp, 
   CreditCard, 
-  FileText, 
+  
   ArrowRightLeft, 
   Users, 
   Shield, 
@@ -15,7 +15,9 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
-  Settings as ManageIcon
+  Settings as ManageIcon,
+  MessageCircle,
+  Gift
 } from 'lucide-react';
 import { COLORS } from '../../constants/colors';
 
@@ -128,10 +130,12 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
         { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
       ]
     },
-    { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
+    // { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
     { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
     { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
+    { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
     { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+    { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
     { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];
 
