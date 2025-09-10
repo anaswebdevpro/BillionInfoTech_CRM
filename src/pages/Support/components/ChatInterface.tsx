@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
 import { Send, MessageCircle, Paperclip } from "lucide-react";
@@ -59,7 +60,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
 
   const [messageText, setMessageText] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
   // const [sending, setSending] = useState(false);
+  
   const [messages, setMessages] = useState<CommentItem[]>(() =>
     ticket?.comments ? [...ticket.comments] : []
   );
