@@ -9,10 +9,10 @@ import PublicRoute from '../components/PublicRoute';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import LiveAccounts from '../pages/LiveAccount/LiveAccounts';
 import TradingAccountCreation from '../pages/createTradingAccount/TradingAccountCreation';
-// import KYCVerification from '../pages/KYCVerification';
+
 import Deposits from '../pages/Deposite/Deposits';
 import InternalTransfer from '../pages/internalTransfer/InternalTransfer';
-import IBRequest from '../pages/IBRequest/IBRequest';
+
 import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
 import MyAccounts from '../pages/MyAccount/MyAccount';
 import ManageAccounts from '../pages/ManageAccounts/ManageAccounts';
@@ -45,6 +45,12 @@ import {
 
 // Admin Layout Wrapper Component
 import AdminLayoutWrapper from '../components/AdminLayoutWrapper';
+
+
+//import iBmodule pages
+import {
+  SetCommission, IBAccordian, IBRequestTree, IBtradeHistory, IBtransaction, IBBusiness, MYSubIBSummnary, CommissionReport
+} from "../pages/IBRequest/index";
 
 export const router = createBrowserRouter([
   {
@@ -115,10 +121,42 @@ export const router = createBrowserRouter([
             path: 'internal-transfer',
             element: <InternalTransfer />,
           },
-          {
-            path: 'ib-request',
-            element: <IBRequest />,
+           {
+            path: 'set-commission',
+            element: <SetCommission />,
           },
+          {
+            path: 'accordian',
+            element: <IBAccordian />,
+          },
+          {
+            path: 'request-tree',
+            element: <IBRequestTree />,
+          },
+          {
+            path: 'trade-history',
+            element: <IBtradeHistory />,
+          },
+          {
+            path: 'transaction',
+            element: <IBtransaction />,
+          },
+          {
+            path: 'business',
+            element: <IBBusiness />,
+          },
+          {
+            path: 'sub-ib-summary',
+            element: <MYSubIBSummnary />,
+          },
+          {
+            path: 'commission-report',
+            element: <CommissionReport />,
+          },
+
+
+
+
           {
             path: '2fa',
             element: <TwoFactorAuth />,

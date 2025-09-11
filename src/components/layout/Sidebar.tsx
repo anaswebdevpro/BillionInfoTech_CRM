@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Adjust the path as necessary
 import {  LayoutDashboard,  TrendingUp,  CreditCard,   ArrowRightLeft,  Users,
-  Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,} from 'lucide-react';
+  Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign,} from 'lucide-react';
 import { COLORS, GRADIENTS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 
@@ -111,7 +111,23 @@ const Sidebar: React.FC = () => {
     { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
     { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
     { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
-    { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+    // { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+
+     {
+  name: 'IB MENU',
+  icon: Users,
+  submenu: [
+    { name: 'Set Commission', href: '/dashboard/set-commission', icon: DollarSign },
+    { name: 'Accordion', href: '/dashboard/accordian', icon: List },
+    { name: 'Request Tree', href: '/dashboard/request-tree', icon: GitBranch },
+    { name: 'Trade History', href: '/dashboard/trade-history', icon: TrendingUp },
+    { name: 'Transaction', href: '/dashboard/transaction', icon: CreditCard },
+    { name: 'Business', href: '/dashboard/business', icon: Building },
+    { name: 'Sub IB Summary', href: '/dashboard/sub-ib-summary', icon: BarChart3 },
+    { name: 'Commission Report', href: '/dashboard/commission-report', icon: FileText }
+  ]
+},
+   
     { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
     { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];

@@ -17,7 +17,13 @@ import {
   Settings,
   Settings as ManageIcon,
   MessageCircle,
-  Gift
+  Gift,
+  DollarSign,
+  List,
+  GitBranch,
+  Building,
+  BarChart3,
+  FileText
 } from 'lucide-react';
 import { COLORS } from '../../constants/colors';
 
@@ -134,7 +140,21 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
     { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
     { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
     { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
-    { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+    // { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+    {
+  name: 'IB MENU',
+  icon: Users,
+  submenu: [
+    { name: 'Set Commission', href: '/dashboard/set-commission', icon: DollarSign },
+    { name: 'Accordion', href: '/dashboard/accordian', icon: List },
+    { name: 'Request Tree', href: '/dashboard/request-tree', icon: GitBranch },
+    { name: 'Trade History', href: '/dashboard/trade-history', icon: TrendingUp },
+    { name: 'Transaction', href: '/dashboard/transaction', icon: CreditCard },
+    { name: 'Business', href: '/dashboard/business', icon: Building },
+    { name: 'Sub IB Summary', href: '/dashboard/sub-ib-summary', icon: BarChart3 },
+    { name: 'Commission Report', href: '/dashboard/commission-report', icon: FileText }
+  ]
+},
     { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
     { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];
