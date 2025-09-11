@@ -46,7 +46,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
 
   const form = useFormik<ProfileFormData>({
     initialValues: {
-      name: profileData?.name || profileData?.firstName || '',
+      name: profileData?.name || '',
       email: profileData?.email || '',
       phone: profileData?.phone || '',
       dateOfBirth: profileData?.dateOfBirth || '',
@@ -112,7 +112,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-medium text-gray-900">
-              {profileData?.firstName} {profileData?.lastName}
+              {profileData?.name}
             </h3>
             <p className="text-sm text-gray-500">{profileData?.email}</p>
             <p className="text-xs text-gray-400 mt-1">
@@ -130,7 +130,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             value={form.values.name}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.name && form.errors.name}
+            error={form.touched.name ? form.errors.name : undefined}
             required
           />
           <Input
@@ -140,7 +140,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             value={form.values.email}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.email && form.errors.email}
+            error={form.touched.email ? form.errors.email : undefined}
             required
           />
           <Input
@@ -150,7 +150,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             value={form.values.phone}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.phone && form.errors.phone}
+            error={form.touched.phone ? form.errors.phone : undefined}
           />
           <Input
             label="Date of Birth"
@@ -159,7 +159,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             value={form.values.dateOfBirth}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.dateOfBirth && form.errors.dateOfBirth}
+            error={form.touched.dateOfBirth ? form.errors.dateOfBirth : undefined}
             required
           />
         </div>
@@ -175,7 +175,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.address.street}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.street && form.errors.address?.street}
+              error={form.touched.address?.street ? form.errors.address?.street : undefined}
               required
             />
             <Input
@@ -185,7 +185,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.address.city}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.city && form.errors.address?.city}
+              error={form.touched.address?.city ? form.errors.address?.city : undefined}
               required
             />
             <Input
@@ -195,7 +195,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.address.state}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.state && form.errors.address?.state}
+              error={form.touched.address?.state ? form.errors.address?.state : undefined}
               required
             />
             <Input
@@ -205,7 +205,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.address.country}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.country && form.errors.address?.country}
+              error={form.touched.address?.country ? form.errors.address?.country : undefined}
               required
             />
             <Input
@@ -215,7 +215,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.address.zipCode}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.zipCode && form.errors.address?.zipCode}
+              error={form.touched.address?.zipCode ? form.errors.address?.zipCode : undefined}
               required
             />
             <Input
@@ -225,7 +225,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
               value={form.values.referralCode}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.referralCode && form.errors.referralCode}
+              error={form.touched.referralCode ? form.errors.referralCode : undefined}
             />
           </div>
         </div>

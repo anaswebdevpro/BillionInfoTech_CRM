@@ -74,7 +74,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
             value={form.values.currentPassword}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.currentPassword && form.errors.currentPassword}
+            error={form.touched.currentPassword ? form.errors.currentPassword : undefined}
             required
             placeholder="Enter your current password"
           />
@@ -85,7 +85,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
             value={form.values.newPassword}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.newPassword && form.errors.newPassword}
+            error={form.touched.newPassword ? form.errors.newPassword : undefined}
             required
             placeholder="Enter your new password"
           />
@@ -96,7 +96,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
             value={form.values.confirmPassword}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.confirmPassword && form.errors.confirmPassword}
+            error={form.touched.confirmPassword ? form.errors.confirmPassword : undefined}
             required
             placeholder="Confirm your new password"
           />

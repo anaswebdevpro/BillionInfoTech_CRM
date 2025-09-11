@@ -108,7 +108,7 @@ const CreateTicket = () => {
       subject: '',
       priority: 'medium',
       message: '',
-      attachments: []
+      attachments: [] as File[]
     },
     validationSchema: Yup.object({
       department: Yup.string().required('Department is required'),
@@ -392,7 +392,7 @@ const CreateTicket = () => {
                   <div className="mt-2">
                     <p className="text-sm text-gray-600">Selected files:</p>
                     <ul className="text-sm text-gray-800">
-                      {formik.values.attachments.map((file, index) => (
+                      {(formik.values.attachments as File[]).map((file, index) => (
                         <li key={index} className="flex items-center space-x-2">
                           <span>• {file.name}</span>
                           <span className="text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>

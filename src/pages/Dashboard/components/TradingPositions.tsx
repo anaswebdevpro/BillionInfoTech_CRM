@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Position } from '../../types';
+import type { Position } from '../../../types';
 
 interface TradingPositionsProps {
   positions: Position[];

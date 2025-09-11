@@ -21,6 +21,20 @@ export interface User {
   profileImage?: string;
 }
 
+// Extended User type with additional profile fields
+export interface ExtendedUser extends User {
+  phone?: string;
+  dateOfBirth?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+  };
+  referralCode?: string;
+}
+
 // Account type for user accounts
 export interface Account {
   id: string;
