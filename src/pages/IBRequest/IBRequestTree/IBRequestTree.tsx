@@ -539,40 +539,46 @@ const IBRequestTree = () => {
         </div>
       )}
 
-      {/* Tree Container */}
-      <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto`}>
-        <div className="min-w-full">
-          {filteredTreeData.length > 0 && selectedMember ? (
-            <Tree
-              lineWidth={'2px'}
-              lineColor={COLORS.BORDER}
-              lineBorderRadius={'10px'}
-              label={
-                <MemberNode 
-                  member={selectedMember} 
-                  onClick={handleNodeClick}
-                  isSelected={true}
-                  networkData={networkData}
-                />
-              }
-            >
-              <TreeNodeRenderer 
-                members={networkData?.tree ?? []} 
-                parentId={selectedMemberId}
-                onNodeClick={handleNodeClick}
-                selectedMemberId={selectedMemberId}
-                networkData={networkData}
-              />
-            </Tree>
-          ) : (
-            <div className={`text-center py-12 text-${COLORS.SECONDARY_TEXT}`}>
-              <div className="text-6xl mb-4">🌳</div>
-              <div className="text-xl font-semibold mb-2">No Network Members</div>
-              <div>This member has no descendants to display</div>
-            </div>
-          )}
-        </div>
+ 
+
+{/* Tree Container */}
+<div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto`}>
+  <div className="min-w-full" style={{ minHeight: '400px' }}>
+    {selectedMember ? (
+      <Tree
+        lineWidth="2px"
+        lineColor="#e5e7eb"
+        lineBorderRadius="10px"
+        nodeSpacing={30}
+        siblingSpacing={20}
+        label={
+          <MemberNode 
+            member={selectedMember} 
+            onClick={handleNodeClick}
+            isSelected={true}
+            networkData={networkData}
+          />
+        }
+      >
+        <TreeNodeRenderer 
+          members={filteredTreeData} 
+          parentId={selectedMemberId}
+          onNodeClick={handleNodeClick}
+          selectedMemberId={selectedMemberId}
+          networkData={networkData}
+        />
+      </Tree>
+    ) : (
+      <div className={`text-center py-12 text-${COLORS.SECONDARY_TEXT}`}>
+        <div className="text-6xl mb-4">🌳</div>
+        <div className="text-xl font-semibold mb-2">No Network Members</div>
+        <div>This member has no descendants to display</div>
       </div>
+    )}
+  </div>
+</div>
+
+
     </div>
   )
 }

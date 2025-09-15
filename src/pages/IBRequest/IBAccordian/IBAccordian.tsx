@@ -402,7 +402,7 @@ const IBAccordian = () => {
                 {hasChildren && (
                   <div className="text-center">
                     <div className="font-semibold text-gray-800">{node.children.length}</div>
-                    <div className="text-gray-500">Children</div>
+                    <div className="text-gray-500">Downline</div>
                   </div>
                 )}
               </div>
@@ -497,30 +497,15 @@ const IBAccordian = () => {
         </div>
       </div>
 
-      {/* Accordion Content */}
-      <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6`}>
-        {accordionData.length > 0 ? (
-          <div className="space-y-2">
-            {accordionData.map(node => renderAccordionNode(node))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📁</div>
-            <div className={`text-xl font-semibold mb-2 text-${COLORS.SECONDARY}`}>No Network Data</div>
-            <div className={`text-${COLORS.SECONDARY_TEXT}`}>No network members found to display</div>
-          </div>
-        )}
-      </div>
-
-      {/* Summary Stats */}
-      <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-4 mt-6`}>
+        {/* Summary Stats */}
+      <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-4 my-6`}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-blue-600">{networkData.tree.length}</div>
             <div className="text-gray-600 text-sm">Total Members</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold bg- text-green-600">
               {networkData.tooltip.filter(t => t.ib_status === 'IB').length}
             </div>
             <div className="text-gray-600 text-sm">IB Members</div>
@@ -539,6 +524,23 @@ const IBAccordian = () => {
           </div>
         </div>
       </div>
+
+      {/* Accordion Content */}
+      <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6`}>
+        {accordionData.length > 0 ? (
+          <div className="space-y-2">
+            {accordionData.map(node => renderAccordionNode(node))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📁</div>
+            <div className={`text-xl font-semibold mb-2 text-${COLORS.SECONDARY}`}>No Network Data</div>
+            <div className={`text-${COLORS.SECONDARY_TEXT}`}>No network members found to display</div>
+          </div>
+        )}
+      </div>
+
+    
     </div>
   )
 }
