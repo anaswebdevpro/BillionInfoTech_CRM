@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../constants/colors';
 import Card from '../../components/ui/Card';
+import { ShimmerStatsCard } from '../../components/ui/Shimmer';
 import { 
   Users, 
   UserCheck, 
@@ -65,10 +66,24 @@ const AdminDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 border-${COLORS.PRIMARY} mx-auto mb-4`}></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
+      <div className="space-y-6">
+        {/* Header Shimmer */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded w-64 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-80 animate-pulse"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Stats Grid Shimmer */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <ShimmerStatsCard key={index} />
+          ))}
         </div>
       </div>
     );

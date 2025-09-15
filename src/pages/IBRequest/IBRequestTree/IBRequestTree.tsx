@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
-// import { apiRequest } from '@/services'
-// import { MY_NETWORK } from '../../../../api/api-variable'
-// import { useAuth } from '@/context'
+import { ShimmerText } from '../../../components/ui/Shimmer'
+import { apiRequest } from '@/services'
+import { MY_NETWORK } from '../../../../api/api-variable'
+import { useAuth } from '@/context'
 
 
 // Types for our data structure
@@ -36,210 +37,102 @@ interface NetworkData {
 }
 
 
-const networkData: NetworkData ={
-    "title": "Network Tree",
-    "gototop": false,
-    "tree": [
-        {
-            "memberId": 1,
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkJIdmRRMTJxSzZLQTBGZjkyZkpwblE9PSIsInZhbHVlIjoiU1R3VENQVnR6djRsQWp0WWxkUlNMZz09IiwibWFjIjoiMmM5YmQxNGQ2YzM0NTJlOGM5MDhlNzRhZDQ2MGJhOTljOGZiNGYzY2EwODRlNmMwYjY5MGRjNTE4ZDliNDZhNiIsInRhZyI6IiJ9",
-            "parentId": null,
-            "otherInfo": "billioninfotech@gmail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6Ikorbjk2YUQvY1RLMFFXZjZCaWRQbWc9PSIsInZhbHVlIjoidUpiNVJ5ZTVrVDNnVzBPV2Zlc2gvdz09IiwibWFjIjoiOGNiNTBmYmFiNjM3N2MzNzg4ZGY2YmVjODMwNjYzZjdhMjQzOTc3MjU1NGU3ZTllZjQ1OGQ1NTIwZThlYzFjNiIsInRhZyI6IiJ9",
-            "memberId": 2,
-            "parentId": 1,
-            "otherInfo": "Test1.1@yopmail.com",
-            "account_number": 22107,
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkF5N2NtVmhod3Q1N01QOHdKZ1Rzdnc9PSIsInZhbHVlIjoicEd3YmpkMy9pUmVBdk9uMFFWd3dzQT09IiwibWFjIjoiYTI3N2QwNjcyMmE1YzdiODY1NTJkNjJhNjM3N2YzNzgyZjhhZTEzODEyZjkxMWRmNTZhNmQ0ZGJlNDdiODcxZSIsInRhZyI6IiJ9",
-            "memberId": 7,
-            "parentId": 1,
-            "otherInfo": "test@mail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkdDR0FocXFaYUQ0OGhXVHZ6RS9FaGc9PSIsInZhbHVlIjoiUTFtK1BYanA1N2xVRFhtTzEyVUQ1QT09IiwibWFjIjoiYTk3ZDI5MTY5MjdhM2I2MDhmZDYyMTYzZWU2Y2YzMDdmZWY5NTkwOGI3MjQzMzc1ZGU2Yjg5NWFiOGE3MTdmMyIsInRhZyI6IiJ9",
-            "memberId": 8,
-            "parentId": 1,
-            "otherInfo": "karan@mail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlJPcXRTQmROU0RpNXhpVFQvUnRWQ0E9PSIsInZhbHVlIjoiY0Nyd1BVb05ETFRRRDcyT2VDSzZxdz09IiwibWFjIjoiMzQ1Yjg3NjcyMGQ0MTFlMzAyOGQ4ODlmNThhZjdkMDZhMWE1YTExMzA2MjViNjZlNDU0ZTUwMTJjZmZlNmZiZiIsInRhZyI6IiJ9",
-            "memberId": 9,
-            "parentId": 1,
-            "otherInfo": "karan12@mail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlBmM2YwUEZTWG5VbWVnM2pwbXE4TWc9PSIsInZhbHVlIjoiVnFXZ3Fnd0JveHp2RTY4S0Q5SDMvUT09IiwibWFjIjoiNzRmMjgzNGRkNjNhNDM1NDc2YjBkZDY1Y2U4YWI4ZThiYTU1YjIwNDQxMjM5MTUxMjI4MjViZjM4Nzc5ZDNmOSIsInRhZyI6IiJ9",
-            "memberId": 10,
-            "parentId": 1,
-            "otherInfo": "guri@mail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IjZ6eFJBQlhLaFEybmUvMWMzZkViV0E9PSIsInZhbHVlIjoiL29FK01ZbFVrd1RLM3d6TGpkcTRKQT09IiwibWFjIjoiMzdiZGJhMjcxMDVlZGE3ZjZhYjZhYjFmMmUwODdmZDk2MmQxOGM4YzdiZmQxNDdiZjU5NjBlMmIyYzYzM2Q2MiIsInRhZyI6IiJ9",
-            "memberId": 19,
-            "parentId": 1,
-            "otherInfo": "testfromapi@gmail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6Im5yVzJnY3ZOeUIxVW9xbjExVE1uMVE9PSIsInZhbHVlIjoibzdlaEJ2MFM3RkdRRVVtbTJMK002Zz09IiwibWFjIjoiZWFkOTdhZjExZTdmZWVmNDllODg5ZmVmOTdmMDllNjIxNjQzOTQ4MDI5MmVjMDlhNmVlNzFhMjFkMzYyNDFlMiIsInRhZyI6IiJ9",
-            "memberId": 3,
-            "parentId": 2,
-            "otherInfo": "Test1.2@yopmail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlNmUS9BS29QRnd0SUtRdUhEdWJkeUE9PSIsInZhbHVlIjoiQmhSQmh4QmJSeXEvM243VjJ0WnZVdz09IiwibWFjIjoiNDFiNWYyZDgzMjQzMzM0NWU1YmFlMzZhNjIxZjA2Mjg5NTQ0ZWM5NjdlZTU4OWQ2YWNlNTMwNDhjMzM0ZWQwOCIsInRhZyI6IiJ9",
-            "memberId": 4,
-            "parentId": 3,
-            "otherInfo": "Test1.3@yopmail.com",
-            "account_number": "N.A.",
-            "business": "0.000"
-        },
-        {
-            "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkFQNVI4Z0ovVXg4S00wMUNUcEUvckE9PSIsInZhbHVlIjoiN3poalhzQWlXaWVRaTJrb3hYU2t5QT09IiwibWFjIjoiNzgzN2Q2YzY1Y2ZjMWEzNmY0MTExMDA5MDA0N2RhMWI4MzA4M2JmZjAwOWU1YTc2MDY5ZTA2MDAyMDIzNTZlOSIsInRhZyI6IiJ9",
-            "memberId": 5,
-            "parentId": 4,
-            "otherInfo": "Test1.4@yopmail.com",
-            "account_number": 22081,
-            "business": "0.000"
-        }
-    ],
-    "tooltip": [
-        {
-            "id": 1,
-            "name": "Company  Horizon",
-            "join_on": "2025-01-14",
-            "buss": "0",
-            "activated_on": "2025-01-14",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        },
-        {
-            "id": 2,
-            "name": "test  1",
-            "join_on": "2025-02-12",
-            "buss": "0",
-            "activated_on": "2025-02-12",
-            "account_number": 22107,
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        },
-        {
-            "id": 7,
-            "name": "test test",
-            "join_on": "2025-07-16",
-            "buss": "0",
-            "activated_on": "2025-07-16",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "Client"
-        },
-        {
-            "id": 8,
-            "name": "karan vir",
-            "join_on": "2025-07-16",
-            "buss": "0",
-            "activated_on": "2025-07-16",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "Client"
-        },
-        {
-            "id": 9,
-            "name": "karan vir singh",
-            "join_on": "2025-07-16",
-            "buss": "0",
-            "activated_on": "2025-07-16",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "Client"
-        },
-        {
-            "id": 10,
-            "name": "gurpreet gurpreet",
-            "join_on": "2025-07-17",
-            "buss": "0",
-            "activated_on": "2025-07-17",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        },
-        {
-            "id": 19,
-            "name": "testfromapi ",
-            "join_on": "2025-09-01",
-            "buss": "0",
-            "activated_on": "2025-09-01",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "Client"
-        },
-        {
-            "id": 3,
-            "name": "test  2",
-            "join_on": "2025-02-12",
-            "buss": "0",
-            "activated_on": "2025-02-12",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        },
-        {
-            "id": 4,
-            "name": "test  3",
-            "join_on": "2025-02-12",
-            "buss": "0",
-            "activated_on": "2025-02-12",
-            "account_number": "N.A.",
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        },
-        {
-            "id": 5,
-            "name": "test  4",
-            "join_on": "2025-02-12",
-            "buss": "0",
-            "activated_on": "2025-02-12",
-            "account_number": 22081,
-            "business": "0.000",
-            "class": "inactive",
-            "ib_status": "IB"
-        }
-    ]
-}
+
 
 
 // Helper function to get tooltip data for a member
 const getTooltipData = (networkData: NetworkData | null, memberId: number): TooltipData | undefined => {
   return networkData?.tooltip.find(item => item.id === memberId)
 }
+
+// Shimmer Components for Tree Structure
+const ShimmerMemberNode = () => (
+  <div className={`border-2 rounded-xl p-4 ${COLORS.SHADOW} min-w-[220px] max-w-[280px] mx-auto bg-${COLORS.WHITE} border-${COLORS.BORDER}`}>
+    <div className="text-center space-y-3">
+      <ShimmerText width="80%" height={20} className="mx-auto" />
+      <ShimmerText width="90%" height={14} className="mx-auto" />
+      <div className="flex justify-between">
+        <ShimmerText width="40%" height={12} />
+        <ShimmerText width="40%" height={12} />
+      </div>
+      <ShimmerText width="60%" height={24} className="mx-auto rounded-full" />
+      <ShimmerText width="50%" height={12} className="mx-auto" />
+    </div>
+  </div>
+)
+
+const ShimmerTreeStructure = ({ levels = 3, childrenPerLevel = 2 }: { levels?: number, childrenPerLevel?: number }) => {
+  const renderLevel = (currentLevel: number, maxLevels: number): React.ReactNode => {
+    if (currentLevel >= maxLevels) return null;
+
+    return (
+      <div className="flex justify-center items-start space-x-8">
+        {Array.from({ length: childrenPerLevel }).map((_, index) => (
+          <div key={index} className="flex flex-col items-center">
+            <ShimmerMemberNode />
+            {currentLevel < maxLevels - 1 && (
+              <div className="mt-4 w-full flex justify-center">
+                {renderLevel(currentLevel + 1, maxLevels)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-center">
+        <ShimmerMemberNode />
+      </div>
+      {levels > 1 && (
+        <div className="mt-8">
+          {renderLevel(1, levels)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ShimmerHeader = () => (
+  <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 mb-6`}>
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div className="space-y-3">
+        <ShimmerText width={300} height={32} />
+        <ShimmerText width={250} height={16} />
+      </div>
+      <div className="flex gap-3">
+        <ShimmerText width={120} height={40} className="rounded-xl" />
+      </div>
+    </div>
+  </div>
+);
+
+const ShimmerBreadcrumb = () => (
+  <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-4 mb-6`}>
+    <div className="flex items-center gap-2">
+      <ShimmerText width={80} height={16} />
+      <ShimmerText width={100} height={16} />
+      <ShimmerText width={20} height={16} />
+      <ShimmerText width={120} height={16} />
+    </div>
+  </div>
+);
+
+const ShimmerMemberDetails = () => (
+  <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-6 mb-6`}>
+    <ShimmerText width={200} height={24} className="mb-4" />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className={`bg-${COLORS.SECONDARY_BG} rounded-lg p-4`}>
+          <ShimmerText width="60%" height={14} className="mb-2" />
+          <ShimmerText width="80%" height={16} />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 // Component for individual node
 const MemberNode = ({ 
@@ -354,39 +247,60 @@ const TreeNodeRenderer = ({
 }
 
 const IBRequestTree = () => {
-  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(1) // Initialize with root member ID
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null) // Initialize as null
   const [breadcrumb, setBreadcrumb] = useState<Array<{id: number, name: string}>>([])
-  // const [networkData, setNetworkData] = useState<NetworkData | null>(null);
-  // const {token} = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true) // Start with loading true
+  const [networkData, setNetworkData] = useState<NetworkData | null>(null);
+  const {token} = useAuth();
 
-  // const FetchNetwork = () => {
-  //   try {
-  //     apiRequest({
-  //       endpoint: MY_NETWORK,
-  //       method: 'POST',
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     }).then((response: any) => {
-  //       setNetworkData(response.data || null);
-  //       if (response.data?.tree?.[0]) {
-  //         setSelectedMemberId(response.data.tree[0].memberId);
-  //       }
-  //       console.log('Network Data:', response);
-  //     })
-  //       .catch((error: any) => {
-  //         console.error('Failed to fetch user data:', error);
-  //       });
-  //   } catch (error) {
-  //     console.error('Failed to fetch user data:', error);
-  //   } 
-  // }
+  const FetchNetwork = React.useCallback(() => {
+    setIsLoading(true);
+    try {
+      apiRequest({
+        endpoint: MY_NETWORK,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: unknown) => {
+        // The API returns data directly, not nested under 'data' property
+        const networkResponse = response as NetworkData;
+        console.log('Full API Response:', response);
+        console.log('Network Response:', networkResponse);
+        console.log('Tree Array:', networkResponse.tree);
+        console.log('Tooltip Array:', networkResponse.tooltip);
+        
+        setNetworkData(networkResponse || null);
+        if (networkResponse?.tree?.[0]) {
+          console.log('Setting selected member ID to:', networkResponse.tree[0].memberId);
+          setSelectedMemberId(networkResponse.tree[0].memberId);
+        }
+        setIsLoading(false);
+      })
+        .catch((error: Error) => {
+          console.error('Failed to fetch user data:', error);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      setIsLoading(false);
+    } 
+  }, [token]);
 
-  // useEffect(() => {
-  //   FetchNetwork();
-  // }, []);
+  useEffect(() => {
+    FetchNetwork();
+  }, [FetchNetwork]);
 
   // Get the selected member data
   const selectedMember = networkData?.tree?.find(member => member.memberId === selectedMemberId) || null
   const selectedTooltipData = selectedMemberId ? getTooltipData(networkData, selectedMemberId) : null
+  
+  // Debug logging
+  console.log('Debug Info:', {
+    selectedMemberId,
+    networkDataExists: !!networkData,
+    treeLength: networkData?.tree?.length,
+    selectedMember,
+    isLoading
+  });
 
   // Handle node click - make it the new root
   const handleNodeClick = (member: TreeMember) => {
@@ -437,14 +351,23 @@ const IBRequestTree = () => {
 
   const filteredTreeData = getFilteredTreeData()
 
-  // Don't render until data is loaded
-  // if (!networkData || !selectedMember) {
-  //   return (
-  //     <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen flex items-center justify-center`}>
-  //       <div className={`text-${COLORS.SECONDARY_TEXT} text-lg`}>Loading network data...</div>
-  //     </div>
-  //   )
-  // }
+  // Show shimmer loading state
+  if (isLoading) {
+    return (
+      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+        <ShimmerHeader />
+        <ShimmerBreadcrumb />
+        <ShimmerMemberDetails />
+        
+        {/* Tree Container with Shimmer */}
+        <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto`}>
+          <div className="min-w-full" style={{ minHeight: '400px' }}>
+            <ShimmerTreeStructure levels={3} childrenPerLevel={2} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
@@ -477,11 +400,17 @@ const IBRequestTree = () => {
           {/* Controls */}
           <div className="flex flex-wrap gap-3">
             <button
-            onClick={handleResetToRoot}
-            className={`px-6 py-3 bg-${COLORS.PRIMARY} text-white rounded-xl hover:bg-${COLORS.PRIMARY_BG} transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
-          >
-            Reset to Root
-          </button>
+              onClick={handleResetToRoot}
+              className={`px-6 py-3 bg-${COLORS.PRIMARY} text-white rounded-xl hover:bg-${COLORS.PRIMARY_BG} transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
+            >
+              Reset to Root
+            </button>
+            <button
+              onClick={() => setIsLoading(!isLoading)}
+              className={`px-6 py-3 bg-${COLORS.SECONDARY} text-white rounded-xl hover:bg-${COLORS.SECONDARY}/80 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
+            >
+              {isLoading ? 'Hide' : 'Show'} Shimmer
+            </button>
           </div>
         </div>
       </div>
@@ -549,8 +478,6 @@ const IBRequestTree = () => {
         lineWidth="2px"
         lineColor="#e5e7eb"
         lineBorderRadius="10px"
-        nodeSpacing={30}
-        siblingSpacing={20}
         label={
           <MemberNode 
             member={selectedMember} 

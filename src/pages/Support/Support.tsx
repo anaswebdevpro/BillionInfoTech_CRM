@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import { ShimmerText, ShimmerCard, ShimmerList, ShimmerButton } from '../../components/ui/Shimmer';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
 import {
@@ -123,6 +124,66 @@ const Support: React.FC = () => {
   const selectedTicketData = tickets.find(ticket => ticket.id === selectedTicket);
 
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {/* Header Shimmer */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <ShimmerText width="300px" height={36} />
+            <ShimmerText width="400px" height={20} />
+          </div>
+          <ShimmerButton width="140px" height={40} />
+        </div>
+
+        {/* Main Content Grid Shimmer */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Side - Ticket List Shimmer */}
+          <div className="lg:col-span-1">
+            <ShimmerCard height={400}>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <ShimmerText width="150px" height={20} />
+                  <ShimmerText width="200px" height={16} />
+                </div>
+                <div className="space-y-3">
+                  <ShimmerList items={5} />
+                </div>
+              </div>
+            </ShimmerCard>
+          </div>
+
+          {/* Right Side - Chat Interface Shimmer */}
+          <div className="lg:col-span-2">
+            <ShimmerCard height={400}>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <ShimmerText width="200px" height={20} />
+                  <ShimmerText width="300px" height={16} />
+                </div>
+                <div className="space-y-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <ShimmerText width="80%" height={16} />
+                        <ShimmerText width="60%" height={14} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex space-x-3">
+                  <ShimmerText width="100%" height={40} />
+                  <ShimmerButton width="80px" height={40} />
+                </div>
+              </div>
+            </ShimmerCard>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -146,11 +207,7 @@ const Support: React.FC = () => {
         <div className="lg:col-span-1">
           <Card title="Support Tickets" subtitle="Your recent support requests">
             <div className="space-y-3">
-              {loading ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Loading tickets...</p>
-                </div>
-              ) : tickets.length > 0 ? (
+              {tickets.length > 0 ? (
                 tickets.map((ticket) => (
                   <div
                     key={ticket.id}

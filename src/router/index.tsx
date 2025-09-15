@@ -21,6 +21,7 @@ import Support from '../pages/Support/Support';
 import CreateTicket from '../pages/createTicket/CreateTicket';
 import BonusPromotion from '../pages/Bonus_promotion/BonusPromotion';
 import NotFound from '../pages/NotFound/NotFound';
+import ShimmerDemo from '../components/ShimmerDemo';
 
 // Import Admin Pages
 import {
@@ -172,6 +173,10 @@ export const router = createBrowserRouter([
           {
             path: 'bonus-promotion',
             element: <BonusPromotion />,
+          },
+          {
+            path: 'shimmer-demo',
+            element: <ShimmerDemo />,
           },
         ],
       },

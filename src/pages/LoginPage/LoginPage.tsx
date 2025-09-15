@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Input from "../../components/ui/Input";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
+import { ShimmerText, ShimmerButton } from "../../components/ui/Shimmer";
 import type { LoginFormData } from "../../types";
 import { IoMdTime } from "react-icons/io";
 import { RiSecurePaymentLine } from "react-icons/ri";
@@ -30,8 +31,17 @@ interface LoginPageProps {
 const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Simulate page loading
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Validation schema using Yup
   const validationSchema = Yup.object({
@@ -81,6 +91,55 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
       } 
     },
   });
+
+  if (isPageLoading) {
+    return (
+      <div className="min-h-screen flex">
+        {/* Left side - Branding Shimmer */}
+        <div className="max-w-[35%] hidden md:block items-center justify-center">
+          <div className={`${GRADIENTS.SIDEBAR} w-full h-screen flex justify-center flex-col items-center p-10`}>
+            <div className="h-32 w-32 bg-white/20 rounded-lg animate-pulse mb-8"></div>
+            <div className="h-48 w-48 bg-white/20 rounded-lg animate-pulse mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-8 bg-white/20 rounded w-80 animate-pulse"></div>
+              <div className="flex gap-4 px-4 my-5">
+                <div className="h-6 bg-white/20 rounded w-32 animate-pulse"></div>
+                <div className="h-6 bg-white/20 rounded w-24 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Login form Shimmer */}
+        <div className={`flex-1 flex items-center justify-center p-12 bg-${COLORS.SECONDARY_BG}`}>
+          <div className={`w-full max-w-md border border-${COLORS.BORDER} bg-${COLORS.WHITE} rounded-lg ${COLORS.SHADOW} p-8`}>
+            <div className="text-center mb-8">
+              <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded w-24 mx-auto animate-pulse"></div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <ShimmerText width="60px" height={16} />
+                <ShimmerText width="100%" height={40} />
+              </div>
+              <div className="space-y-2">
+                <ShimmerText width="80px" height={16} />
+                <ShimmerText width="100%" height={40} />
+              </div>
+              <div className="text-right">
+                <ShimmerText width="120px" height={16} />
+              </div>
+              <ShimmerButton width="100%" height={40} />
+              <div className="text-center">
+                <ShimmerText width="200px" height={16} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
