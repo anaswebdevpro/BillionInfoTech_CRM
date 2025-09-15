@@ -139,7 +139,7 @@ const TradingPositions: React.FC<TradingPositionsProps> = ({
               <span>
                 Total:{" "}
                 <span className="font-bold text-lg text-gray-900">
-                  $12,345.67
+                  $0.00
                 </span>
               </span>
             )}

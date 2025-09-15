@@ -37,3 +37,10 @@ export const SHOW_ALL_SPECIFIC_COMMENT= "/show-specific-ticket";
 
 
 
+// IBMENU sytem apis 
+
+export const MY_NETWORK="/my-network";
+export const GET_USER_DOWNLINE="/get-user-downline";
+
+
+

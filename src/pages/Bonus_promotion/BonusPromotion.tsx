@@ -4,6 +4,7 @@ import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { FETCH_BONUS, CLAIM_BONUS } from '../../../api/api-variable';
+import { enqueueSnackbar } from 'notistack';
 
 
 // Types
@@ -24,68 +25,7 @@ interface Bonus {
   updated_at: string;
 }
 
-interface ApiResponse {
-  success?: boolean;
-  message?: string;
-  error?: string;
-  status?: string;
-  data?: {
-    message?: string;
-    error?: string;
-  };
-}
-
-interface BonusResponse extends ApiResponse {
-  title: string;
-  bonuses: Bonus[];
-}
-
-type ClaimBonusResponse = ApiResponse;
-
-// Removed BONUS_TYPES for simplified design
-
-// Utility Functions
-const extractErrorMessage = (error: unknown): string => {
-  if (!error || typeof error !== 'object') {
-    return 'An unexpected error occurred. Please try again.';
-  }
-
-  // Check for axios error with response data
-  if ('response' in error && error.response && typeof error.response === 'object') {
-    const responseData = error.response as { 
-      data?: { 
-        message?: string; 
-        error?: string;
-        errors?: string | string[] | { [key: string]: string[] };
-        detail?: string;
-      } 
-    };
-    
-    if (responseData.data?.message) return responseData.data.message;
-    if (responseData.data?.error) return responseData.data.error;
-    if (responseData.data?.detail) return responseData.data.detail;
-    if (responseData.data?.errors) {
-      if (typeof responseData.data.errors === 'string') return responseData.data.errors;
-      if (Array.isArray(responseData.data.errors)) return responseData.data.errors.join(', ');
-      if (typeof responseData.data.errors === 'object') {
-        const errorValues = Object.values(responseData.data.errors).flat();
-        return errorValues.join(', ');
-      }
-    }
-  }
-  
-  // Check for direct error message
-  if ('message' in error && typeof error.message === 'string') {
-    return error.message;
-  }
-  
-  return 'An unexpected error occurred. Please try again.';
-};
-
-const extractApiMessage = (response: ApiResponse | null): string => {
-  if (!response) return 'Operation failed. Please try again.';
-  return response.message || response.error || response.data?.message || response.data?.error || 'Operation failed. Please try again.';
-};
+// Simplified API handling - removed complex error handling and types
 
 
 
@@ -136,83 +76,76 @@ const BonusPromotion: React.FC = () => {
   const [claiming, setClaiming] = useState<number | null>(null);
 
   // API call functions
-  const fetchBonuses = useCallback(async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
+  const FetchBonuses = useCallback(() => {
+    setLoading(true);
     try {
-      console.log('Fetching bonuses with token:', token.substring(0, 10) + '...');
-      
-      const response = await apiRequest<BonusResponse>({
+      apiRequest({
         endpoint: FETCH_BONUS,
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+        headers: { Authorization: `Bearer ${token}` },
+      })
       
-      console.log('Fetch bonuses response:', response);
-      
-      if (response && response.success) {
-        setBonuses(response.bonuses);
-      } else {
-        const errorMessage = extractApiMessage(response);
-        console.error('Failed to fetch bonuses:', errorMessage);
-      }
+      .then((response: unknown) => {
+        const data = response as { bonuses?: Bonus[]; success?: boolean };
+        setLoading(false);
+        setBonuses(data.bonuses || []);
+        console.log('Bonuses Data:', response);
+        if (data.success) {
+          enqueueSnackbar('Bonuses loaded successfully!', { variant: 'success' });
+        }
+      }) 
+        .catch((error: Error) => {
+          setLoading(false);
+          console.error('Failed to fetch bonuses:', error);
+          enqueueSnackbar('Failed to fetch bonuses: ' + error.message, { variant: 'error' });
+        });
     } catch (error) {
-      console.error('Failed to fetch bonuses:', error);
-      const errorMessage = extractErrorMessage(error);
-      console.error('Fetch error:', errorMessage);
-    } finally {
       setLoading(false);
+      console.error('Failed to fetch bonuses:', error);
+      enqueueSnackbar('Failed to fetch bonuses. Please try again.', { variant: 'error' });
     }
   }, [token]);
-
-  const claimBonus = async (bonusId: number) => {
+    
+  const ClaimBonus = (bonusId: number) => {
     if (!token) return;
 
     setClaiming(bonusId);
     try {
-      console.log('Claiming bonus with ID:', bonusId);
-      
-      const response = await apiRequest<ClaimBonusResponse>({
+      apiRequest({
         endpoint: CLAIM_BONUS,
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}` },
         data: { bonus_id: bonusId },
-      });
-      
-      console.log('Claim bonus response:', response);
-      
-             if (response) {
-         if (response.success || response.status === 'success') {
-           console.log('Bonus claimed successfully!');
-         } else {
-           const errorMessage = extractApiMessage(response);
-           console.error('Claim failed:', errorMessage);
-         }
-       } else {
-         console.error('Failed to claim bonus. Please try again.');
-       }
-     } catch (error) {
-       console.error('Failed to claim bonus:', error);
-       const errorMessage = extractErrorMessage(error);
-       console.error('Claim error:', errorMessage);
-    } finally {
+        }).then((response: unknown) => {
+          const data = response as { success?: boolean; status?: string; message?: string };
+          setClaiming(null);
+          console.log('Claim Bonus Response:', response);
+          if (data && (data.success || data.status === 'success')) {
+            console.log('Bonus claimed successfully!');
+            enqueueSnackbar(data.message || 'Bonus claimed successfully!', { variant: 'success' });
+            // Optionally refresh the bonuses list
+            FetchBonuses();
+          } else {
+            console.error('Failed to claim bonus:', response);
+            enqueueSnackbar(data.message || 'Failed to claim bonus. Please try again.', { variant: 'error' });
+          }
+        })
+        .catch((error: Error) => {
+          setClaiming(null);
+          console.error('Failed to claim bonus:', error);
+          enqueueSnackbar('Failed to claim bonus: ' + error.message, { variant: 'error' });
+        });
+    } catch (error) {
       setClaiming(null);
+      console.error('Failed to claim bonus:', error);
+      enqueueSnackbar('Failed to claim bonus. Please try again.', { variant: 'error' });
     }
   };
 
   // Effects
   useEffect(() => {
-    fetchBonuses();
-  }, [fetchBonuses]);
+    FetchBonuses();
+  }, [FetchBonuses]);
 
   // Loading state
   if (loading) {
@@ -244,7 +177,7 @@ const BonusPromotion: React.FC = () => {
           <BonusCard
             key={bonus.id}
             bonus={bonus}
-            onClaim={claimBonus}
+            onClaim={ClaimBonus}
             isClaiming={claiming === bonus.id}
           />
         ))}
