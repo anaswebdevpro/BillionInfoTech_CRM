@@ -1,125 +1,32 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { COLORS } from '../../../constants/colors';
+import { ShimmerText } from '../../../components/ui/Shimmer';
+import { apiRequest } from '@/services';
+import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
+import { useAuth } from '@/context';
 
-// Define the data structure based on the provided JSON
-interface SubIBData {
+// Define the data structure based on the actual API response
+interface DownlineData {
   id: number;
   first_name: string;
   email: string;
-  status: number;
-  created_on: string;
+  status: number; // 1 for active, 0 for inactive
+  created_on: string; // Format: "YYYY-MM-DD HH:MM:SS"
   sponsor: number;
   level: number;
 }
 
-interface SubIBResponse {
+interface DownlineResponse {
   draw: number;
   recordsTotal: number;
   recordsFiltered: number;
-  data: SubIBData[];
+  data: DownlineData[];
 }
 
-const MYSubIBSummary: React.FC = () => {
-  // State for pagination, search, and filters
-  const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [levelFilter, setLevelFilter] = useState('all');
-
-  // Sample data - replace with actual API call
-  const subIBData: SubIBResponse = {
-    "draw": 1,
-    "recordsTotal": 9,
-    "recordsFiltered": 9,
-    "data": [
-      {
-        "id": 2,
-        "first_name": "test",
-        "email": "Test1.1@yopmail.com",
-        "status": 1,
-        "created_on": "2025-02-12 11:39:51",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 7,
-        "first_name": "test",
-        "email": "test@mail.com",
-        "status": 1,
-        "created_on": "2025-07-16 16:09:06",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 8,
-        "first_name": "karan",
-        "email": "karan@mail.com",
-        "status": 1,
-        "created_on": "2025-07-16 16:11:41",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 9,
-        "first_name": "karan",
-        "email": "karan12@mail.com",
-        "status": 0,
-        "created_on": "2025-07-16 16:17:44",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 10,
-        "first_name": "gurpreet",
-        "email": "guri@mail.com",
-        "status": 1,
-        "created_on": "2025-07-17 09:46:32",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 19,
-        "first_name": "testfromapi",
-        "email": "testfromapi@gmail.com",
-        "status": 1,
-        "created_on": "2025-09-01 13:14:17",
-        "sponsor": 1,
-        "level": 1
-      },
-      {
-        "id": 3,
-        "first_name": "test",
-        "email": "Test1.2@yopmail.com",
-        "status": 1,
-        "created_on": "2025-02-12 11:44:14",
-        "sponsor": 2,
-        "level": 2
-      },
-      {
-        "id": 4,
-        "first_name": "test",
-        "email": "Test1.3@yopmail.com",
-        "status": 1,
-        "created_on": "2025-02-12 11:45:31",
-        "sponsor": 3,
-        "level": 3
-      },
-      {
-        "id": 5,
-        "first_name": "test",
-        "email": "Test1.4@yopmail.com",
-        "status": 1,
-        "created_on": "2025-02-12 12:02:13",
-        "sponsor": 4,
-        "level": 4
-      }
-    ]
-  };
-
-  // Helper function to format date
-  const formatDate = (dateString: string) => {
+// Utility functions following DRY principle
+const formatDate = (dateString: string): string => {
+  try {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -128,24 +35,86 @@ const MYSubIBSummary: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return dateString; // Return original string if parsing fails
+  }
+};
 
-  // Helper function to get status badge
-  const getStatusBadge = (status: number) => {
-    return status === 1 ? (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800`}>
-        Active
-      </span>
-    ) : (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800`}>
-        Inactive
-      </span>
-    );
-  };
+const getMemberType = (level: number): 'IB' | 'CLIENT' => {
+  // Based on business logic - you can adjust this as needed
+  return level === 1 ? 'IB' : 'CLIENT';
+};
+
+
+const getStatusBadge = (status: number) => {
+  const isActive = status === 1;
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+    }`}>
+      {isActive ? 'ACTIVE' : 'IN-ACTIVE'}
+    </span>
+  );
+};
+
+const getTypeBadge = (type: 'IB' | 'CLIENT') => {
+  const isIB = type === 'IB';
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      isIB ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
+    }`}>
+      {type}
+    </span>
+  );
+};
+
+const MYSubIBSummary: React.FC = () => {
+  // State for pagination, search, and filters
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [levelFilter, setLevelFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [downlineData, setDownlineData] = useState<DownlineResponse | null>(null);
+  const { token } = useAuth();
+
+  // Fetch downline data from API
+  const FetchDownline = useCallback(() => {
+    setIsLoading(true);
+    try {
+      apiRequest({
+        endpoint: GET_USER_DOWNLINE,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: unknown) => {
+        
+        const downlineResponse = response as DownlineResponse;
+        console.log('Downline API Response:', downlineResponse);
+        
+        setDownlineData(downlineResponse || null);
+        setIsLoading(false);
+      })
+        .catch((error: Error) => {
+          console.error('Failed to fetch downline data:', error);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.error('Failed to fetch downline data:', error);
+      setIsLoading(false);
+    } 
+  }, [token]);
+
+  useEffect(() => {
+    FetchDownline();
+  }, [FetchDownline]);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
-    return subIBData.data.filter((item) => {
+    if (!downlineData?.data) return [];
+    
+    return downlineData.data.filter((item) => {
       // Search filter
       const matchesSearch = searchTerm === '' || 
         item.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -163,7 +132,7 @@ const MYSubIBSummary: React.FC = () => {
 
       return matchesSearch && matchesStatus && matchesLevel;
     });
-  }, [subIBData.data, searchTerm, statusFilter, levelFilter]);
+  }, [downlineData?.data, searchTerm, statusFilter, levelFilter]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
@@ -172,26 +141,115 @@ const MYSubIBSummary: React.FC = () => {
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
   // Reset to first page when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, levelFilter, entriesPerPage]);
 
   // Get unique levels for filter dropdown
-  const uniqueLevels = useMemo(() => {
-    const levels = [...new Set(subIBData.data.map(item => item.level))].sort((a, b) => a - b);
-    return levels;
-  }, [subIBData.data]);
+  const uniqueLevels = useMemo(() => 
+    downlineData?.data ? [...new Set(downlineData.data.map(item => item.level))].sort((a, b) => a - b) : [],
+    [downlineData?.data]
+  );
+
+  // Shimmer Components
+  const ShimmerTableRow = () => (
+    <tr className={`border-b border-${COLORS.BORDER}`}>
+      {[30, 200, 40, 60, 80, 32, 60, 120].map((width, i) => (
+        <td key={i} className="p-4">
+          <ShimmerText width={width} height={i === 2 || i === 3 || i === 4 || i === 6 ? 24 : i === 2 ? 32 : 16} 
+            className={i === 2 || i === 3 || i === 4 || i === 6 ? "rounded-full" : ""} />
+        </td>
+      ))}
+    </tr>
+  );
+
+  const ShimmerTable = () => (
+    <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER}`}>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className={`border-b border-${COLORS.BORDER}`}>
+              {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Joined On'].map(header => (
+                <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 10 }, (_, i) => <ShimmerTableRow key={i} />)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <ShimmerText width={200} height={32} />
+            <ShimmerText width={300} height={16} />
+          </div>
+          <ShimmerText width={100} height={16} />
+        </div>
+
+        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="space-y-2">
+                <ShimmerText width={80} height={16} />
+                <ShimmerText width="100%" height={40} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
+              <ShimmerText width={40} height={32} />
+              <ShimmerText width={120} height={16} className="mt-2" />
+            </div>
+          ))}
+        </div>
+
+        <ShimmerTable />
+      </div>
+    );
+  }
+
+
+  // No data state
+  if (!downlineData?.data || downlineData.data.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>Network Downline</h1>
+            <p className={`text-${COLORS.SECONDARY_TEXT}`}>Overview of your network downline and their details</p>
+          </div>
+        </div>
+        
+        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-8 text-center`}>
+          <div className="text-6xl mb-4">📊</div>
+          <h2 className={`text-xl font-semibold text-${COLORS.SECONDARY} mb-2`}>No Downline Data</h2>
+          <p className={`text-${COLORS.SECONDARY_TEXT}`}>You don't have any downline members yet.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>My Sub IB Summary</h1>
-          <p className={`text-${COLORS.SECONDARY_TEXT}`}>Overview of your sub IB partners and their details</p>
+          <h1 className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>Network Downline</h1>
+          <p className={`text-${COLORS.SECONDARY_TEXT}`}>Overview of your network downline and their details</p>
         </div>
         <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
-          Total Records: {subIBData.recordsTotal}
+          Total Records: {downlineData?.recordsTotal || 0}
         </div>
       </div>
 
@@ -290,76 +348,63 @@ const MYSubIBSummary: React.FC = () => {
           <div className={`text-2xl font-bold text-green-600`}>
             {filteredData.filter(item => item.status === 1).length}
           </div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Active Sub IBs</div>
+          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Active Members</div>
         </div>
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
           <div className={`text-2xl font-bold text-red-600`}>
             {filteredData.filter(item => item.status === 0).length}
           </div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Inactive Sub IBs</div>
+          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Inactive Members</div>
         </div>
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-          <div className={`text-2xl font-bold text-${COLORS.PRIMARY}`}>
-            {filteredData.length > 0 ? Math.max(...filteredData.map(item => item.level)) : 0}
+          <div className={`text-2xl font-bold text-purple-600`}>
+            {filteredData.filter(item => getMemberType(item.level) === 'IB').length}
           </div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Max Level</div>
+          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>IB Members</div>
         </div>
       </div>
 
-      {/* Sub IB Table */}
+      {/* Network Downline Table */}
       <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER}`}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className={`border-b border-${COLORS.BORDER}`}>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>ID</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Name</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Email</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Status</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Level</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Sponsor ID</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Created On</th>
-                <th className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>Actions</th>
+                {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Joined On'].map(header => (
+                  <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>{header}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((subIB) => (
-                <tr
-                  key={subIB.id}
-                  className={`border-b border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}
-                >
+              {paginatedData.map((member, index) => (
+                <tr key={member.id} className={`border-b border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}>
                   <td className={`p-4 text-${COLORS.SECONDARY}`}>
-                    <span className="font-medium">#{subIB.id}</span>
-                  </td>
-                  <td className={`p-4 text-${COLORS.SECONDARY}`}>
-                    <div className="font-medium">{subIB.first_name}</div>
+                    <span className="font-medium">{startIndex + index + 1}</span>
                   </td>
                   <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
-                    <div className="text-sm">{subIB.email}</div>
-                  </td>
-                  <td className="p-4">
-                    {getStatusBadge(subIB.status)}
+                    <div className="text-sm">{member.email}</div>
                   </td>
                   <td className={`p-4 text-${COLORS.SECONDARY}`}>
-                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.PRIMARY} font-semibold text-sm`}>
-                      {subIB.level}
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-semibold text-sm">
+                      L{member.level}
                     </span>
                   </td>
-                  <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
-                    <span className="font-medium">#{subIB.sponsor}</span>
-                  </td>
-                  <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
-                    <div className="text-sm">{formatDate(subIB.created_on)}</div>
+                  <td className="p-4">{getTypeBadge(getMemberType(member.level))}</td>
+                  <td className="p-4">{getStatusBadge(member.status)}</td>
+                  <td className="p-4">
+                    <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </button>
                   </td>
                   <td className="p-4">
-                    <div className="flex space-x-2">
-                      <button className={`px-3 py-1 text-xs bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.PRIMARY} rounded-md hover:bg-${COLORS.PRIMARY} hover:text-white transition-colors`}>
-                        View
-                      </button>
-                      <button className={`px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors`}>
-                        Edit
-                      </button>
-                    </div>
+                    <button className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-full font-medium hover:bg-purple-200 transition-colors">
+                      MT5
+                    </button>
+                  </td>
+                  <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
+                    <div className="text-sm">{formatDate(member.created_on)}</div>
                   </td>
                 </tr>
               ))}
@@ -372,9 +417,9 @@ const MYSubIBSummary: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
             <div>
               Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
-              {filteredData.length !== subIBData.recordsTotal && (
+              {filteredData.length !== downlineData?.recordsTotal && (
                 <span className="ml-2 text-gray-500">
-                  (filtered from {subIBData.recordsTotal} total entries)
+                  (filtered from {downlineData?.recordsTotal} total entries)
                 </span>
               )}
             </div>

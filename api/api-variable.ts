@@ -41,6 +41,7 @@ export const SHOW_ALL_SPECIFIC_COMMENT= "/show-specific-ticket";
 
 export const MY_NETWORK="/my-network";
 export const GET_USER_DOWNLINE="/get-user-downline";
+export const IB_TRANSACTION="/ajax-user-transactions";
 
 
 
