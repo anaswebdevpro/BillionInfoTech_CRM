@@ -22,10 +22,16 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const validationSchema = Yup.object({
-    name: Yup.string()
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must be less than 50 characters')
-      .required('Name is required'),
+    first_name: Yup.string()
+      .min(2, 'First name must be at least 2 characters')
+      .max(50, 'First name must be less than 50 characters')
+      .required('First name is required'),
+    last_name: Yup.string()
+      .min(2, 'Last name must be at least 2 characters')
+      .max(50, 'Last name must be less than 50 characters')
+      .required('Last name is required'),
+    middle_name: Yup.string()
+      .max(50, 'Middle name must be less than 50 characters'),
     email: Yup.string()
       .email('Invalid email address')
       .required('Email is required'),
@@ -33,32 +39,32 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
       .matches(/^[0-9+\-\s()]+$/, 'Invalid phone number format')
       .min(10, 'Phone number must be at least 10 digits')
       .max(15, 'Phone number must be less than 15 digits'),
-    dateOfBirth: Yup.string().required('Date of birth is required'),
-    address: Yup.object({
-      street: Yup.string().required('Street address is required'),
-      city: Yup.string().required('City is required'),
-      state: Yup.string().required('State is required'),
-      country: Yup.string().required('Country is required'),
-      zipCode: Yup.string().required('ZIP code is required'),
-    }),
-    referralCode: Yup.string().max(20, 'Referral code must be less than 20 characters'),
+    isd_code: Yup.number()
+      .min(1, 'ISD code is required')
+      .required('ISD code is required'),
+    address: Yup.string(),
+    city: Yup.string(),
+    state: Yup.string(),
+    country: Yup.string(),
+    zip_code: Yup.string(),
+    referral_code: Yup.string().max(20, 'Referral code must be less than 20 characters'),
   });
 
-  const form = useFormik<ProfileFormData>({
+  const form = useFormik({
     initialValues: {
-      name: profileData?.name || '',
+      first_name: profileData?.first_name || '',
+      last_name: profileData?.last_name || '',
+      middle_name: profileData?.middle_name || '',
       email: profileData?.email || '',
       phone: profileData?.phone || '',
-      dateOfBirth: profileData?.dateOfBirth || '',
-      address: {
-        street: profileData?.address?.street || '',
-        city: profileData?.address?.city || '',
-        state: profileData?.address?.state || '',
-        country: profileData?.address?.country || '',
-        zipCode: profileData?.address?.zipCode || '',
-      },
-      referralCode: profileData?.referralCode || '',
-      profileImage: profileData?.profileImage || '',
+      isd_code: profileData?.isd_code || 0,
+      address: profileData?.address || '',
+      city: profileData?.city || '',
+      state: profileData?.state || '',
+      country: profileData?.country || '',
+      zip_code: profileData?.zip_code || '',
+      referral_code: profileData?.referral_code || '',
+      profile_picture: profileData?.profile_picture || '',
     },
     validationSchema,
     enableReinitialize: true,
@@ -86,9 +92,9 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
         <div className="flex items-center space-x-6">
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-              {profileImage || profileData?.profileImage ? (
+              {profileImage || profileData?.profile_picture ? (
                 <img
-                  src={profileImage || profileData?.profileImage}
+                  src={profileImage || profileData?.profile_picture}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
@@ -112,7 +118,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-medium text-gray-900">
-              {profileData?.name}
+              {profileData?.first_name} {profileData?.last_name}
             </h3>
             <p className="text-sm text-gray-500">{profileData?.email}</p>
             <p className="text-xs text-gray-400 mt-1">
@@ -124,14 +130,33 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Full Name"
-            name="name"
+            label="First Name"
+            name="first_name"
             type="text"
-            value={form.values.name}
+            value={form.values.first_name}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.name ? form.errors.name : undefined}
+            error={form.touched.first_name ? form.errors.first_name : undefined}
             required
+          />
+          <Input
+            label="Last Name"
+            name="last_name"
+            type="text"
+            value={form.values.last_name}
+            onChange={form.handleChange}
+            onBlur={form.handleBlur}
+            error={form.touched.last_name ? form.errors.last_name : undefined}
+            required
+          />
+          <Input
+            label="Middle Name"
+            name="middle_name"
+            type="text"
+            value={form.values.middle_name}
+            onChange={form.handleChange}
+            onBlur={form.handleBlur}
+            error={form.touched.middle_name ? form.errors.middle_name : undefined}
           />
           <Input
             label="Email Address"
@@ -153,13 +178,13 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             error={form.touched.phone ? form.errors.phone : undefined}
           />
           <Input
-            label="Date of Birth"
-            name="dateOfBirth"
-            type="date"
-            value={form.values.dateOfBirth}
+            label="ISD Code"
+            name="isd_code"
+            type="number"
+            value={form.values.isd_code}
             onChange={form.handleChange}
             onBlur={form.handleBlur}
-            error={form.touched.dateOfBirth ? form.errors.dateOfBirth : undefined}
+            error={form.touched.isd_code ? form.errors.isd_code : undefined}
             required
           />
         </div>
@@ -169,63 +194,58 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
           <h4 className="text-lg font-medium text-gray-900">Address Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
-              label="Street Address"
-              name="address.street"
+              label="Address"
+              name="address"
               type="text"
-              value={form.values.address.street}
+              value={form.values.address}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.street ? form.errors.address?.street : undefined}
-              required
+              error={form.touched.address ? form.errors.address : undefined}
             />
             <Input
               label="City"
-              name="address.city"
+              name="city"
               type="text"
-              value={form.values.address.city}
+              value={form.values.city}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.city ? form.errors.address?.city : undefined}
-              required
+              error={form.touched.city ? form.errors.city : undefined}
             />
             <Input
               label="State"
-              name="address.state"
+              name="state"
               type="text"
-              value={form.values.address.state}
+              value={form.values.state}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.state ? form.errors.address?.state : undefined}
-              required
+              error={form.touched.state ? form.errors.state : undefined}
             />
             <Input
               label="Country"
-              name="address.country"
+              name="country"
               type="text"
-              value={form.values.address.country}
+              value={form.values.country}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.country ? form.errors.address?.country : undefined}
-              required
+              error={form.touched.country ? form.errors.country : undefined}
             />
             <Input
               label="ZIP Code"
-              name="address.zipCode"
+              name="zip_code"
               type="text"
-              value={form.values.address.zipCode}
+              value={form.values.zip_code}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.address?.zipCode ? form.errors.address?.zipCode : undefined}
-              required
+              error={form.touched.zip_code ? form.errors.zip_code : undefined}
             />
             <Input
               label="Referral Code"
-              name="referralCode"
+              name="referral_code"
               type="text"
-              value={form.values.referralCode}
+              value={form.values.referral_code}
               onChange={form.handleChange}
               onBlur={form.handleBlur}
-              error={form.touched.referralCode ? form.errors.referralCode : undefined}
+              error={form.touched.referral_code ? form.errors.referral_code : undefined}
             />
           </div>
         </div>

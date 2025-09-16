@@ -1,79 +1,152 @@
-import React from 'react';
-import { FileText, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, Upload, X } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { apiRequest } from '../../../services/api';
+import { UPLOAD_DOCUMENT } from '../../../../api/api-variable';
+import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { enqueueSnackbar } from 'notistack';
 
 interface KYCVerificationProps {
-  profileData: any;
+  profileData: {
+    kycDocuments?: Array<{
+      name: string;
+      uploadedAt: string;
+      status: string;
+    }>;
+  } | null;
 }
 
+interface DocumentFile {
+  file: File;
+  type: 'government_id_front' | 'government_id_back' | 'proof_of_address';
+  name: string;
+}
+
+// API field mapping
+const getApiFieldName = (type: DocumentFile['type']): string => {
+  switch (type) {
+    case 'government_id_front': return 'add_proof_f';
+    case 'government_id_back': return 'add_proof_b';
+    case 'proof_of_address': return 'file';
+    default: return 'file';
+  }
+};
+
+const getApiTypeValue = (type: DocumentFile['type']): string => {
+  switch (type) {
+    case 'government_id_front': return 'add_proof_f';
+    case 'government_id_back': return 'add_proof_b';
+    case 'proof_of_address': return 'add_proof_address';
+    default: return 'add_proof_b';
+  }
+};
+
 const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
-  // Mock KYC status - in real app, this would come from API
-  const kycStatus = profileData?.kycStatus || 'pending';
+  const { token } = useAuth();
+  const [uploading, setUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<DocumentFile[]>([]);
   const kycDocuments = profileData?.kycDocuments || [];
 
-  const getStatusInfo = (status: string) => {
-    switch (status) {
-      case 'verified':
-        return {
-          icon: CheckCircle,
-          color: 'text-green-600',
-          bgColor: 'bg-green-100',
-          title: 'KYC Verified',
-          description: 'Your identity has been successfully verified.',
-        };
-      case 'pending':
-        return {
-          icon: AlertCircle,
-          color: 'text-yellow-600',
-          bgColor: 'bg-yellow-100',
-          title: 'KYC Pending',
-          description: 'Your documents are under review. This usually takes 1-3 business days.',
-        };
-      case 'rejected':
-        return {
-          icon: AlertCircle,
-          color: 'text-red-600',
-          bgColor: 'bg-red-100',
-          title: 'KYC Rejected',
-          description: 'Your documents were rejected. Please upload new documents.',
-        };
-      default:
-        return {
-          icon: FileText,
-          color: 'text-gray-600',
-          bgColor: 'bg-gray-100',
-          title: 'KYC Not Started',
-          description: 'Please complete your KYC verification to access all features.',
-        };
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: DocumentFile['type']) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const newDocument: DocumentFile = {
+        file,
+        type,
+        name: file.name
+      };
+      setSelectedFiles(prev => [...prev.filter(doc => doc.type !== type), newDocument]);
     }
   };
 
-  const statusInfo = getStatusInfo(kycStatus);
-  const StatusIcon = statusInfo.icon;
+  // Handle upload button click
+  const handleUploadClick = (type: DocumentFile['type']) => {
+    const input = document.getElementById(type) as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  };
+
+  // Remove selected file
+  const removeFile = (type: DocumentFile['type']) => {
+    setSelectedFiles(prev => prev.filter(doc => doc.type !== type));
+  };
+
+  // Upload all selected documents at once
+  const handleUploadDocuments = async () => {
+    if (selectedFiles.length === 0) {
+      enqueueSnackbar('Please select at least one document to upload', { variant: 'warning' });
+      return;
+    }
+
+    if (uploading) {
+      enqueueSnackbar('Please wait, upload is in progress', { variant: 'warning' });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      
+      // Add type field (required by API) - use the first document's type
+      formData.append('type', getApiTypeValue(selectedFiles[0].type));
+      
+      // Add all files with their correct API field names
+      selectedFiles.forEach((doc) => {
+        formData.append(getApiFieldName(doc.type), doc.file);
+      });
+
+      const response = await apiRequest({
+        endpoint: UPLOAD_DOCUMENT,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type for FormData, let browser set it with boundary
+        },
+        data: formData,
+      });
+
+      console.log('Upload response:', response);
+
+      // Check if response is null (unexpected error)
+      if (!response) {
+        enqueueSnackbar('Failed to upload documents. Please try again.', { variant: 'error' });
+        return;
+      }
+
+      // Check if it's a success response
+      if ((response as { success?: boolean })?.success === true) {
+        enqueueSnackbar('All documents uploaded successfully!', { variant: 'success' });
+        // Clear all selected files
+        setSelectedFiles([]);
+        // Reset all file inputs
+        const inputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+        inputs.forEach(input => input.value = '');
+      } else {
+        // Handle error response - extract the message
+        const errorMessage = (response as { message?: string })?.message || 'Upload failed';
+        console.log('Error message from API:', errorMessage);
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+        
+        // If it's an "already uploaded" error, clear the files
+        if (errorMessage.includes('already uploaded')) {
+          setSelectedFiles([]);
+          const inputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+          inputs.forEach(input => input.value = '');
+        }
+      }
+    } catch (error) {
+      console.error('Document upload failed:', error);
+      enqueueSnackbar('Failed to upload documents. Please try again.', { variant: 'error' });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      {/* KYC Status */}
-      <Card title="KYC Verification Status" subtitle="Identity verification status">
-        <div className="flex items-start space-x-4">
-          <div className={`p-3 rounded-full ${statusInfo.bgColor}`}>
-            <StatusIcon className={`h-6 w-6 ${statusInfo.color}`} />
-          </div>
-          <div className="flex-1">
-            <h3 className={`text-lg font-medium ${statusInfo.color}`}>
-              {statusInfo.title}
-            </h3>
-            <p className="text-gray-600 mt-1">{statusInfo.description}</p>
-            {kycStatus === 'rejected' && (
-              <p className="text-sm text-red-600 mt-2">
-                Reason: Document quality is insufficient. Please ensure all documents are clear and readable.
-              </p>
-            )}
-          </div>
-        </div>
-      </Card>
-
       {/* Required Documents */}
       <Card title="Required Documents" subtitle="Upload the following documents for verification">
         <div className="space-y-4">
@@ -87,17 +160,79 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Front side</span>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      id="government_id_front"
+                      className="hidden"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileSelect(e, 'government_id_front')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        type="button"
+                        onClick={() => handleUploadClick('government_id_front')}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Select File
+                      </Button>
+                      {selectedFiles.find(f => f.type === 'government_id_front') && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                            {selectedFiles.find(f => f.type === 'government_id_front')?.name}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFile('government_id_front')}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Back side</span>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      id="government_id_back"
+                      className="hidden"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileSelect(e, 'government_id_back')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        type="button"
+                        onClick={() => handleUploadClick('government_id_back')}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Select File
+                      </Button>
+                      {selectedFiles.find(f => f.type === 'government_id_back') && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                            {selectedFiles.find(f => f.type === 'government_id_back')?.name}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFile('government_id_back')}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -111,10 +246,41 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Document</span>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      id="proof_of_address"
+                      className="hidden"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileSelect(e, 'proof_of_address')}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        type="button"
+                        onClick={() => handleUploadClick('proof_of_address')}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Select File
+                      </Button>
+                      {selectedFiles.find(f => f.type === 'proof_of_address') && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                            {selectedFiles.find(f => f.type === 'proof_of_address')?.name}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFile('proof_of_address')}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -137,7 +303,7 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Uploaded Documents</h4>
               <div className="space-y-2">
-                {kycDocuments.map((doc: any, index: number) => (
+                {kycDocuments.map((doc, index: number) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <FileText className="h-5 w-5 text-gray-400" />
@@ -149,15 +315,6 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        doc.status === 'approved' 
-                          ? 'bg-green-100 text-green-800'
-                          : doc.status === 'rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {doc.status}
-                      </span>
                       <Button variant="outline" size="sm">
                         View
                       </Button>
@@ -169,11 +326,20 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
           )}
 
           {/* Submit Button */}
-          {kycStatus !== 'verified' && (
-            <div className="flex justify-end">
-              <Button variant="primary" size="lg">
-                Submit for Verification
-              </Button>
+          <div className="flex justify-end">
+            <Button 
+              variant="primary" 
+              size="lg"
+              onClick={handleUploadDocuments}
+              disabled={uploading || selectedFiles.length === 0}
+              loading={uploading}
+            >
+              {uploading ? 'Uploading Documents...' : 'Submit for Verification'}
+            </Button>
+          </div>
+          {selectedFiles.length > 0 && (
+            <div className="text-center text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+              Ready to upload {selectedFiles.length} document(s). Click "Submit for Verification" to upload all documents at once.
             </div>
           )}
         </div>

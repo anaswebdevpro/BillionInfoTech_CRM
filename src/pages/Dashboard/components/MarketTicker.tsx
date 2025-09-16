@@ -1,4 +1,3 @@
-import React from 'react';
 import { Rss } from 'lucide-react';
 import TickerDisplay from '../../../components/ui/TickerDisplay';
 

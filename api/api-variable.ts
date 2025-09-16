@@ -21,6 +21,9 @@ export const DASHBOARD_DATA="/dashboard-data";
 export const SAVE_BANK="/save-bank";
 export const DELETE_BANK="/delete-bank"
 
+//Meta accounts 
+export const MANAGE_ACCOUNTS="/manage-accounts";
+
 
 
 //Bonus and promotions

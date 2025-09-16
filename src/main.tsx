@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { router } from './router'
 import { AuthProvider } from './context/AuthContext/AuthContext'
+
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
     <AuthProvider>
@@ -16,5 +17,5 @@ createRoot(document.getElementById('root')!).render(
               <RouterProvider router={router} />
       </SnackbarProvider>
     </AuthProvider>
-  // </StrictMode>,
+  // {/* </StrictMode>, */}
 )

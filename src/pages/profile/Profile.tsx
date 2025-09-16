@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { apiRequest } from '../../services/api';
 import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../../api/api-variable';
-import { ShimmerText, ShimmerCard, ShimmerButton } from '../../components/ui/Shimmer';
-import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, User as UserType } from '../../types';
+import { ShimmerText, ShimmerButton } from '../../components/ui/Shimmer';
+import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, ExtendedUser } from '../../types';
 
 // Import Profile Components
 import {
@@ -16,27 +16,6 @@ import {
 
 // Tab types
 type TabType = 'profile' | 'password' | 'kyc' | 'bank';
-
-// Extended user interface for profile data
-interface ExtendedUser extends UserType {
-  phone?: string;
-  dateOfBirth?: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
-  };
-  referralCode?: string;
-  profileImage?: string;
-  firstName?: string;
-  lastName?: string;
-  walletBalance?: number;
-  status?: string;
-  kycStatus?: string;
-  kycDocuments?: any[];
-}
 
 // API Bank Account Response interface
 interface ApiBankAccount {
@@ -132,7 +111,7 @@ const Profile: React.FC = () => {
       console.log('✅ Bank details mapped and set:', mappedAccounts);
     })
     .catch((error) => {
-      console.error('❌ Error fetching bank details:', error);
+      console.error(' Error fetching bank details:', error);
     });
   }, [token]);
 
@@ -149,11 +128,18 @@ const Profile: React.FC = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append('name', values.name);
+      formData.append('first_name', values.first_name);
+      formData.append('last_name', values.last_name);
+      formData.append('middle_name', values.middle_name || '');
       formData.append('email', values.email);
       formData.append('phone', values.phone);
-      formData.append('dateOfBirth', values.dateOfBirth);
-      formData.append('referralCode', values.referralCode);
+      formData.append('isd_code', values.isd_code.toString());
+      formData.append('address', values.address || '');
+      formData.append('city', values.city || '');
+      formData.append('state', values.state || '');
+      formData.append('country', values.country || '');
+      formData.append('zip_code', values.zip_code || '');
+      formData.append('referral_code', values.referral_code || '');
       
       if (imageFile) {
         formData.append('profileImage', imageFile);
@@ -161,7 +147,7 @@ const Profile: React.FC = () => {
 
       const response = await apiRequest({
         endpoint: PROFILE_UPDATE,
-        method: 'PUT',
+        method: 'POST',
         data: formData,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -329,18 +315,8 @@ const Profile: React.FC = () => {
             
             {/* Tab Content Shimmer */}
             <div className="p-6">
-              <ShimmerCard height={400}>
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <ShimmerText width="100px" height={16} />
-                      <ShimmerText width="100%" height={40} />
-                    </div>
-                    <div className="space-y-4">
-                      <ShimmerText width="100px" height={16} />
-                      <ShimmerText width="100%" height={40} />
-                    </div>
-                  </div>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <ShimmerText width="100px" height={16} />
                     <ShimmerText width="100%" height={40} />
@@ -348,12 +324,20 @@ const Profile: React.FC = () => {
                   <div className="space-y-4">
                     <ShimmerText width="100px" height={16} />
                     <ShimmerText width="100%" height={40} />
-                  </div>
-                  <div className="flex justify-end">
-                    <ShimmerButton width="120px" height={40} />
                   </div>
                 </div>
-              </ShimmerCard>
+                <div className="space-y-4">
+                  <ShimmerText width="100px" height={16} />
+                  <ShimmerText width="100%" height={40} />
+                </div>
+                <div className="space-y-4">
+                  <ShimmerText width="100px" height={16} />
+                  <ShimmerText width="100%" height={40} />
+                </div>
+                <div className="flex justify-end">
+                  <ShimmerButton width="120px" height={40} />
+                </div>
+              </div>
             </div>
           </div>
         </div>

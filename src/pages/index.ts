@@ -1,10 +1,8 @@
 // Main Pages Exports
-export { default as AdminDashboard } from './AdminDashboard';
 export { default as AdminSupport } from './admin/AdminSupport';
 export { default as CreateTicket } from './createTicket/CreateTicket';
 export { default as Dashboard } from './Dashboard/Dashboard';
 export { default as Deposits } from './Deposite/Deposits';
-export { default as IBRequest } from './IBRequest/IBRequest';
 export { default as InternalTransfer } from './internalTransfer/InternalTransfer';
 // export { default as KYCVerification } from './KYCVerification';
 export { default as LiveAccounts } from './LiveAccount/LiveAccounts';

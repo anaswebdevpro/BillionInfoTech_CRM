@@ -51,9 +51,8 @@ function TickerDisplay() {
   return (
     <div className="tradingview-widget-container" ref={container}>
       <div className="tradingview-widget-container__widget"></div>
-     
     </div>
   );
 }
 
-  export default memo(TickerDisplay);
+export default memo(TickerDisplay);

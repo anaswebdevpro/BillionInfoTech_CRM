@@ -23,16 +23,27 @@ export interface User {
 
 // Extended User type with additional profile fields
 export interface ExtendedUser extends User {
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
   phone?: string;
-  dateOfBirth?: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
-  };
-  referralCode?: string;
+  isd_code?: number;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zip_code?: string;
+  referral_code?: string;
+  profile_picture?: string;
+  sponsor?: string;
+  status?: number;
+  theme?: number;
+  withdrawal_status?: number;
+  kycDocuments?: Array<{
+    name: string;
+    uploadedAt: string;
+    status: string;
+  }>;
 }
 
 // Account type for user accounts
@@ -181,19 +192,19 @@ export interface AuthContextType {
 }
 
 export interface ProfileFormData {
-  name: string;
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
   email: string;
   phone: string;
-  dateOfBirth: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
-  };
-  referralCode: string;
-  profileImage?: string;
+  isd_code: number;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zip_code?: string;
+  referral_code?: string;
+  profile_picture?: string;
 }
 
 export interface BankDetailsFormData {
