@@ -1,53 +1,284 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect} from 'react';
 import { COLORS } from '../../../constants/colors';
-
-// Dummy data structure as specified
-const dummyData = {
-  "draw": null,
-  "recordsTotal": 0,
-  "recordsFiltered": 0,
-  "data": [{ id: 1, name: "TEST", email: "test@example.com", type: "IB", status: 1, joined: "16 Jul, 2025 04:09 pm" },
-    { id: 2, name: "Meta Trader 5", email: "metatrader5@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:11 pm" },
-    { id: 3, name: "Forex", email: "forex@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:17 pm" },
-    { id: 4, name: "Forex Majors", email: "forexmajors@example.com", type: "IB", status: 1, joined: "17 Jul, 2025 09:46 am" },
-    { id: 5, name: "Metals", email: "metals@example.com", type: "CLIENT", status: 1, joined: "09 Sep, 2025 08:32 am" },
-    { id: 6, name: "Energies", email: "energies@example.com", type: "CLIENT", status: 1, joined: "12 Feb, 2025 11:39 am" },
-    { id: 7, name: "Indices", email: "indices@example.com", type: "IB", status: 1, joined: "16 Jul, 2025 04:09 pm" },
-    { id: 8, name: "Crypto", email: "crypto@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:11 pm" },{ id: 1, name: "TEST", email: "test@example.com", type: "IB", status: 1, joined: "16 Jul, 2025 04:09 pm" },
-    { id: 2, name: "Meta Trader 5", email: "metatrader5@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:11 pm" },
-    { id: 3, name: "Forex", email: "forex@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:17 pm" },
-    { id: 4, name: "Forex Majors", email: "forexmajors@example.com", type: "IB", status: 1, joined: "17 Jul, 2025 09:46 am" },
-    { id: 5, name: "Metals", email: "metals@example.com", type: "CLIENT", status: 1, joined: "09 Sep, 2025 08:32 am" },
-    { id: 6, name: "Energies", email: "energies@example.com", type: "CLIENT", status: 1, joined: "12 Feb, 2025 11:39 am" },
-    { id: 7, name: "Indices", email: "indices@example.com", type: "IB", status: 1, joined: "16 Jul, 2025 04:09 pm" },
-    { id: 8, name: "Crypto", email: "crypto@example.com", type: "CLIENT", status: 1, joined: "16 Jul, 2025 04:11 pm" }]
-};
+import { apiRequest } from '../../../services/api';
+import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
+import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { ShimmerText, ShimmerCard, ShimmerButton } from '../../../components/ui/Shimmer';
+import { useNavigate } from 'react-router-dom';
 
 
+
+// Types
+interface UserData {
+  id: number | string;
+  name?: string;
+  email?: string;
+  type?: string;
+  status?: number;
+  joined?: string;
+  created_at?: string;
+  account_type?: string;
+}
+
+// Constants
+const ENTRIES_PER_PAGE_OPTIONS = [5, 10, 25] as const;
+const DEFAULT_ENTRIES_PER_PAGE = 10;
+
+// Reusable Components
+const SummaryCard: React.FC<{ title: string; count: number; color: string }> = ({ title, count, color }) => (
+  <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
+    <div className={`text-2xl font-bold ${color}`}>{count}</div>
+    <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>{title}</div>
+  </div>
+);
+
+const StatusBadge: React.FC<{ status: number }> = ({ status }) => (
+  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+    status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+  }`}>
+    {status === 1 ? 'ACTIVE' : 'INACTIVE'}
+  </span>
+);
+
+const TypeBadge: React.FC<{ type: string; onEdit?: () => void }> = ({ type, onEdit }) => (
+  <div className="flex items-center gap-2">
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      type === 'IB' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
+    }`}>
+      {type || 'N/A'}
+    </span>
+    {type === 'IB' && onEdit && (
+      <button
+        onClick={onEdit}
+        className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium hover:bg-blue-200 transition-colors"
+        title="Edit Commission"
+      >
+        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      </button>
+    )}
+  </div>
+);
+
+const AccountBadge: React.FC<{ accountType?: string }> = ({ accountType }) => (
+  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+    {accountType || 'MT5'}
+  </span>
+);
+
+const PaginationButton: React.FC<{
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+  isActive?: boolean;
+}> = ({ onClick, disabled, children, isActive }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-3 py-1 border rounded-md transition-colors ${
+      isActive
+        ? `bg-${COLORS.PRIMARY} text-white border-${COLORS.PRIMARY}`
+        : `border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG}`
+    } disabled:opacity-50 disabled:cursor-not-allowed`}
+  >
+    {children}
+  </button>
+);
 
 const SetCommission: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [entriesPerPage, setEntriesPerPage] = useState(DEFAULT_ENTRIES_PER_PAGE);
   const [currentPage, setCurrentPage] = useState(1);
+  const [data, setData] = useState<UserData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
-  // Use dummy data structure but with sample data for demo
-  const data = dummyData.data;
 
+  const FetchData  =() => {
+    setIsLoading(true);
+    try {
+      apiRequest({
+        endpoint: GET_USER_DOWNLINE,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        data:{
+          level:1
+        }
+      })
+      .then((response: unknown) => {         
+        
+        
+        console.log('Data API Response:', response);
+
+
+      if (Array.isArray(response)) {
+          setData(response);
+        } else if (response && typeof response === 'object' && 'data' in response) {
+          setData((response as { data: UserData[] }).data || []);
+        } else {
+          setData([]);
+        }
+        setIsLoading(false);
+      })
+        .catch((error: Error) => {
+          console.error('Failed to fetch user data:', error);
+          setData([]);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      setIsLoading(false);
+    }
+  };  
+
+  useEffect(() => {
+    FetchData();
+  }, []);
+
+  // Handler for edit commission
+  const handleEditCommission = (userItem: UserData) => {
+    navigate('/dashboard/set-commission-form', { 
+      state: { 
+        userId: userItem.id, 
+        userEmail: userItem.email,
+        userName: userItem.name 
+      } 
+    });
+  };
+
+
+
+  
+
+  // Data processing
   const filteredData = useMemo(() => 
-    data.filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.email.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [data, searchTerm]
+    data.filter((item: UserData) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        item.name?.toLowerCase().includes(searchLower) ||
+        item.email?.toLowerCase().includes(searchLower)
+      );
+    }), [data, searchTerm]
   );
 
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
+  const paginatedData = useMemo(() => 
+    filteredData.slice(
+      (currentPage - 1) * entriesPerPage,
+      currentPage * entriesPerPage
+    ), [filteredData, currentPage, entriesPerPage]
   );
 
-  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
-  const activeCount = filteredData.filter(item => item.status === 1).length;
-  const inactiveCount = filteredData.filter(item => item.status === 0).length;
+  const stats = useMemo(() => ({
+    total: filteredData.length,
+    active: filteredData.filter((item: UserData) => item.status === 1).length,
+    inactive: filteredData.filter((item: UserData) => item.status === 0).length,
+    totalPages: Math.ceil(filteredData.length / entriesPerPage)
+  }), [filteredData, entriesPerPage]);
+
+  // Handlers
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleEntriesPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setEntriesPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing entries per page
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, stats.totalPages));
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  // Shimmer loading components
+  const ShimmerTableRow = () => (
+    <tr className={`border-b border-${COLORS.BORDER}`}>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <td key={index} className="p-4">
+          <ShimmerText width="100%" height={20} />
+        </td>
+      ))}
+    </tr>
+  );
+
+  const ShimmerLoadingState = () => (
+    <div className="space-y-6">
+      {/* Header Shimmer */}
+      <div className="flex justify-between items-center">
+        <div>
+          <ShimmerText width="400px" height={32} />
+          <ShimmerText width="300px" height={20} className="mt-2" />
+        </div>
+        <ShimmerButton width="100px" height={40} />
+      </div>
+
+      {/* Search Controls Shimmer */}
+      <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <ShimmerText width="60px" height={16} className="mb-2" />
+            <ShimmerText width="100%" height={40} />
+          </div>
+          <div>
+            <ShimmerText width="100px" height={16} className="mb-2" />
+            <ShimmerText width="100%" height={40} />
+          </div>
+          <div className="flex items-end">
+            <ShimmerButton width="120px" height={40} />
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Cards Shimmer */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <ShimmerCard key={index} height={80} />
+        ))}
+      </div>
+
+      {/* Table Shimmer */}
+      <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER}`}>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className={`border-b border-${COLORS.BORDER}`}>
+                {['#', 'Email', 'Type', 'Status', 'Accounts', 'Joined On'].map(header => (
+                  <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <ShimmerTableRow key={index} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isLoading) {
+    return <ShimmerLoadingState />;
+  }
 
   return (
     <div className="space-y-6">
@@ -71,7 +302,7 @@ const SetCommission: React.FC = () => {
               type="text"
               placeholder="Search by name, ID, slug, or symbol..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
             />
           </div>
@@ -79,17 +310,17 @@ const SetCommission: React.FC = () => {
             <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>Entries per page</label>
             <select
               value={entriesPerPage}
-              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+              onChange={handleEntriesPerPageChange}
               className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
             >
-              <option value={5}>5 entries</option>
-              <option value={10}>10 entries</option>
-              <option value={25}>25 entries</option>
+              {ENTRIES_PER_PAGE_OPTIONS.map(option => (
+                <option key={option} value={option}>{option} entries</option>
+              ))}
             </select>
           </div>
           <div className="flex items-end">
             <button
-              onClick={() => setSearchTerm('')}
+              onClick={handleClearFilters}
               className={`px-4 py-2 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors`}
             >
               Clear Filters
@@ -100,18 +331,9 @@ const SetCommission: React.FC = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-          <div className={`text-2xl font-bold text-green-600`}>{filteredData.length}</div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Filtered Results</div>
-        </div>
-        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-          <div className={`text-2xl font-bold text-green-600`}>{activeCount}</div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Active Items</div>
-        </div>
-        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-          <div className={`text-2xl font-bold text-red-600`}>{inactiveCount}</div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Inactive Items</div>
-        </div>
+        <SummaryCard title="Filtered Results" count={stats.total} color="text-green-600" />
+        <SummaryCard title="Active Items" count={stats.active} color="text-green-600" />
+        <SummaryCard title="Inactive Items" count={stats.inactive} color="text-red-600" />
       </div>
 
       {/* Data Table */}
@@ -138,36 +360,39 @@ const SetCommission: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((item, index) => (
-                <tr key={item.id} className={`border-b border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}>
-                  <td className={`p-4 text-${COLORS.SECONDARY}`}>
-                    <span className="font-medium">{(currentPage - 1) * entriesPerPage + index + 1}</span>
-                  </td>
-                  <td className="p-4 text-orange-600">
-                    <div className="text-sm">{item.email}</div>
-                  </td>
-                  <td className="p-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      item.type === 'IB' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
-                    }`}>
-                      {item.type}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      ACTIVE
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      MT5
-                    </span>
-                  </td>
-                  <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
-                    <div className="text-sm">{item.joined}</div>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item: UserData, index: number) => (
+                  <tr key={item.id || index} className={`border-b border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}>
+                    <td className={`p-4 text-${COLORS.SECONDARY}`}>
+                      <span className="font-medium">{(currentPage - 1) * entriesPerPage + index + 1}</span>
+                    </td>
+                    <td className="p-4 text-orange-600">
+                      <div className="text-sm">{item.email || 'N/A'}</div>
+                    </td>
+                    <td className="p-4">
+                      <TypeBadge 
+                        type={item.type || ''} 
+                        onEdit={item.type === 'IB' ? () => handleEditCommission(item) : undefined}
+                      />
+                    </td>
+                    <td className="p-4">
+                      <StatusBadge status={item.status || 0} />
+                    </td>
+                    <td className="p-4">
+                      <AccountBadge accountType={item.account_type} />
+                    </td>
+                    <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
+                      <div className="text-sm">{item.joined || item.created_at || 'N/A'}</div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-gray-500">
+                    No data available
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -181,40 +406,34 @@ const SetCommission: React.FC = () => {
             
             {/* Pagination Controls */}
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              <PaginationButton
+                onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className={`px-3 py-1 border border-${COLORS.BORDER} rounded-md hover:bg-${COLORS.SECONDARY_BG} transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 Previous
-              </button>
+              </PaginationButton>
 
               <div className="flex space-x-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                {Array.from({ length: Math.min(5, stats.totalPages) }, (_, i) => {
                   const pageNum = i + 1;
                   return (
-                    <button
+                    <PaginationButton
                       key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-1 border rounded-md transition-colors ${
-                        currentPage === pageNum
-                          ? `bg-${COLORS.PRIMARY} text-white border-${COLORS.PRIMARY}`
-                          : `border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG}`
-                      }`}
+                      onClick={() => handlePageChange(pageNum)}
+                      isActive={currentPage === pageNum}
                     >
                       {pageNum}
-                    </button>
+                    </PaginationButton>
                   );
                 })}
               </div>
 
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 border border-${COLORS.BORDER} rounded-md hover:bg-${COLORS.SECONDARY_BG} transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+              <PaginationButton
+                onClick={handleNextPage}
+                disabled={currentPage === stats.totalPages}
               >
                 Next
-              </button>
+              </PaginationButton>
             </div>
           </div>
         </div>

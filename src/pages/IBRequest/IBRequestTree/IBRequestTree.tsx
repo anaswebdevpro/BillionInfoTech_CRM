@@ -15,6 +15,7 @@ interface TreeMember {
   otherInfo: string
   account_number: string | number
   business: string
+  status?: number | string
 }
 
 interface TooltipData {
@@ -152,7 +153,7 @@ const MemberNode = ({
   
   return (
     <div 
-      className={`border-2 rounded-xl p-4 ${COLORS.SHADOW} hover:shadow-xl transition-all duration-300 min-w-[220px]
+      className={` rounded-xl p-4 ${COLORS.SHADOW} hover:shadow-xl transition-all duration-300 min-w-[220px]
         max-w-[280px] mx-auto cursor-pointer transform hover:scale-105 ${
         isSelected 
           ? `bg-${COLORS.PRIMARY_BG_LIGHT} border-${COLORS.PRIMARY} ring-2 ring-${COLORS.PRIMARY} ring-opacity-30` 
@@ -163,12 +164,16 @@ const MemberNode = ({
       <div className="text-center">
         <div className={`font-bold text-${COLORS.SECONDARY} mb-2 text-lg`}>
           {tooltipData?.name || `Member ${member.memberId}`}
+          
+
         </div>
+        
         <div className={`text-sm text-${COLORS.SECONDARY_TEXT} mb-3 truncate`} title={member.otherInfo}>
           {member.otherInfo}
         </div>
         <div className={`flex justify-between text-xs text-${COLORS.SECONDARY_TEXT} mb-3`}>
           <span className="font-medium">Acc: {member.account_number}</span>
+          
           <span className="font-medium">Bus: {member.business}</span>
         </div>
         <div className="mb-3">
@@ -178,6 +183,23 @@ const MemberNode = ({
               : `bg-${COLORS.SECONDARY_TEXT} text-white`
           }`}>
             {tooltipData?.ib_status || 'Unknown'}
+          </span>
+          
+        </div>
+        {/* Status Badge */}
+        <div className="mb-3">
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            member.status === 1 || member.status === 'active' || member.status === 'Active'
+              ? 'bg-green-100 text-green-800' 
+              : member.status === 0 || member.status === 'inactive' || member.status === 'Inactive'
+              ? 'bg-red-100 text-red-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}>
+            {member.status === 1 || member.status === 'active' || member.status === 'Active' 
+              ? 'ACTIVE' 
+              : member.status === 0 || member.status === 'inactive' || member.status === 'Inactive'
+              ? 'INACTIVE'
+              : member.status || 'UNKNOWN'}
           </span>
         </div>
         {tooltipData && (
@@ -253,7 +275,7 @@ const IBRequestTree = () => {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const {token} = useAuth();
 
-  const FetchNetwork = React.useCallback(() => {
+  const FetchNetwork =() => {
     setIsLoading(true);
     try {
       apiRequest({
@@ -264,9 +286,7 @@ const IBRequestTree = () => {
         // The API returns data directly, not nested under 'data' property
         const networkResponse = response as NetworkData;
         console.log('Full API Response:', response);
-        console.log('Network Response:', networkResponse);
-        console.log('Tree Array:', networkResponse.tree);
-        console.log('Tooltip Array:', networkResponse.tooltip);
+       
         
         setNetworkData(networkResponse || null);
         if (networkResponse?.tree?.[0]) {
@@ -283,11 +303,11 @@ const IBRequestTree = () => {
       console.error('Failed to fetch user data:', error);
       setIsLoading(false);
     } 
-  }, [token]);
+  };
 
   useEffect(() => {
     FetchNetwork();
-  }, [FetchNetwork]);
+  }, []);
 
   // Get the selected member data
   const selectedMember = networkData?.tree?.find(member => member.memberId === selectedMemberId) || null
@@ -404,12 +424,6 @@ const IBRequestTree = () => {
               className={`px-6 py-3 bg-${COLORS.PRIMARY} text-white rounded-xl hover:bg-${COLORS.PRIMARY_BG} transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
             >
               Reset to Root
-            </button>
-            <button
-              onClick={() => setIsLoading(!isLoading)}
-              className={`px-6 py-3 bg-${COLORS.SECONDARY} text-white rounded-xl hover:bg-${COLORS.SECONDARY}/80 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
-            >
-              {isLoading ? 'Hide' : 'Show'} Shimmer
             </button>
           </div>
         </div>

@@ -52,6 +52,7 @@ import AdminLayoutWrapper from '../components/AdminLayoutWrapper';
 import {
   SetCommission, IBAccordian, IBRequestTree, IBtradeHistory, IBtransaction, IBBusiness, MYSubIBSummnary, CommissionReport
 } from "../pages/IBRequest/index";
+import SetCommissionForm from '../pages/IBRequest/SetCommission/SetCommissionForm';
 
 export const router = createBrowserRouter([
   {
@@ -125,6 +126,10 @@ export const router = createBrowserRouter([
            {
             path: 'set-commission',
             element: <SetCommission />,
+          },
+          {
+            path: 'set-commission-form',
+            element: <SetCommissionForm />,
           },
           {
             path: 'accordian',
