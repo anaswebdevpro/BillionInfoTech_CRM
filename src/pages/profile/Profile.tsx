@@ -176,10 +176,11 @@ const Profile: React.FC = () => {
     try {
       const response = await apiRequest({
         endpoint: UPDATE_PASSWORD,
-        method: 'PUT',
+        method: 'POST',
         data: {
-          currentPassword: values.currentPassword,
-          newPassword: values.newPassword,
+          password: values.currentPassword,
+          new_password: values.newPassword,
+          confirm_password: values.confirmPassword,
         },
         headers: {
           'Authorization': `Bearer ${token}`,

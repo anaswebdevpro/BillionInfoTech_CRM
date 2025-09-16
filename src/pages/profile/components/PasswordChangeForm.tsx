@@ -25,6 +25,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
         'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
       )
+      // .matches(/^[A-Za-z0-9]+$/, "Password can only contain letters and numbers")
       .required('New password is required'),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('newPassword')], 'Passwords must match')
@@ -67,7 +68,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
 
         {/* Password Fields */}
         <div className="space-y-4">
-          <Input
+          <Input autoComplete="current-password"
             label="Current Password"
             name="currentPassword"
             type="password"
@@ -78,7 +79,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
             required
             placeholder="Enter your current password"
           />
-          <Input
+          <Input autoComplete="new-password"
             label="New Password"
             name="newPassword"
             type="password"
@@ -89,7 +90,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({
             required
             placeholder="Enter your new password"
           />
-          <Input
+          <Input autoComplete="new-password"  
             label="Confirm New Password"
             name="confirmPassword"
             type="password"
