@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../constants/colors';
-import { ShimmerChart, ShimmerText, ShimmerStatsCard } from '../../components/ui/Shimmer';
+import { ShimmerChart, ShimmerText } from '../../components/ui/Shimmer';
 
 const AdminReports: React.FC = () => {
   const [loading, setLoading] = useState(true);
