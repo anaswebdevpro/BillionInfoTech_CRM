@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSnackbar } from 'notistack';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { apiRequest } from '../../services/api';
 import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../../api/api-variable';
@@ -38,8 +39,9 @@ const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<ExtendedUser | null>(null);
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   
-  // Get user data from AuthContext
+  // Get user data from AuthContext and snackbar hook
   const { user, token } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 console.log(token);
   // Function to fetch profile data from API
   const fetchProfileData = useCallback(() => {
@@ -155,13 +157,15 @@ console.log(token);
       }) as { user?: ExtendedUser; success?: boolean; message?: string };
 
       if (response?.user || response?.success) {
-        fetchProfileData();
+        await fetchProfileData();
+        enqueueSnackbar(response?.message || 'Profile updated successfully!', { variant: 'success' });
         console.log('Profile updated successfully');
       } else {
         throw new Error(response?.message || 'Profile update failed');
       }
     } catch (error) {
       console.error('Profile update failed:', error);
+      enqueueSnackbar(error instanceof Error ? error.message : 'Profile update failed. Please try again.', { variant: 'error' });
       throw error;
     } finally {
       setIsLoading(false);
@@ -191,9 +195,11 @@ console.log(token);
         throw new Error(response?.message || 'Password update failed');
       }
       
+      enqueueSnackbar(response?.message || 'Password updated successfully!', { variant: 'success' });
       console.log('Password updated successfully');
     } catch (error) {
       console.error('Password update failed:', error);
+      enqueueSnackbar(error instanceof Error ? error.message : 'Password update failed. Please try again.', { variant: 'error' });
       throw error;
     } finally {
       setIsLoading(false);
@@ -228,9 +234,11 @@ console.log(token);
       }
       
       await fetchBankDetails();
+      enqueueSnackbar(response?.message || 'Bank account added successfully!', { variant: 'success' });
       console.log('Bank account added successfully');
     } catch (error) {
       console.error('Failed to add bank account:', error);
+      enqueueSnackbar(error instanceof Error ? error.message : 'Failed to add bank account. Please try again.', { variant: 'error' });
       throw error;
     } finally {
       setIsLoading(false);
@@ -256,9 +264,11 @@ console.log(token);
       }
       
       await fetchBankDetails();
+      enqueueSnackbar(response?.message || 'Bank account deleted successfully!', { variant: 'success' });
       console.log('Bank account deleted successfully');
     } catch (error) {
       console.error('Failed to delete bank account:', error);
+      enqueueSnackbar(error instanceof Error ? error.message : 'Failed to delete bank account. Please try again.', { variant: 'error' });
       throw error;
     } finally {
       setIsLoading(false);

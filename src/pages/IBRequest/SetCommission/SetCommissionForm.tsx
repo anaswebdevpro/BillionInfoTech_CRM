@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { COLORS } from '../../../constants/colors';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useSnackbar } from 'notistack';
 import { apiRequest } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { COMMISSION_SETTINGS, UPDATE_COMMISSION_SETTINGS } from '../../../../api/api-variable';
 
 // Types
-interface CommissionFormData {
-  userId: string | number;
-  userEmail: string;
-  userName: string;
-  commissionType: string;
-  commissionRate: number;
-  minVolume: number;
-  maxVolume: number;
-  effectiveDate: string;
-  status: 'active' | 'inactive';
-  notes: string;
-}
 
-interface FormErrors {
-  userId?: string;
-  userEmail?: string;
-  userName?: string;
-  commissionType?: string;
-  commissionRate?: string;
-  minVolume?: string;
-  maxVolume?: string;
-  effectiveDate?: string;
-  status?: string;
-  notes?: string;
+export interface responseData {
+  title: string;
+  groups: {
+    id: number;
+    name: string;
+    symbol: string;
+    curid: number;
+  }[];
+  platforms: {
+    id: number;
+    name: string;
+    slug: string;
+    status: number;
+  }[];
+  categories: {
+    id: number;
+    name: string;
+    slug: string;
+    status: number;
+  }[];
 }
-
 interface LocationState {
   userId: string | number;
   userEmail: string;
@@ -41,23 +40,60 @@ const SetCommissionForm: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const locationState = location.state as LocationState;
-
-  const [formData, setFormData] = useState<CommissionFormData>({
-    userId: locationState?.userId || '',
-    userEmail: locationState?.userEmail || '',
-    userName: locationState?.userName || '',
-    commissionType: 'percentage',
-    commissionRate: 0,
-    minVolume: 0,
-    maxVolume: 0,
-    effectiveDate: new Date().toISOString().split('T')[0],
-    status: 'active',
-    notes: ''
-  });
+  const [data, setData] = useState<responseData | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+
+  useEffect(() => {
+    const FetchData = () => {
+      setIsLoading(true);
+      try {
+        apiRequest({
+          endpoint: COMMISSION_SETTINGS,
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        
+        .then((response: unknown) => {
+          console.log('Commission Settings Data:', response);        
+          setIsLoading(false);
+          setData(response as responseData);
+        }) 
+          .catch((error: Error) => {
+         setIsLoading(false);
+            console.error('Failed to fetch Commission Settings:', error);
+            enqueueSnackbar('Failed to fetch Commission Settings data: ' + error.message, { variant: 'error' });
+          });
+      } catch (error) {
+        setIsLoading(false);
+        console.error('Failed to fetch Commission Settings:', error);
+        enqueueSnackbar('Failed to fetch Commission Settings. Please try again.', { variant: 'error' });
+      }
+    };  
+
+    FetchData();
+  }, [token, enqueueSnackbar]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Redirect if no user data provided
   useEffect(() => {
@@ -66,276 +102,295 @@ const SetCommissionForm: React.FC = () => {
     }
   }, [locationState, navigate]);
 
-  // Handle form field changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Validation schema
+  const validationSchema = Yup.object({
+    platformType: Yup.string()
+      .required('Platform type is required'),
+    accountType: Yup.string()
+      .required('Account type is required'),
+    tradeCategory: Yup.string()
+      .required('Trade category is required'),
+    downlineNetwork: Yup.string()
+      .required('Downline network is required'),
+    shareCommission: Yup.number()
+      .min(0, 'Share commission cannot be negative')
+      .max(100, 'Share commission cannot exceed 100%')
+      .required('Share commission is required')
+  });
+
+  // Formik hook
+  const formik = useFormik({
+    initialValues: {
+      platformType: '',
+      accountType: '',
+      tradeCategory: '',
+      downlineNetwork: 'All',
+      shareCommission: 0
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        setIsLoading(true);
     
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined
-      }));
-    }
-  };
-
-  // Form validation
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.commissionRate || formData.commissionRate <= 0) {
-      newErrors.commissionRate = 'Commission rate must be greater than 0';
-    }
-
-    if (formData.commissionRate > 100) {
-      newErrors.commissionRate = 'Commission rate cannot exceed 100%';
-    }
-
-    if (formData.minVolume < 0) {
-      newErrors.minVolume = 'Minimum volume cannot be negative';
-    }
-
-    if (formData.maxVolume < 0) {
-      newErrors.maxVolume = 'Maximum volume cannot be negative';
-    }
-
-    if (formData.maxVolume > 0 && formData.minVolume > formData.maxVolume) {
-      newErrors.maxVolume = 'Maximum volume must be greater than minimum volume';
-    }
-
-    if (!formData.effectiveDate) {
-      newErrors.effectiveDate = 'Effective date is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+        const payload = {
+          share_commission: values.shareCommission,
+          user_id: locationState?.userId,        // from location state
+          platform_id: data?.platforms.find(p => p.slug === values.platformType)?.id || null,
+          group_id: [
+            data?.groups.find(g => g.name === values.accountType)?.id || null
+          ].filter(Boolean), // ensure no null
+          trade_category: [
+            data?.categories.find(c => c.slug === values.tradeCategory)?.id || null
+          ].filter(Boolean),
+          from_user_id: locationState?.userId    // adjust if you want a different value
+        };
     
-    if (!validateForm()) {
-      return;
-    }
+        console.log("Sending payload:", payload);
+    
+        apiRequest({
+          endpoint: UPDATE_COMMISSION_SETTINGS,
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          data: payload
+        })
+          .then((response: unknown) => {
+            setIsLoading(false);
+            console.log("Commission Settings updated:", response);
+            enqueueSnackbar("Commission Settings updated successfully", { variant: "success" });
+          })
+          .catch((error: Error) => {
+            setIsLoading(false);
+            console.error("Failed to update Commission Settings:", error);
+            enqueueSnackbar("Failed to update Commission Settings data: " + error.message, { variant: "error" });
+          });
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Failed to update Commission Settings:", error);
+        enqueueSnackbar("Failed to update Commission Settings. Please try again.", { variant: "error" });
+      }
+    
+      }
+     
+    });
 
-    setIsLoading(true);
-    try {
-      await apiRequest({
-        endpoint: '/api/set-commission', // Replace with your actual endpoint
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        data: formData
-      });
-
-      // Success - redirect back to list
-      navigate('/dashboard/set-commission', { 
-        state: { message: 'Commission settings updated successfully!' } 
-      });
-    } catch (error) {
-      console.error('Failed to save commission settings:', error);
-      // Handle error (you might want to show a toast or error message)
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    
 
   // Handle cancel
   const handleCancel = () => {
     navigate('/dashboard/set-commission');
   };
 
+
+
+
+
+
   return (
-    <div className={`min-h-screen bg-${COLORS.SECONDARY_BG} py-6`}>
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Page Header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <button
               onClick={handleCancel}
-              className={`text-${COLORS.PRIMARY} hover:text-${COLORS.PRIMARY}/80 transition-colors`}
+              className="text-blue-600 hover:text-blue-800 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>Set Commission</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Income Settings</h1>
           </div>
-          <p className={`text-${COLORS.SECONDARY_TEXT}`}>
-            Configure commission settings for {formData.userName} ({formData.userEmail})
-          </p>
+          <p className="text-gray-600">Configure commission settings for trading accounts</p>
         </div>
 
-        {/* Form */}
-        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* User Information (Read-only) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  User ID
-                </label>
-                <input
-                  type="text"
-                  value={formData.userId}
-                  disabled
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md bg-gray-50 text-gray-500`}
-                />
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          {/* Top Filter Section */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Platform:</label>
+              <select className="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                <option value="">Select Platform</option>
+                {data?.platforms?.map((platform) => (
+                  <option key={platform.id} value={platform.slug}>
+                    {platform.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Account Type:</label>
+              <select className="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                <option value="">Select Account Type</option>
+                {data?.groups?.map((group) => (
+                  <option key={group.id} value={group.name}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Downline Network:</label>
+              <select className="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                <option value="All">All</option>
+                <option value="Direct">Direct</option>
+                <option value="Level1">Level 1</option>
+                <option value="Level2">Level 2</option>
+                <option value="Level3">Level 3</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Commission Categories Table */}
+          <div className="mb-6">
+            <div className="bg-gray-50 rounded-lg border border-gray-200">
+              <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-200 bg-gray-100">
+                <div className="font-medium text-gray-700">Categories</div>
+                <div className="font-medium text-gray-700">Assigned Commission</div>
+                <div className="font-medium text-gray-700">Shared Commission</div>
+                <div className="font-medium text-gray-700">Own Commission</div>
               </div>
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={formData.userEmail}
-                  disabled
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md bg-gray-50 text-gray-500`}
-                />
+              <div className="p-8 text-center text-gray-500">
+                No record found!
               </div>
             </div>
+          </div>
 
-            {/* Commission Settings */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Commission Type *
-                </label>
+          {/* Commission Settings Form */}
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Platform Type */}
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700 w-32">Platform Type:</label>
                 <select
-                  name="commissionType"
-                  value={formData.commissionType}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
+                  name="platformType"
+                  value={formik.values.platformType}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    formik.touched.platformType && formik.errors.platformType ? 'border-red-500' : ''
+                  }`}
                 >
-                  <option value="percentage">Percentage (%)</option>
-                  <option value="fixed">Fixed Amount</option>
-                  <option value="tiered">Tiered Commission</option>
+                  <option value="">Select Platform Type</option>
+                  {data?.platforms?.map((platform) => (
+                    <option key={platform.id} value={platform.slug}>
+                      {platform.name}
+                    </option>
+                  ))}
                 </select>
-              </div>
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Commission Rate * {formData.commissionType === 'percentage' ? '(%)' : '($)'}
-                </label>
-                <input
-                  type="number"
-                  name="commissionRate"
-                  value={formData.commissionRate}
-                  onChange={handleInputChange}
-                  step="0.01"
-                  min="0"
-                  max={formData.commissionType === 'percentage' ? '100' : undefined}
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent ${
-                    errors.commissionRate ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.commissionRate && (
-                  <p className="text-red-500 text-xs mt-1">{errors.commissionRate}</p>
+                {formik.touched.platformType && formik.errors.platformType && (
+                  <p className="text-red-500 text-xs">{formik.errors.platformType}</p>
                 )}
               </div>
-            </div>
 
-            {/* Volume Limits */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Minimum Volume
-                </label>
-                <input
-                  type="number"
-                  name="minVolume"
-                  value={formData.minVolume}
-                  onChange={handleInputChange}
-                  step="0.01"
-                  min="0"
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent ${
-                    errors.minVolume ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.minVolume && (
-                  <p className="text-red-500 text-xs mt-1">{errors.minVolume}</p>
-                )}
-              </div>
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Maximum Volume (0 for unlimited)
-                </label>
-                <input
-                  type="number"
-                  name="maxVolume"
-                  value={formData.maxVolume}
-                  onChange={handleInputChange}
-                  step="0.01"
-                  min="0"
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent ${
-                    errors.maxVolume ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.maxVolume && (
-                  <p className="text-red-500 text-xs mt-1">{errors.maxVolume}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Date and Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Effective Date *
-                </label>
-                <input
-                  type="date"
-                  name="effectiveDate"
-                  value={formData.effectiveDate}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent ${
-                    errors.effectiveDate ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.effectiveDate && (
-                  <p className="text-red-500 text-xs mt-1">{errors.effectiveDate}</p>
-                )}
-              </div>
-              <div>
-                <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                  Status
-                </label>
+              {/* Account Type */}
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700 w-32">Account Type:</label>
                 <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
+                  name="accountType"
+                  value={formik.values.accountType}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    formik.touched.accountType && formik.errors.accountType ? 'border-red-500' : ''
+                  }`}
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="">Select Account Type</option>
+                  {data?.groups?.map((group) => (
+                    <option key={group.id} value={group.name}>
+                      {group.name}
+                    </option>
+                  ))}
                 </select>
+                {formik.touched.accountType && formik.errors.accountType && (
+                  <p className="text-red-500 text-xs">{formik.errors.accountType}</p>
+                )}
               </div>
-            </div>
 
-            {/* Notes */}
-            <div>
-              <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                Notes (Optional)
-              </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                rows={4}
-                className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
-                placeholder="Add any additional notes or comments..."
-              />
+              {/* Trade Category */}
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700 w-32">Trade Category:</label>
+                <select
+                  name="tradeCategory"
+                  value={formik.values.tradeCategory}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    formik.touched.tradeCategory && formik.errors.tradeCategory ? 'border-red-500' : ''
+                  }`}
+                >
+                  <option value="">Select Trade Category</option>
+                  {data?.categories?.map((category) => (
+                    <option key={category.id} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {formik.touched.tradeCategory && formik.errors.tradeCategory && (
+                  <p className="text-red-500 text-xs">{formik.errors.tradeCategory}</p>
+                )}
+              </div>
+
+              {/* Downline Network */}
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700 w-32">Downline Network:</label>
+                <select
+                  name="downlineNetwork"
+                  value={formik.values.downlineNetwork}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    formik.touched.downlineNetwork && formik.errors.downlineNetwork ? 'border-red-500' : ''
+                  }`}
+                >
+                  <option value="All">All</option>
+                  <option value="Direct">Direct</option>
+                  <option value="Level1">Level 1</option>
+                  <option value="Level2">Level 2</option>
+                  <option value="Level3">Level 3</option>
+                </select>
+                {formik.touched.downlineNetwork && formik.errors.downlineNetwork && (
+                  <p className="text-red-500 text-xs">{formik.errors.downlineNetwork}</p>
+                )}
+              </div>
+
+              {/* Share Commission */}
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-medium text-gray-700 w-32">Share Commission:</label>
+                <input
+                  type="number"
+                  name="shareCommission"
+                  value={formik.values.shareCommission}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  className={`flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    formik.touched.shareCommission && formik.errors.shareCommission ? 'border-red-500' : ''
+                  }`}
+                  placeholder="0"
+                />
+                {formik.touched.shareCommission && formik.errors.shareCommission && (
+                  <p className="text-red-500 text-xs">{formik.errors.shareCommission}</p>
+                )}
+              </div>
             </div>
 
             {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+           
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Close
+              </button>
               <button
                 type="submit"
-                disabled={isLoading}
-                className={`px-6 py-2 bg-${COLORS.PRIMARY} text-white rounded-md hover:bg-${COLORS.PRIMARY}/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+                disabled={isLoading || !formik.isValid}
+                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -343,18 +398,11 @@ const SetCommissionForm: React.FC = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Saving...
+                    Updating...
                   </>
                 ) : (
-                  'Save Commission Settings'
+                  'Update Settings'
                 )}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className={`px-6 py-2 border border-${COLORS.BORDER} text-${COLORS.SECONDARY} rounded-md hover:bg-${COLORS.SECONDARY_BG} transition-colors`}
-              >
-                Cancel
               </button>
             </div>
           </form>
