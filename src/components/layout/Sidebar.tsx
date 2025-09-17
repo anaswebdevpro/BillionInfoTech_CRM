@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Adjust the path as necessary
 import {  LayoutDashboard,  TrendingUp,  CreditCard,   ArrowRightLeft,  Users,
-  Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign,} from 'lucide-react';
+  Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, History,} from 'lucide-react';
 import { COLORS, GRADIENTS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 
@@ -110,6 +110,16 @@ const Sidebar: React.FC = () => {
     // { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
     { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
     { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
+    {
+      name: 'Funds',
+      icon: Wallet,
+      submenu: [
+        { name: 'Deposit Funds', href: '/dashboard/funds/deposit', icon: ArrowUpCircle },
+        { name: 'Withdraw Funds', href: '/dashboard/funds/withdraw', icon: ArrowDownCircle },
+        { name: 'Internal Transfer', href: '/dashboard/funds/transfer', icon: ArrowRightLeft },
+        { name: 'Transaction History', href: '/dashboard/funds/history', icon: History },
+      ]
+    },
     { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
     // { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
 

@@ -12,6 +12,7 @@ import TradingAccountCreation from '../pages/createTradingAccount/TradingAccount
 
 import Deposits from '../pages/Deposite/Deposits';
 import InternalTransfer from '../pages/internalTransfer/InternalTransfer';
+import { DepositFunds, WithdrawFunds, InternalTransfer as FundsInternalTransfer, TransactionHistory } from '../pages/funds';
 
 import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
 import MyAccounts from '../pages/MyAccount/MyAccount';
@@ -121,6 +122,23 @@ export const router = createBrowserRouter([
           {
             path: 'internal-transfer',
             element: <InternalTransfer />,
+          },
+          // Funds Routes
+          {
+            path: 'funds/deposit',
+            element: <DepositFunds />,
+          },
+          {
+            path: 'funds/withdraw',
+            element: <WithdrawFunds />,
+          },
+          {
+            path: 'funds/transfer',
+            element: <FundsInternalTransfer />,
+          },
+          {
+            path: 'funds/history',
+            element: <TransactionHistory />,
           },
            {
             path: 'set-commission',
