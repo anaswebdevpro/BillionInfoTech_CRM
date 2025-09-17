@@ -41,8 +41,9 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({
       .min(8, 'SWIFT code must be at least 8 characters')
       .max(11, 'SWIFT code must be less than 11 characters'),
     iban: Yup.string()
-      .min(15, 'IBAN must be at least 15 characters')
-      .max(34, 'IBAN must be less than 34 characters'),
+      .min(8, 'IFSC code must be at least 8 characters')
+      .max(11, 'IFSC code must be less than 11 characters')
+      .required('IFSC code is required'),
   });
 
   const form = useFormik<BankDetailsFormData>({
@@ -71,71 +72,88 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({
     <div className="space-y-6">
       {/* Add New Bank Account */}
       <Card title="Add Bank Account" subtitle="Add a new bank account for withdrawals">
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> IFSC code is required for Indian bank accounts. It's an 11-character code (e.g., SBIN0001234) that identifies your bank branch.
+          </p>
+        </div>
         <form onSubmit={form.handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              label="Bank Name"
-              name="bankName"
-              type="text"
-              value={form.values.bankName}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.bankName && form.errors.bankName ? String(form.errors.bankName) : undefined}
-              required
-              placeholder="Enter bank name"
-            />
-            <Input
-              label="Account Holder Name"
-              name="accountHolderName"
-              type="text"
-              value={form.values.accountHolderName}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.accountHolderName && form.errors.accountHolderName ? String(form.errors.accountHolderName) : undefined}
-              required
-              placeholder="Enter account holder name"
-            />
-            <Input
-              label="Account Number"
-              name="accountNumber"
-              type="text"
-              value={form.values.accountNumber}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.accountNumber && form.errors.accountNumber ? String(form.errors.accountNumber) : undefined}
-              required
-              placeholder="Enter account number"
-            />
-            <Input
-              label="Routing Number"
-              name="routingNumber"
-              type="text"
-              value={form.values.routingNumber}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.routingNumber && form.errors.routingNumber ? String(form.errors.routingNumber) : undefined}
-              placeholder="Enter routing number (US)"
-            />
-            <Input
-              label="SWIFT Code"
-              name="swiftCode"
-              type="text"
-              value={form.values.swiftCode}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.swiftCode && form.errors.swiftCode ? String(form.errors.swiftCode) : undefined}
-              placeholder="Enter SWIFT code (International)"
-            />
-            <Input
-              label="IBAN"
-              name="iban"
-              type="text"
-              value={form.values.iban}
-              onChange={form.handleChange}
-              onBlur={form.handleBlur}
-              error={form.touched.iban && form.errors.iban ? String(form.errors.iban) : undefined}
-              placeholder="Enter IBAN (International)"
-            />
+          {/* Required Fields */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Required Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                label="Bank Name"
+                name="bankName"
+                type="text"
+                value={form.values.bankName}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.bankName && form.errors.bankName ? String(form.errors.bankName) : undefined}
+                required
+                placeholder="Enter bank name"
+              />
+              <Input
+                label="Account Holder Name"
+                name="accountHolderName"
+                type="text"
+                value={form.values.accountHolderName}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.accountHolderName && form.errors.accountHolderName ? String(form.errors.accountHolderName) : undefined}
+                required
+                placeholder="Enter account holder name"
+              />
+              <Input
+                label="Account Number"
+                name="accountNumber"
+                type="text"
+                value={form.values.accountNumber}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.accountNumber && form.errors.accountNumber ? String(form.errors.accountNumber) : undefined}
+                required
+                placeholder="Enter account number"
+              />
+              <Input
+                label="IFSC Code"
+                name="iban"
+                type="text"
+                value={form.values.iban}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.iban && form.errors.iban ? String(form.errors.iban) : undefined}
+                required
+                placeholder="Enter IFSC code (e.g., SBIN0001234)"
+              />
+            </div>
+          </div>
+
+          {/* Optional Fields */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Optional Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                label="Routing Number"
+                name="routingNumber"
+                type="text"
+                value={form.values.routingNumber}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.routingNumber && form.errors.routingNumber ? String(form.errors.routingNumber) : undefined}
+                placeholder="Enter routing number (US)"
+              />
+              <Input
+                label="SWIFT Code"
+                name="swiftCode"
+                type="text"
+                value={form.values.swiftCode}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.touched.swiftCode && form.errors.swiftCode ? String(form.errors.swiftCode) : undefined}
+                placeholder="Enter SWIFT code (International)"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end">

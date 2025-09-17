@@ -40,7 +40,7 @@ const Profile: React.FC = () => {
   
   // Get user data from AuthContext
   const { user, token } = useAuth();
-
+console.log(token);
   // Function to fetch profile data from API
   const fetchProfileData = useCallback(() => {
     if (!token) return;
@@ -206,10 +206,18 @@ const Profile: React.FC = () => {
     
     setIsLoading(true);
     try {
+      // Map form data to API expected format
+      const apiData = {
+        account_holder_name: values.accountHolderName,
+        account_number: values.accountNumber,
+        ifsc_code: values.iban, // Using iban field for IFSC code as per API
+        bank_name: values.bankName
+      };
+
       const response = await apiRequest({
         endpoint: ADD_BANK_ACCOUNT,
         method: 'POST',
-        data: values,
+        data: apiData,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -219,7 +227,7 @@ const Profile: React.FC = () => {
         throw new Error(response?.message || 'Failed to add bank account');
       }
       
-      fetchBankDetails();
+      await fetchBankDetails();
       console.log('Bank account added successfully');
     } catch (error) {
       console.error('Failed to add bank account:', error);
@@ -236,9 +244,8 @@ const Profile: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await apiRequest({
-        endpoint: DELETE_BANK_ACCOUNT,
-        method: 'DELETE',
-        data: { accountId },
+        endpoint: `${DELETE_BANK_ACCOUNT}/${accountId}`,
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -248,7 +255,7 @@ const Profile: React.FC = () => {
         throw new Error(response?.message || 'Failed to delete bank account');
       }
       
-      fetchBankDetails();
+      await fetchBankDetails();
       console.log('Bank account deleted successfully');
     } catch (error) {
       console.error('Failed to delete bank account:', error);
