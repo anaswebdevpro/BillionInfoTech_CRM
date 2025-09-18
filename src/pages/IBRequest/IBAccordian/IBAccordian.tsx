@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { COLORS } from '../../../constants/colors'
-import { ShimmerText } from '../../../components/ui/Shimmer'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
@@ -42,114 +41,6 @@ interface AccordionNode {
   level: number
 }
 
-// Shimmer Components for Accordion Structure
-const ShimmerAccordionNode = ({ level = 0 }: { level?: number }) => (
-  <div className={`mb-2 border rounded-lg ${COLORS.SHADOW} ${
-    level === 0 ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200' : 
-    level === 1 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' :
-    'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200'
-  }`}>
-    <div className="p-4">
-      <div className="flex items-center space-x-4">
-        {/* Level indicator shimmer */}
-        <div className="flex space-x-1">
-          {Array.from({ length: level }, (_, i) => (
-            <div key={i} className={`w-1 h-6 rounded ${
-              level === 0 ? 'bg-blue-200' :
-              level === 1 ? 'bg-green-200' :
-              'bg-purple-200'
-            }`} />
-          ))}
-        </div>
-
-        {/* Expand icon shimmer */}
-        <div className="w-5 h-5">
-          <ShimmerText width={20} height={20} />
-        </div>
-
-        {/* Member info shimmer */}
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center space-x-3">
-            <ShimmerText width="60%" height={20} />
-            <ShimmerText width={60} height={24} className="rounded-full" />
-          </div>
-          <ShimmerText width="80%" height={14} />
-        </div>
-
-        {/* Stats shimmer */}
-        <div className="flex items-center space-x-4">
-          <div className="text-center space-y-1">
-            <ShimmerText width={40} height={16} />
-            <ShimmerText width={50} height={12} />
-          </div>
-          <div className="text-center space-y-1">
-            <ShimmerText width={40} height={16} />
-            <ShimmerText width={50} height={12} />
-          </div>
-          <div className="text-center space-y-1">
-            <ShimmerText width={40} height={16} />
-            <ShimmerText width={50} height={12} />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const ShimmerAccordionStructure = ({ levels = 3, itemsPerLevel = 2 }: { levels?: number, itemsPerLevel?: number }) => {
-  const renderLevel = (currentLevel: number, maxLevels: number): React.ReactNode => {
-    if (currentLevel >= maxLevels) return null;
-
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: itemsPerLevel }).map((_, index) => (
-          <div key={index}>
-            <ShimmerAccordionNode level={currentLevel} />
-            {currentLevel < maxLevels - 1 && (
-              <div className="ml-6 mt-2">
-                {renderLevel(currentLevel + 1, maxLevels)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  return (
-    <div className="space-y-2">
-      {renderLevel(0, levels)}
-    </div>
-  );
-};
-
-const ShimmerHeader = () => (
-  <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 mb-6`}>
-    <div className="flex justify-between items-center">
-      <div className="space-y-3">
-        <ShimmerText width={400} height={32} />
-        <ShimmerText width={300} height={16} />
-      </div>
-      <div className="flex space-x-3">
-        <ShimmerText width={100} height={36} className="rounded-lg" />
-        <ShimmerText width={100} height={36} className="rounded-lg" />
-      </div>
-    </div>
-  </div>
-);
-
-const ShimmerSummaryStats = () => (
-  <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-4 my-6`}>
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="space-y-2">
-          <ShimmerText width={40} height={32} className="mx-auto" />
-          <ShimmerText width={100} height={14} className="mx-auto" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 
 // const networkData: NetworkData = {
@@ -562,20 +453,6 @@ const IBAccordian = () => {
     )
   }
 
-  // Show shimmer loading state
-  if (isLoading) {
-    return (
-      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
-        <ShimmerHeader />
-        <ShimmerSummaryStats />
-        
-        {/* Accordion Content with Shimmer */}
-        <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6`}>
-          <ShimmerAccordionStructure levels={3} itemsPerLevel={2} />
-        </div>
-      </div>
-    );
-  }
 
   // Handle case when no data is available but not loading
   if (!networkData) {

@@ -11,7 +11,7 @@ import LiveAccounts from '../pages/LiveAccount/LiveAccounts';
 import TradingAccountCreation from '../pages/createTradingAccount/TradingAccountCreation';
 
 import Deposits from '../pages/Deposite/Deposits';
-import InternalTransfer from '../pages/internalTransfer/InternalTransfer';
+import InternalTransfer from '../pages/funds/InternalTransfer';
 import { DepositFunds, WithdrawFunds, InternalTransfer as FundsInternalTransfer, TransactionHistory } from '../pages/funds';
 
 import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';

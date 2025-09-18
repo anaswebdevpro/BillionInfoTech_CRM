@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../constants/colors';
 import Card from '../../components/ui/Card';
-import { ShimmerStatsCard } from '../../components/ui/Shimmer';
 import { 
   Users, 
   UserCheck, 
@@ -64,30 +63,6 @@ const AdminDashboard: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {/* Header Shimmer */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="space-y-2">
-            <div className="h-8 bg-gray-200 rounded w-64 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-80 animate-pulse"></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
-          </div>
-        </div>
-
-        {/* Stats Grid Shimmer */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Array.from({ length: 9 }).map((_, index) => (
-            <ShimmerStatsCard key={index} />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

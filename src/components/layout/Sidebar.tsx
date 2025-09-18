@@ -107,9 +107,7 @@ const Sidebar: React.FC = () => {
         { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
       ]
     },
-    // { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
-    { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
-    { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
+  
     {
       name: 'Funds',
       icon: Wallet,

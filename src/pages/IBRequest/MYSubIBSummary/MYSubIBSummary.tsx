@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../../constants/colors';
-import { ShimmerText } from '../../../components/ui/Shimmer';
 import { apiRequest } from '@/services';
 import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
 import { useAuth } from '@/context';
@@ -104,73 +103,6 @@ const MYSubIBSummary: React.FC = () => {
 
 
 
-  // Shimmer Components
-  const ShimmerTableRow = () => (
-    <tr className={`border-b border-${COLORS.BORDER}`}>
-      {[30, 200, 40, 60, 80, 32, 60, 120].map((width, i) => (
-        <td key={i} className="p-4">
-          <ShimmerText width={width} height={i === 2 || i === 3 || i === 4 || i === 6 ? 24 : i === 2 ? 32 : 16} 
-            className={i === 2 || i === 3 || i === 4 || i === 6 ? "rounded-full" : ""} />
-        </td>
-      ))}
-    </tr>
-  );
-
-  const ShimmerTable = () => (
-    <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className={`border-b border-${COLORS.BORDER}`}>
-              {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Created At'].map(header => (
-                <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 10 }, (_, i) => <ShimmerTableRow key={i} />)}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <ShimmerText width={200} height={32} />
-            <ShimmerText width={300} height={16} />
-          </div>
-          <ShimmerText width={100} height={16} />
-        </div>
-
-        <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="space-y-2">
-                <ShimmerText width={80} height={16} />
-                <ShimmerText width="100%" height={40} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-              <ShimmerText width={40} height={32} />
-              <ShimmerText width={120} height={16} className="mt-2" />
-            </div>
-          ))}
-        </div>
-
-        <ShimmerTable />
-      </div>
-    );
-  }
 
 
   // No data state

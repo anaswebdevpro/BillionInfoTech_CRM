@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, Button } from '../../../components/ui';
 import { COLORS } from '../../../constants/colors';
 import { DollarSign, BarChart3 } from 'lucide-react';
+import { useAuth } from '@/context';
+import { apiRequest } from '@/services';
+import { IB_TRANSACTION, GET_LOT_WISE_TRANSACTIONS } from '../../../../api/api-variable';
 
 interface TableRow {
   [key: string]: string | number;
@@ -15,52 +18,90 @@ interface TableData {
 }
 
 const IBTransaction: React.FC = () => {
-  // Dummy data objects
-  const partnerCommissionsData: TableData = {
-    draw: null,
-    recordsTotal: 15,
-    recordsFiltered: 15,
-    data: [
-      { "#": 1, "Account": "IB001234", "Ticket": "TXN789456", "Amount": "$125.50", "Date": "2024-01-15" },
-      { "#": 2, "Account": "IB001235", "Ticket": "TXN789457", "Amount": "$89.75", "Date": "2024-01-15" },
-      { "#": 3, "Account": "IB001236", "Ticket": "TXN789458", "Amount": "$234.20", "Date": "2024-01-14" },
-      { "#": 4, "Account": "IB001237", "Ticket": "TXN789459", "Amount": "$156.80", "Date": "2024-01-14" },
-      { "#": 5, "Account": "IB001238", "Ticket": "TXN789460", "Amount": "$78.90", "Date": "2024-01-13" },
-      { "#": 6, "Account": "IB001239", "Ticket": "TXN789461", "Amount": "$312.45", "Date": "2024-01-13" },
-      { "#": 7, "Account": "IB001240", "Ticket": "TXN789462", "Amount": "$98.30", "Date": "2024-01-12" },
-      { "#": 8, "Account": "IB001241", "Ticket": "TXN789463", "Amount": "$167.25", "Date": "2024-01-12" },
-      { "#": 9, "Account": "IB001242", "Ticket": "TXN789464", "Amount": "$245.60", "Date": "2024-01-11" },
-      { "#": 10, "Account": "IB001243", "Ticket": "TXN789465", "Amount": "$134.70", "Date": "2024-01-11" }
-    ]
-  };
-
-  const lotWiseCommissionData: TableData = {
-    draw: null,
-    recordsTotal: 12,
-    recordsFiltered: 12,
-    data: [
-      { "#": 1, "Account": "IB001234", "Lots": "2.5", "Amount": "$87.50", "Date": "2024-01-15" },
-      { "#": 2, "Account": "IB001235", "Lots": "1.8", "Amount": "$63.00", "Date": "2024-01-15" },
-      { "#": 3, "Account": "IB001236", "Lots": "3.2", "Amount": "$112.00", "Date": "2024-01-14" },
-      { "#": 4, "Account": "IB001237", "Lots": "2.1", "Amount": "$73.50", "Date": "2024-01-14" },
-      { "#": 5, "Account": "IB001238", "Lots": "1.5", "Amount": "$52.50", "Date": "2024-01-13" },
-      { "#": 6, "Account": "IB001239", "Lots": "4.1", "Amount": "$143.50", "Date": "2024-01-13" },
-      { "#": 7, "Account": "IB001240", "Lots": "1.2", "Amount": "$42.00", "Date": "2024-01-12" },
-      { "#": 8, "Account": "IB001241", "Lots": "2.8", "Amount": "$98.00", "Date": "2024-01-12" },
-      { "#": 9, "Account": "IB001242", "Lots": "3.5", "Amount": "$122.50", "Date": "2024-01-11" },
-      { "#": 10, "Account": "IB001243", "Lots": "2.0", "Amount": "$70.00", "Date": "2024-01-11" }
-    ]
-  };
-
+  // State for data and loading
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [partnerCommissionsData, setPartnerCommissionsData] = useState<TableData | null>(null);
+  const [lotWiseCommissionData, setLotWiseCommissionData] = useState<TableData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
+
+  // Fetch partner commissions data
+  const fetchPartnerCommissions = useCallback(async () => {
+    try {
+      const response = await apiRequest({
+        endpoint: IB_TRANSACTION,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response) {
+        setPartnerCommissionsData(response as TableData);
+        console.log('Partner Commissions Response:', response);
+      }
+    } catch (error) {
+      console.error("Failed to fetch partner commissions:", error);
+      setError("Failed to fetch partner commissions data");
+    }
+  }, [token]);
+
+  // Fetch lot-wise commission data
+  const fetchLotWiseCommissions = useCallback(async () => {
+    try {
+      const response = await apiRequest({
+        endpoint: GET_LOT_WISE_TRANSACTIONS,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response) {
+        setLotWiseCommissionData(response as TableData);
+        console.log('Lot-wise Commissions Response:', response);
+      }
+    } catch (error) {
+      console.error("Failed to fetch lot-wise commissions:", error);
+      setError("Failed to fetch lot-wise commission data");
+    }
+  }, [token]);
+
+  // Fetch all data
+  const fetchAllData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await Promise.all([
+        fetchPartnerCommissions(),
+        fetchLotWiseCommissions()
+      ]);
+    } catch (error) {
+      console.error("Failed to fetch transaction data:", error);
+      setError("Failed to fetch transaction data");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchPartnerCommissions, fetchLotWiseCommissions]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
+
+
+
+
+
+
+
+
+
 
   const handleRefresh = () => {
-    // Refresh logic here
     console.log('Refreshing data...');
+    fetchAllData();
   };
 
-  const TableComponent: React.FC<{ title: string; headers: string[]; data: TableData }> = ({ title, headers, data }) => (
+  const TableComponent: React.FC<{ title: string; headers: string[]; data: TableData | null; isLoading?: boolean }> = ({ title, headers, data, isLoading = false }) => (
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className={`px-6 py-4 border-b border-${COLORS.BORDER}`}>
         <h3 className={`text-xl font-bold text-${COLORS.SECONDARY} flex items-center gap-2`}>
@@ -68,7 +109,7 @@ const IBTransaction: React.FC = () => {
           {title}
         </h3>
         <p className={`text-sm text-${COLORS.SECONDARY_TEXT} mt-1`}>
-          {data.recordsTotal} total transactions
+          {isLoading ? 'Loading...' : `${data?.recordsTotal || 0} total transactions`}
         </p>
       </div>
       
@@ -113,7 +154,16 @@ const IBTransaction: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data.data.length === 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={headers.length} className={`text-center py-12 text-${COLORS.SECONDARY_TEXT}`}>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                      <div className={`text-lg font-semibold text-${COLORS.SECONDARY_TEXT}`}>Loading transactions...</div>
+                    </div>
+                  </td>
+                </tr>
+              ) : !data || data.data?.length === 0 ? ( 
                 <tr>
                   <td colSpan={headers.length} className={`text-center py-12 text-${COLORS.SECONDARY_TEXT}`}>
                     <div className="flex flex-col items-center gap-3">
@@ -128,7 +178,7 @@ const IBTransaction: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                data.data.map((row: TableRow, index: number) => (
+                data.data?.map((row: TableRow, index: number) => (
                   <tr key={index} className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                     {Object.values(row).map((cell: string | number, cellIndex: number) => (
                       <td key={cellIndex} className={`py-4 px-6 text-sm font-medium ${cellIndex === 0 ? `text-${COLORS.SECONDARY} font-bold` : `text-${COLORS.SECONDARY_TEXT}`}`}>
@@ -146,13 +196,19 @@ const IBTransaction: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
           <div className={`text-sm font-semibold text-${COLORS.SECONDARY_TEXT}`}>
-            Showing <span className="text-green-600 font-bold">{data.recordsFiltered === 0 ? 0 : 1}</span> to <span className="text-green-600 font-bold">{Math.min(entriesPerPage, data.recordsFiltered)}</span> of <span className="text-green-600 font-bold">{data.recordsTotal}</span> entries
+            {isLoading ? (
+              'Loading...'
+            ) : (
+              <>
+                Showing <span className="text-green-600 font-bold">{data?.recordsFiltered === 0 ? 0 : 1}</span> to <span className="text-green-600 font-bold">{Math.min(entriesPerPage, data?.recordsFiltered || 0)}</span> of <span className="text-green-600 font-bold">{data?.recordsTotal || 0}</span> entries
+              </>
+            )}
           </div>
           <div className="flex gap-3">
             <Button 
               variant="outline" 
               size="sm" 
-              disabled={data.recordsTotal <= entriesPerPage}
+              disabled={isLoading || (data?.recordsTotal || 0) <= entriesPerPage}
               className="px-4 py-2 font-semibold rounded-lg border-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ← Previous
@@ -160,7 +216,7 @@ const IBTransaction: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              disabled={data.recordsTotal <= entriesPerPage}
+              disabled={isLoading || (data?.recordsTotal || 0) <= entriesPerPage}
               className="px-4 py-2 font-semibold rounded-lg border-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next →
@@ -231,17 +287,31 @@ const IBTransaction: React.FC = () => {
         </Card>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className={`bg-red-50 border border-red-200 rounded-lg p-4 mb-6`}>
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className={`text-red-700 font-medium`}>{error}</span>
+          </div>
+        </div>
+      )}
+
       {/* Data Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TableComponent 
           title="Partner Commissions" 
           headers={["#", "Account", "Ticket", "Amount", "Date"]} 
           data={partnerCommissionsData} 
+          isLoading={isLoading}
         />
         <TableComponent 
           title="Lot Wise Commission" 
           headers={["#", "Account", "Lots", "Amount", "Date"]} 
           data={lotWiseCommissionData} 
+          isLoading={isLoading}
         />
       </div>
     </div>

@@ -58,6 +58,34 @@ export interface Account {
   status: string;
 }
 
+// Internal Transfer API Response types
+export interface InternalTransferResponse {
+  response: boolean;
+  title: string;
+  main_wallet: string;
+  profit_wallet: string;
+  live_accounts: LiveAccount[];
+  from_account: FromAccount[];
+  to_account: ToAccount[];
+}
+
+export interface LiveAccount {
+  account_number: number;
+  slug: string;
+}
+
+export interface FromAccount {
+  wallet?: string;
+  balance?: string;
+  account_number?: number;
+  slug?: string;
+}
+
+export interface ToAccount {
+  account_number: number;
+  slug: string;
+}
+
 // Transaction type
 export interface Transaction {
   id: string;

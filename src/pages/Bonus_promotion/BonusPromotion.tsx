@@ -5,7 +5,6 @@ import { apiRequest } from '../../services';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { FETCH_BONUS, CLAIM_BONUS } from '../../../api/api-variable';
 import { enqueueSnackbar } from 'notistack';
-import { ShimmerText,  ShimmerButton } from '../../components/ui/Shimmer';
 
 
 // Types
@@ -146,47 +145,6 @@ const BonusPromotion: React.FC = () => {
     FetchBonuses();
   }, [FetchBonuses]);
 
-  // Loading state with shimmer effects
-  if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Header Shimmer */}
-        <div className="text-center mb-8">
-          <ShimmerText width="300px" height={36} className="mx-auto mb-2" />
-          <ShimmerText width="400px" height={20} className="mx-auto" />
-        </div>
-
-        {/* Bonus Grid Shimmer */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className={`bg-${COLORS.WHITE} rounded-lg ${COLORS.SHADOW} p-6 border-${COLORS.BORDER}`}>
-              <div className="space-y-4">
-                {/* Icon and Title Shimmer */}
-                <div className="text-center mb-4">
-                  <div className="h-12 w-12 bg-gray-200 rounded-full animate-pulse mx-auto mb-2"></div>
-                  <ShimmerText width="150px" height={20} className="mx-auto" />
-                </div>
-
-                {/* Description Shimmer */}
-                <div className="text-center mb-4">
-                  <ShimmerText width="100%" height={16} className="mb-2" />
-                  <ShimmerText width="80%" height={16} className="mx-auto" />
-                </div>
-
-                {/* Condition Shimmer */}
-                <div className="text-center mb-4">
-                  <ShimmerText width="120px" height={16} className="mx-auto" />
-                </div>
-
-                {/* Button Shimmer */}
-                <ShimmerButton width="100%" height={40} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">

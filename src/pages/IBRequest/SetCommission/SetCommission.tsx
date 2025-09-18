@@ -3,7 +3,6 @@ import { COLORS } from '../../../constants/colors';
 import { apiRequest } from '../../../services/api';
 import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
-import { ShimmerText, ShimmerCard, ShimmerButton } from '../../../components/ui/Shimmer';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -206,79 +205,6 @@ const SetCommission: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // Shimmer loading components
-  const ShimmerTableRow = () => (
-    <tr className={`border-b border-${COLORS.BORDER}`}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <td key={index} className="p-4">
-          <ShimmerText width="100%" height={20} />
-        </td>
-      ))}
-    </tr>
-  );
-
-  const ShimmerLoadingState = () => (
-    <div className="space-y-6">
-      {/* Header Shimmer */}
-      <div className="flex justify-between items-center">
-        <div>
-          <ShimmerText width="400px" height={32} />
-          <ShimmerText width="300px" height={20} className="mt-2" />
-        </div>
-        <ShimmerButton width="100px" height={40} />
-      </div>
-
-      {/* Search Controls Shimmer */}
-      <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <ShimmerText width="60px" height={16} className="mb-2" />
-            <ShimmerText width="100%" height={40} />
-          </div>
-          <div>
-            <ShimmerText width="100px" height={16} className="mb-2" />
-            <ShimmerText width="100%" height={40} />
-          </div>
-          <div className="flex items-end">
-            <ShimmerButton width="120px" height={40} />
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Cards Shimmer */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <ShimmerCard key={index} height={80} />
-        ))}
-      </div>
-
-      {/* Table Shimmer */}
-      <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER}`}>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b border-${COLORS.BORDER}`}>
-                {['#', 'Email', 'Type', 'Status', 'Accounts', 'Joined On'].map(header => (
-                  <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <ShimmerTableRow key={index} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (isLoading) {
-    return <ShimmerLoadingState />;
-  }
 
   return (
     <div className="space-y-6">

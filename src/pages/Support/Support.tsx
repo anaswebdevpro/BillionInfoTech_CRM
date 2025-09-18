@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import { ShimmerText, ShimmerCard, ShimmerButton } from '../../components/ui/Shimmer';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
 import {
@@ -125,31 +124,6 @@ const Support: React.FC = () => {
 
 
   if (loading) {
-      return (
-        <div className="space-y-6">
-          {/* Header Shimmer */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <ShimmerText width="300px" height={36} />
-              <ShimmerText width="400px" height={20} />
-            </div>
-            <ShimmerButton width="140px" height={40} />
-          </div>
-
-          {/* Main Content Grid Shimmer */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Side - Ticket List Shimmer */}
-            <div className="lg:col-span-1">
-              <ShimmerCard height={400} />
-            </div>
-
-            {/* Right Side - Chat Interface Shimmer */}
-            <div className="lg:col-span-2">
-              <ShimmerCard height={400} />
-            </div>
-          </div>
-        </div>
-      );
   }
 
   return (

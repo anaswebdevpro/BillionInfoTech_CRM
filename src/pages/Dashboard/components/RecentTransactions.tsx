@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import { ShimmerList } from '../../../components/ui/Shimmer';
 import type { Transaction } from '../../../types';
 
 interface RecentTransactionsProps {
@@ -9,15 +8,7 @@ interface RecentTransactionsProps {
   loading?: boolean;
 }
 
-const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransactions, loading = false }) => {
-  if (loading) {
-    return (
-      <Card title="Recent Transactions" subtitle="Latest account activity">
-        <ShimmerList items={5} />
-      </Card>
-    );
-  }
-
+const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransactions }) => {
   return (
     <Card title="Recent Transactions" subtitle="Latest account activity">
       <div className="space-y-1 overflow-y-scroll max-h-[300px]">

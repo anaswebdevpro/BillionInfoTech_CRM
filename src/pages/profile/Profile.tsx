@@ -3,7 +3,6 @@ import { useSnackbar } from 'notistack';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { apiRequest } from '../../services/api';
 import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../../api/api-variable';
-import { ShimmerText, ShimmerButton } from '../../components/ui/Shimmer';
 import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, ExtendedUser } from '../../types';
 
 // Import Profile Components
@@ -309,59 +308,6 @@ console.log(token);
     }
   };
 
-  // Show shimmer loading when profile data is being fetched
-  if (isLoading && !profileData) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header Shimmer */}
-          <div className="mb-8">
-            <ShimmerText width="300px" height={36} />
-            <ShimmerText width="500px" height={20} className="mt-2" />
-          </div>
-
-          {/* Tabs Shimmer */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {/* Tab Navigation Shimmer */}
-            <div className="border-b border-gray-200">
-              <div className="flex space-x-8 px-6 py-4">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <ShimmerText key={index} width="80px" height={20} />
-                ))}
-              </div>
-            </div>
-            
-            {/* Tab Content Shimmer */}
-            <div className="p-6">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <ShimmerText width="100px" height={16} />
-                    <ShimmerText width="100%" height={40} />
-                  </div>
-                  <div className="space-y-4">
-                    <ShimmerText width="100px" height={16} />
-                    <ShimmerText width="100%" height={40} />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <ShimmerText width="100px" height={16} />
-                  <ShimmerText width="100%" height={40} />
-                </div>
-                <div className="space-y-4">
-                  <ShimmerText width="100px" height={16} />
-                  <ShimmerText width="100%" height={40} />
-                </div>
-                <div className="flex justify-end">
-                  <ShimmerButton width="120px" height={40} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

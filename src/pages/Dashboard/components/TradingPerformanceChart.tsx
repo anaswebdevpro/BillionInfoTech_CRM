@@ -1,7 +1,6 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import { ShimmerChart } from '../../../components/ui/Shimmer';
 import type { DashboardStats } from '../../../types';
 import { GRADIENTS } from '../../../constants/colors';
 
@@ -10,11 +9,7 @@ interface TradingPerformanceChartProps {
   loading?: boolean;
 }
 
-const TradingPerformanceChart: React.FC<TradingPerformanceChartProps> = ({ stats, loading = false }) => {
-  if (loading) {
-    return <ShimmerChart />;
-  }
-
+const TradingPerformanceChart: React.FC<TradingPerformanceChartProps> = ({ stats }) => {
   return (
     <Card title="Trading Performance" subtitle="Monthly growth overview">
       <div className={`h-64 relative ${GRADIENTS.CARD} rounded-lg overflow-hidden`}>

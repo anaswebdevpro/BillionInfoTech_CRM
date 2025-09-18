@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Eye, Settings, TrendingUp } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import {  ShimmerText, ShimmerButton } from '../../components/ui/Shimmer';
 // import { apiRequest } from '../services/api';
 import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
@@ -120,63 +119,6 @@ const MyAccounts: React.FC = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {/* Header Shimmer */}
-        <div className={`border-b border-${COLORS.BORDER} pb-5`}>
-          <ShimmerText width="200px" height={36} />
-          <ShimmerText width="400px" height={20} className="mt-2" />
-        </div>
-
-        {/* Account Grid Shimmer */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="space-y-4">
-                {/* Account Header Shimmer */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-5 w-5 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="space-y-2">
-                      <ShimmerText width="120px" height={20} />
-                      <ShimmerText width="80px" height={16} />
-                    </div>
-                  </div>
-                  <ShimmerText width="60px" height={24} />
-                </div>
-
-                {/* Account Details Shimmer */}
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <ShimmerText width="60px" height={14} />
-                      <ShimmerText width="100px" height={18} />
-                    </div>
-                    <div className="space-y-2">
-                      <ShimmerText width="70px" height={14} />
-                      <ShimmerText width="80px" height={18} />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <ShimmerText width="60px" height={14} />
-                    <ShimmerText width="40px" height={16} />
-                  </div>
-                </div>
-
-                {/* Action Buttons Shimmer */}
-                <div className="flex space-x-3">
-                  <ShimmerButton width="100%" height={32} />
-                  <ShimmerButton width="100%" height={32} />
-                  <ShimmerButton width="40px" height={32} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

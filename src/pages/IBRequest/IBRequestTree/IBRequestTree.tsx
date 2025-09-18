@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
-import { ShimmerText } from '../../../components/ui/Shimmer'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
@@ -46,94 +45,6 @@ const getTooltipData = (networkData: NetworkData | null, memberId: number): Tool
   return networkData?.tooltip.find(item => item.id === memberId)
 }
 
-// Shimmer Components for Tree Structure
-const ShimmerMemberNode = () => (
-  <div className={`border-2 rounded-xl p-4 ${COLORS.SHADOW} min-w-[220px] max-w-[280px] mx-auto bg-${COLORS.WHITE} border-${COLORS.BORDER}`}>
-    <div className="text-center space-y-3">
-      <ShimmerText width="80%" height={20} className="mx-auto" />
-      <ShimmerText width="90%" height={14} className="mx-auto" />
-      <div className="flex justify-between">
-        <ShimmerText width="40%" height={12} />
-        <ShimmerText width="40%" height={12} />
-      </div>
-      <ShimmerText width="60%" height={24} className="mx-auto rounded-full" />
-      <ShimmerText width="50%" height={12} className="mx-auto" />
-    </div>
-  </div>
-)
-
-const ShimmerTreeStructure = ({ levels = 3, childrenPerLevel = 2 }: { levels?: number, childrenPerLevel?: number }) => {
-  const renderLevel = (currentLevel: number, maxLevels: number): React.ReactNode => {
-    if (currentLevel >= maxLevels) return null;
-
-    return (
-      <div className="flex justify-center items-start space-x-8">
-        {Array.from({ length: childrenPerLevel }).map((_, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <ShimmerMemberNode />
-            {currentLevel < maxLevels - 1 && (
-              <div className="mt-4 w-full flex justify-center">
-                {renderLevel(currentLevel + 1, maxLevels)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  return (
-    <div className="p-6">
-      <div className="flex justify-center">
-        <ShimmerMemberNode />
-      </div>
-      {levels > 1 && (
-        <div className="mt-8">
-          {renderLevel(1, levels)}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ShimmerHeader = () => (
-  <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 mb-6`}>
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-      <div className="space-y-3">
-        <ShimmerText width={300} height={32} />
-        <ShimmerText width={250} height={16} />
-      </div>
-      <div className="flex gap-3">
-        <ShimmerText width={120} height={40} className="rounded-xl" />
-      </div>
-    </div>
-  </div>
-);
-
-const ShimmerBreadcrumb = () => (
-  <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-4 mb-6`}>
-    <div className="flex items-center gap-2">
-      <ShimmerText width={80} height={16} />
-      <ShimmerText width={100} height={16} />
-      <ShimmerText width={20} height={16} />
-      <ShimmerText width={120} height={16} />
-    </div>
-  </div>
-);
-
-const ShimmerMemberDetails = () => (
-  <div className={`bg-${COLORS.WHITE} rounded-xl ${COLORS.SHADOW} p-6 mb-6`}>
-    <ShimmerText width={200} height={24} className="mb-4" />
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className={`bg-${COLORS.SECONDARY_BG} rounded-lg p-4`}>
-          <ShimmerText width="60%" height={14} className="mb-2" />
-          <ShimmerText width="80%" height={16} />
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 // Component for individual node
 const MemberNode = ({ 
@@ -303,6 +214,18 @@ const IBRequestTree = () => {
   const MAX_NODES = 15
   const renderCountRef = useRef<number>(0)
 
+  // Zoom controls (buttons)
+  const [zoom, setZoom] = useState<number>(1)
+  const MIN_ZOOM = 0.5
+  const MAX_ZOOM = 2
+  const step = 0.1
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(MAX_ZOOM, parseFloat((prev + step).toFixed(2))))
+  }
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(MIN_ZOOM, parseFloat((prev - step).toFixed(2))))
+  }
+
   const FetchNetwork =() => {
     setIsLoading(true);
     try {
@@ -402,23 +325,6 @@ const IBRequestTree = () => {
   // Reset node counter for each render and count root if present
   renderCountRef.current = selectedMember ? 1 : 0
 
-  // Show shimmer loading state
-  if (isLoading) {
-    return (
-      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
-        <ShimmerHeader />
-        <ShimmerBreadcrumb />
-        <ShimmerMemberDetails />
-        
-        {/* Tree Container with Shimmer */}
-        <div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto`}>
-          <div className="min-w-full" style={{ minHeight: '400px' }}>
-            <ShimmerTreeStructure levels={3} childrenPerLevel={2} />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
@@ -516,34 +422,38 @@ const IBRequestTree = () => {
  
 
 {/* Tree Container */}
-<div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto`}>
+<div className={`bg-${COLORS.WHITE} rounded-2xl ${COLORS.SHADOW} p-6 overflow-auto relative`}>
   <div className="min-w-full" style={{ minHeight: '400px' }}>
     {selectedMember ? (
-      <Tree
-        lineWidth="2px"
-        lineColor="#e5e7eb"
-        lineBorderRadius="10px"
-        label={
-          <MemberNode 
-            member={selectedMember} 
-            onClick={handleNodeClick}
-            isSelected={true}
-            networkData={networkData}
-          />
-        }
-      >
-        <TreeNodeRenderer 
-          members={filteredTreeData} 
-          parentId={selectedMemberId}
-          onNodeClick={handleNodeClick}
-          selectedMemberId={selectedMemberId}
-          networkData={networkData}
-          currentLevel={2}
-          maxLevel={MAX_LEVEL}
-          maxNodes={MAX_NODES}
-          renderCountRef={renderCountRef}
-        />
-      </Tree>
+      <>
+        <div style={{ transform: `scale(${zoom})`, transformOrigin: '0 0', display: 'inline-block' }}>
+          <Tree
+            lineWidth="2px"
+            lineColor="#e5e7eb"
+            lineBorderRadius="10px"
+            label={
+              <MemberNode 
+                member={selectedMember} 
+                onClick={handleNodeClick}
+                isSelected={true}
+                networkData={networkData}
+              />
+            }
+          >
+            <TreeNodeRenderer 
+              members={filteredTreeData} 
+              parentId={selectedMemberId}
+              onNodeClick={handleNodeClick}
+              selectedMemberId={selectedMemberId}
+              networkData={networkData}
+              currentLevel={2}
+              maxLevel={MAX_LEVEL}
+              maxNodes={MAX_NODES}
+              renderCountRef={renderCountRef}
+            />
+          </Tree>
+        </div>
+      </>
     ) : (
       <div className={`text-center py-12 text-${COLORS.SECONDARY_TEXT}`}>
         <div className="text-6xl mb-4">🌳</div>
@@ -552,6 +462,21 @@ const IBRequestTree = () => {
       </div>
     )}
   </div>
+  
+  {/* Fixed Zoom Controls - positioned outside scrollable content */}
+  {selectedMember && (
+    <div className="fixed bottom-6 right-6 z-10">
+      <div className={`flex items-center gap-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-${COLORS.BORDER} p-2`}>
+        <button onClick={handleZoomOut} className={`px-3 py-1 rounded border border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}>
+          -
+        </button>
+        <span className={`text-sm text-${COLORS.SECONDARY_TEXT} px-2 min-w-[52px] text-center`}>{Math.round(zoom * 100)}%</span>
+        <button onClick={handleZoomIn} className={`px-3 py-1 rounded border border-${COLORS.BORDER} hover:bg-${COLORS.SECONDARY_BG} transition-colors`}>
+          +
+        </button>
+      </div>
+    </div>
+  )}
 </div>
 
 

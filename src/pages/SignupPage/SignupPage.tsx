@@ -5,7 +5,6 @@ import * as Yup from 'yup';
 import { Eye, EyeOff, Mail, Lock, User, CheckSquare, Square } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { ShimmerText, ShimmerButton } from '../../components/ui/Shimmer';
 import { apiRequest } from '../../services/api';
 import laptop from '../../assets/lapi.png';
 import logo from '../../assets/company-logo 1.png';
@@ -113,66 +112,6 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin }) => {
     },
   });
 
-  if (isPageLoading) {
-    return (
-      <div className="min-h-screen flex">
-        {/* Left side - Branding Shimmer */}
-        <div className="max-w-[35%] hidden md:block items-center justify-center">
-          <div className={`${GRADIENTS.SIDEBAR} w-full h-screen flex justify-center flex-col items-center p-10`}>
-            <div className="h-32 w-32 bg-white/20 rounded-lg animate-pulse mb-8"></div>
-            <div className="h-48 w-48 bg-white/20 rounded-lg animate-pulse mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-8 bg-white/20 rounded w-80 animate-pulse"></div>
-              <div className="flex gap-4 px-4 my-5">
-                <div className="h-6 bg-white/20 rounded w-32 animate-pulse"></div>
-                <div className="h-6 bg-white/20 rounded w-24 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Signup form Shimmer */}
-        <div className={`flex-1 flex items-center justify-center p-12 bg-${COLORS.SECONDARY_BG}`}>
-          <div className={`w-full max-w-md border border-${COLORS.BORDER} bg-${COLORS.WHITE} rounded-lg ${COLORS.SHADOW} p-8`}>
-            <div className="text-center mb-8">
-              <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded w-32 mx-auto mb-2 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-40 mx-auto animate-pulse"></div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <ShimmerText width="80px" height={16} />
-                <ShimmerText width="100%" height={40} />
-              </div>
-              <div className="space-y-2">
-                <ShimmerText width="60px" height={16} />
-                <ShimmerText width="100%" height={40} />
-              </div>
-              <div className="space-y-2">
-                <ShimmerText width="80px" height={16} />
-                <ShimmerText width="100%" height={40} />
-              </div>
-              <div className="space-y-2">
-                <ShimmerText width="120px" height={16} />
-                <ShimmerText width="100%" height={40} />
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="h-5 w-5 bg-gray-200 rounded animate-pulse mt-1"></div>
-                <div className="flex-1">
-                  <ShimmerText width="200px" height={16} />
-                </div>
-              </div>
-              <ShimmerButton width="100%" height={40} />
-              <div className="text-center">
-                <ShimmerText width="250px" height={16} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex">

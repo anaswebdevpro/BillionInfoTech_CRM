@@ -26,40 +26,19 @@ const {token} =useAuth();
   );
   const [positions, setPositions] = useState<Position[]>([]);
   const [closedPositions] = useState<Position[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showOpenPositions, setShowOpenPositions] = useState(true);
   const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
-  const fetchingRef = useRef(false); // Prevent multiple concurrent API calls
 
-  // Fetch dashboard data on component mount
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      // Don't fetch if token is not available yet
-      if (!token) {
-        console.log("No token available, skipping dashboard data fetch");
-        setLoading(false); // Stop loading if no token
-        return;
-      }
-      
-      // Prevent multiple concurrent API calls
-      if (fetchingRef.current) {
-        console.log("API call already in progress, skipping...");
-        return;
-      }
-      
-      console.log("Fetching dashboard data with token:", token.substring(0, 10) + "...");
-      setLoading(true); // Start loading when we have token
-      fetchingRef.current = true; // Mark as fetching
-      
-      try {
-        const response = await apiRequest({
-          endpoint: DASHBOARD_DATA,
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        
+  const fetchDashboardData = () => {
+    setLoading(true);
+    try {
+      apiRequest({
+        endpoint: DASHBOARD_DATA,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: any) => {
+        setLoading(false);
         console.log("Dashboard data received:", response);
         
         // Type the response data properly
@@ -113,105 +92,21 @@ const {token} =useAuth();
           
           setDashboardData(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-      } finally {
-        setLoading(false);
-        fetchingRef.current = false; // Reset fetching flag
-      }
-    };
+      })
+        .catch((error: any) => {
+          console.error("Failed to fetch dashboard data:", error);
+        });
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDashboardData();
-  }, [token]);
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {/* Stats Grid Shimmer */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-                <div className="ml-4 flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
-                  <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Charts and Recent Activity Shimmer */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
-            <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-gray-200 rounded-full animate-pulse"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Market Ticker Shimmer */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
-          <div className="flex space-x-4 overflow-x-auto">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="flex-shrink-0 w-32">
-                <div className="h-4 bg-gray-200 rounded w-20 mb-1 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trading Positions and Refer & Earn Shimmer */}
-        <div className="flex flex-col lg:flex-row gap-5 min-h-96">
-          <div className="w-full lg:w-1/2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
-              <div className="space-y-3">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="h-4 bg-gray-200 rounded w-8 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-14 animate-pulse"></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="w-full lg:w-1/2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
-              <div className="space-y-4">
-                <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
-                <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Show a message if no token is available
   if (!token) {
@@ -227,12 +122,12 @@ const {token} =useAuth();
   return (
     <div className="space-y-2">
       {/* Stats Grid */}
-      <StatsGrid stats={stats} loading={loading} />
+      <StatsGrid stats={stats} />
 
       {/* Charts and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TradingPerformanceChart stats={stats} loading={loading} />
-        <RecentTransactions recentTransactions={recentTransactions} loading={loading} />
+        <TradingPerformanceChart stats={stats} />
+        <RecentTransactions recentTransactions={recentTransactions} />
       </div>
 
       {/* Market Ticker */}

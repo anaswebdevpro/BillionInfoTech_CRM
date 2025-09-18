@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../constants/colors';
-import { ShimmerDataTable, ShimmerText } from '../../components/ui/Shimmer';
 
 const AdminUsers: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -13,21 +12,6 @@ const AdminUsers: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="space-y-4">
-            <ShimmerText width="200px" height={32} />
-            <ShimmerText width="300px" height={20} />
-            <div className="mt-6">
-              <ShimmerDataTable rows={8} columns={6} />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

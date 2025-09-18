@@ -1,7 +1,6 @@
 import React from 'react';
 import { TrendingUp, DollarSign, Activity, Users } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import { ShimmerStatsCard } from '../../../components/ui/Shimmer';
 import type { DashboardStats } from '../../../types';
 
 interface StatsGridProps {
@@ -9,17 +8,7 @@ interface StatsGridProps {
   loading?: boolean;
 }
 
-const StatsGrid: React.FC<StatsGridProps> = ({ stats, loading = false }) => {
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <ShimmerStatsCard key={index} />
-        ))}
-      </div>
-    );
-  }
-
+const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <Card>

@@ -8,7 +8,7 @@ import {
   TrendingUp, 
   CreditCard, 
   
-  ArrowRightLeft, 
+  
   Users, 
   Shield, 
   LogOut,
@@ -136,11 +136,9 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
         { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
       ]
     },
-    // { name: 'KYC Verification', href: '/dashboard/kyc', icon: FileText },
-    { name: 'Deposits', href: '/dashboard/deposits', icon: CreditCard },
-    { name: 'Internal Transfer', href: '/dashboard/internal-transfer', icon: ArrowRightLeft },
+   
     { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
-    // { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
+
     {
   name: 'IB MENU',
   icon: Users,
