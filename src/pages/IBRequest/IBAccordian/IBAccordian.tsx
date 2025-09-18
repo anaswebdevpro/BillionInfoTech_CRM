@@ -247,11 +247,9 @@ const IBAccordian = () => {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null)
   const [accordionData, setAccordionData] = useState<AccordionNode[]>([])
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set())
-  const [isLoading, setIsLoading] = useState<boolean>(true)
   const { token } = useAuth()
 
   const FetchNetwork = React.useCallback(() => {
-    setIsLoading(true);
     try {
       apiRequest({
         endpoint: MY_NETWORK,
@@ -262,15 +260,12 @@ const IBAccordian = () => {
         console.log('Accordion API Response:', networkResponse);
         
         setNetworkData(networkResponse || null);
-        setIsLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
-          setIsLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
-      setIsLoading(false);
     } 
   }, [token]);
 

@@ -30,17 +30,9 @@ interface LoginPageProps {
 const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Simulate page loading
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Validation schema using Yup
   const validationSchema = Yup.object({

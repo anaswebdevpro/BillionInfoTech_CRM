@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from 'react';
+
 import { COLORS } from '../../constants/colors';
 
 const AdminUsers: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
 
   return (

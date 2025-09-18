@@ -29,16 +29,8 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Simulate page loading
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Validation schema using Yup
   const validationSchema = Yup.object({

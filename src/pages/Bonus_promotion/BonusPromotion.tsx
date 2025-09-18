@@ -72,12 +72,10 @@ const BonusCard: React.FC<{
 const BonusPromotion: React.FC = () => {
   const { token } = useAuth();
   const [bonuses, setBonuses] = useState<Bonus[]>([]);
-  const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState<number | null>(null);
 
   // API call functions
   const FetchBonuses = useCallback(() => {
-    setLoading(true);
     try {
       apiRequest({
         endpoint: FETCH_BONUS,
@@ -87,18 +85,15 @@ const BonusPromotion: React.FC = () => {
       
       .then((response: unknown) => {
         const data = response as { bonuses?: Bonus[]; success?: boolean };
-        setLoading(false);
         setBonuses(data.bonuses || []);
         console.log('Bonuses Data:', response);
        
       }) 
         .catch((error: Error) => {
-          setLoading(false);
           console.error('Failed to fetch bonuses:', error);
           enqueueSnackbar('Failed to fetch bonuses: ' + error.message, { variant: 'error' });
         });
     } catch (error) {
-      setLoading(false);
       console.error('Failed to fetch bonuses:', error);
       enqueueSnackbar('Failed to fetch bonuses. Please try again.', { variant: 'error' });
     }

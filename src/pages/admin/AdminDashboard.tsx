@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { COLORS } from '../../constants/colors';
 import Card from '../../components/ui/Card';
 import { 
@@ -52,16 +52,7 @@ const AdminDashboard: React.FC = () => {
     pendingIBRequest: 0
   });
 
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate loading dashboard data
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
 
   return (

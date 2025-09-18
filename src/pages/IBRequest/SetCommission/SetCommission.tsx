@@ -91,13 +91,11 @@ const SetCommission: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(DEFAULT_ENTRIES_PER_PAGE);
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState<UserData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
   const navigate = useNavigate();
 
 
   const FetchData  =() => {
-    setIsLoading(true);
     try {
       apiRequest({
         endpoint: GET_USER_DOWNLINE,
@@ -120,16 +118,13 @@ const SetCommission: React.FC = () => {
         } else {
           setData([]);
         }
-        setIsLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
           setData([]);
-          setIsLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
-      setIsLoading(false);
     }
   };  
 

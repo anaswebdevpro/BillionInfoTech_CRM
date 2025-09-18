@@ -48,7 +48,7 @@ export const IB_TRANSACTION="/ajax-user-transactions";
 export const GET_LOT_WISE_TRANSACTIONS="/get-lot-wise-transactions";
 export const COMMISSION_SETTINGS="/client-network-settings";
 export const UPDATE_COMMISSION_SETTINGS="/update-network-settings";
-
+export const GET_PARTNER_BUSINESS="/get-partner-business";
 
 
 

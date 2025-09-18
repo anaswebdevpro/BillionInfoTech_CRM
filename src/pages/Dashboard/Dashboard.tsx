@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect} from "react";
 import { COLORS } from "../../constants/colors";
 import { apiRequest } from "../../services";
@@ -26,19 +27,19 @@ const {token} =useAuth();
   );
   const [positions, setPositions] = useState<Position[]>([]);
   const [closedPositions] = useState<Position[]>([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [showOpenPositions, setShowOpenPositions] = useState(true);
   const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
 
   const fetchDashboardData = () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       apiRequest({
         endpoint: DASHBOARD_DATA,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: any) => {
-        setLoading(false);
+        // setLoading(false);
         console.log("Dashboard data received:", response);
         
         // Type the response data properly
@@ -99,7 +100,7 @@ const {token} =useAuth();
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

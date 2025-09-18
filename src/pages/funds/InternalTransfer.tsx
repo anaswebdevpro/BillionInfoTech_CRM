@@ -76,6 +76,7 @@ const InternalTransfer: React.FC = () => {
 
       if (response?.response) {
         console.log('API Response:', response);
+        
         setApiData(response);
       } else {
         console.error('API Response failed:', response);

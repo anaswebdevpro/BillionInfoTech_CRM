@@ -56,13 +56,11 @@ const MYSubIBSummary: React.FC = () => {
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [isLoading, setIsLoading] = useState(true);
   const [downlineData, setDownlineData] = useState<DownlineResponse | null>(null);
   const { token } = useAuth();
 
   // Fetch downline data from API
   const FetchDownline = () => {
-    setIsLoading(true);
     try {
       apiRequest({
         endpoint: GET_USER_DOWNLINE,
@@ -74,15 +72,12 @@ const MYSubIBSummary: React.FC = () => {
         console.log('Downline API Response:', downlineResponse);
         
         setDownlineData(downlineResponse || null);
-        setIsLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch downline data:', error);
-          setIsLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch downline data:', error);
-      setIsLoading(false);
     } 
   };
 
