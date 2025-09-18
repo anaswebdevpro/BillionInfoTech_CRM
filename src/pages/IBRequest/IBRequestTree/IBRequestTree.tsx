@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
 import { ShimmerText } from '../../../components/ui/Shimmer'
@@ -223,49 +223,72 @@ const buildTree = (members: TreeMember[], parentId: number | null = null): TreeM
   return members.filter(member => member.parentId === parentId)
 }
 
-// Recursive component to render tree nodes
+// Recursive component to render tree nodes with limits
 const TreeNodeRenderer = ({ 
   members, 
   parentId, 
   onNodeClick, 
   selectedMemberId,
-  networkData
+  networkData,
+  currentLevel,
+  maxLevel,
+  maxNodes,
+  renderCountRef
 }: { 
   members: TreeMember[]
   parentId: number | null
   onNodeClick: (member: TreeMember) => void
   selectedMemberId: number | null
   networkData: NetworkData | null
+  currentLevel: number
+  maxLevel: number
+  maxNodes: number
+  renderCountRef: React.MutableRefObject<number>
 }) => {
+  // Stop if depth or node limits have been reached
+  if (currentLevel > maxLevel || renderCountRef.current >= maxNodes) return null
+
   const children = buildTree(members, parentId)
-  
   if (children.length === 0) return null
 
-  return (
-    <>
-      {children.map(member => (
-        <TreeNode 
-          key={member.memberId} 
-          label={
-            <MemberNode 
-              member={member} 
-              onClick={onNodeClick}
-              isSelected={selectedMemberId === member.memberId}
-              networkData={networkData}
-            />
-          }
-        >
+  const renderedNodes: React.ReactNode[] = []
+
+  for (const member of children) {
+    if (renderCountRef.current >= maxNodes) break
+
+    // Count this node before rendering its subtree
+    renderCountRef.current += 1
+
+    renderedNodes.push(
+      <TreeNode 
+        key={member.memberId} 
+        label={
+          <MemberNode 
+            member={member} 
+            onClick={onNodeClick}
+            isSelected={selectedMemberId === member.memberId}
+            networkData={networkData}
+          />
+        }
+      >
+        {currentLevel < maxLevel && renderCountRef.current < maxNodes ? (
           <TreeNodeRenderer 
             members={members} 
             parentId={member.memberId}
             onNodeClick={onNodeClick}
             selectedMemberId={selectedMemberId}
             networkData={networkData}
+            currentLevel={currentLevel + 1}
+            maxLevel={maxLevel}
+            maxNodes={maxNodes}
+            renderCountRef={renderCountRef}
           />
-        </TreeNode>
-      ))}
-    </>
-  )
+        ) : null}
+      </TreeNode>
+    )
+  }
+
+  return <>{renderedNodes}</>
 }
 
 const IBRequestTree = () => {
@@ -274,6 +297,11 @@ const IBRequestTree = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true) // Start with loading true
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const {token} = useAuth();
+  
+  // Rendering limits
+  const MAX_LEVEL = 5
+  const MAX_NODES = 15
+  const renderCountRef = useRef<number>(0)
 
   const FetchNetwork =() => {
     setIsLoading(true);
@@ -370,6 +398,9 @@ const IBRequestTree = () => {
   }
 
   const filteredTreeData = getFilteredTreeData()
+
+  // Reset node counter for each render and count root if present
+  renderCountRef.current = selectedMember ? 1 : 0
 
   // Show shimmer loading state
   if (isLoading) {
@@ -507,6 +538,10 @@ const IBRequestTree = () => {
           onNodeClick={handleNodeClick}
           selectedMemberId={selectedMemberId}
           networkData={networkData}
+          currentLevel={2}
+          maxLevel={MAX_LEVEL}
+          maxNodes={MAX_NODES}
+          renderCountRef={renderCountRef}
         />
       </Tree>
     ) : (

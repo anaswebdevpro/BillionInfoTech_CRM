@@ -20,7 +20,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransacti
 
   return (
     <Card title="Recent Transactions" subtitle="Latest account activity">
-      <div className="space-y-1">
+      <div className="space-y-1 overflow-y-scroll max-h-[300px]">
         {recentTransactions.length > 0 ? (
           recentTransactions.map((transaction) => (
             <div

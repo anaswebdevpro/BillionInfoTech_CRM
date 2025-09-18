@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../../constants/colors';
 import { ShimmerText } from '../../../components/ui/Shimmer';
 import { apiRequest } from '@/services';
@@ -12,7 +12,7 @@ interface DownlineData {
   first_name: string;
   email: string;
   status: number; // 1 for active, 0 for inactive
-  created_on: string; // Format: "YYYY-MM-DD HH:MM:SS"
+  created_at: string; // Format: "YYYY-MM-DD HH:MM:SS"
   sponsor: number;
   level: number;
 }
@@ -24,22 +24,6 @@ interface DownlineResponse {
   data: DownlineData[];
 }
 
-// Utility functions following DRY principle
-const formatDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  } catch (error) {
-    console.error('Date formatting error:', error);
-    return dateString; // Return original string if parsing fails
-  }
-};
 
 const getMemberType = (level: number): 'IB' | 'CLIENT' => {
   // Based on business logic - you can adjust this as needed
@@ -70,18 +54,15 @@ const getTypeBadge = (type: 'IB' | 'CLIENT') => {
 };
 
 const MYSubIBSummary: React.FC = () => {
-  // State for pagination, search, and filters
+  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [levelFilter, setLevelFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [downlineData, setDownlineData] = useState<DownlineResponse | null>(null);
   const { token } = useAuth();
 
   // Fetch downline data from API
-  const FetchDownline = useCallback(() => {
+  const FetchDownline = () => {
     setIsLoading(true);
     try {
       apiRequest({
@@ -104,52 +85,24 @@ const MYSubIBSummary: React.FC = () => {
       console.error('Failed to fetch downline data:', error);
       setIsLoading(false);
     } 
-  }, [token]);
+  };
 
   useEffect(() => {
     FetchDownline();
-  }, [FetchDownline]);
+  }, []);
 
-  // Filter and search logic
-  const filteredData = useMemo(() => {
-    if (!downlineData?.data) return [];
-    
-    return downlineData.data.filter((item) => {
-      // Search filter
-      const matchesSearch = searchTerm === '' || 
-        item.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.id.toString().includes(searchTerm);
+  // Display data as received from API
+  const displayData = downlineData?.data || [];
 
-      // Status filter
-      const matchesStatus = statusFilter === 'all' || 
-        (statusFilter === 'active' && item.status === 1) ||
-        (statusFilter === 'inactive' && item.status === 0);
-
-      // Level filter
-      const matchesLevel = levelFilter === 'all' || 
-        item.level.toString() === levelFilter;
-
-      return matchesSearch && matchesStatus && matchesLevel;
-    });
-  }, [downlineData?.data, searchTerm, statusFilter, levelFilter]);
-
+  
   // Pagination logic
-  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  const totalPages = Math.ceil(displayData.length / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = startIndex + entriesPerPage;
-  const paginatedData = filteredData.slice(startIndex, endIndex);
+  const paginatedData = displayData.slice(startIndex, endIndex);
 
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, levelFilter, entriesPerPage]);
 
-  // Get unique levels for filter dropdown
-  const uniqueLevels = useMemo(() => 
-    downlineData?.data ? [...new Set(downlineData.data.map(item => item.level))].sort((a, b) => a - b) : [],
-    [downlineData?.data]
-  );
+
 
   // Shimmer Components
   const ShimmerTableRow = () => (
@@ -169,7 +122,7 @@ const MYSubIBSummary: React.FC = () => {
         <table className="w-full">
           <thead>
             <tr className={`border-b border-${COLORS.BORDER}`}>
-              {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Joined On'].map(header => (
+              {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Created At'].map(header => (
                 <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>{header}</th>
               ))}
             </tr>
@@ -249,69 +202,25 @@ const MYSubIBSummary: React.FC = () => {
           <p className={`text-${COLORS.SECONDARY_TEXT}`}>Overview of your network downline and their details</p>
         </div>
         <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
-          Total Records: {downlineData?.recordsTotal || 0}
+          {/* Total Records: {totalRecords} */}
         </div>
       </div>
 
-      {/* Search and Filter Controls */}
+      {/* Entries Per Page Control */}
       <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-6`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search Bar */}
+        <div className="flex justify-between items-center">
           <div>
-            <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-              Search
-            </label>
-            <input
-              type="text"
-              placeholder="Search by name, email, or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
-            />
+            <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>Network Downline</h3>
+            <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Showing all downline members</p>
           </div>
-
-          {/* Status Filter */}
-          <div>
-            <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          {/* Level Filter */}
-          <div>
-            <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-              Level
-            </label>
-            <select
-              value={levelFilter}
-              onChange={(e) => setLevelFilter(e.target.value)}
-              className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
-            >
-              <option value="all">All Levels</option>
-              {uniqueLevels.map(level => (
-                <option key={level} value={level.toString()}>Level {level}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Entries Per Page */}
-          <div>
-            <label className={`block text-sm font-medium text-${COLORS.SECONDARY_TEXT} mb-2`}>
-              Entries per page
+          <div className="flex items-center space-x-4">
+            <label className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>
+              Entries per page:
             </label>
             <select
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-              className={`w-full px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
+              className={`px-3 py-2 border border-${COLORS.BORDER} rounded-md focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-transparent`}
             >
               <option value={5}>5 entries</option>
               <option value={10}>10 entries</option>
@@ -321,44 +230,29 @@ const MYSubIBSummary: React.FC = () => {
             </select>
           </div>
         </div>
-
-        {/* Clear Filters Button */}
-        <div className="mt-4 flex justify-end">
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setStatusFilter('all');
-              setLevelFilter('all');
-              setCurrentPage(1);
-            }}
-            className={`px-4 py-2 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors`}
-          >
-            Clear Filters
-          </button>
-        </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
-          <div className={`text-2xl font-bold text-${COLORS.PRIMARY}`}>{filteredData.length}</div>
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Filtered Results</div>
+          <div className={`text-2xl font-bold text-${COLORS.PRIMARY}`}>{displayData.length}</div>
+          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Total Members</div>
         </div>
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
           <div className={`text-2xl font-bold text-green-600`}>
-            {filteredData.filter(item => item.status === 1).length}
+            {displayData.filter(item => item.status === 1).length}
           </div>
           <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Active Members</div>
         </div>
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
           <div className={`text-2xl font-bold text-red-600`}>
-            {filteredData.filter(item => item.status === 0).length}
+            {displayData.filter(item => item.status === 0).length}
           </div>
           <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Inactive Members</div>
         </div>
         <div className={`bg-${COLORS.WHITE} rounded-lg border border-${COLORS.BORDER} p-4`}>
           <div className={`text-2xl font-bold text-purple-600`}>
-            {filteredData.filter(item => getMemberType(item.level) === 'IB').length}
+            {displayData.filter(item => getMemberType(item.level) === 'IB').length}
           </div>
           <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>IB Members</div>
         </div>
@@ -370,7 +264,7 @@ const MYSubIBSummary: React.FC = () => {
           <table className="w-full">
             <thead>
               <tr className={`border-b border-${COLORS.BORDER}`}>
-                {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Joined On'].map(header => (
+                {['#', 'Email', 'Level', 'Type', 'Status', 'Txns', 'Accounts', 'Created At'].map(header => (
                   <th key={header} className={`text-left p-4 font-semibold text-${COLORS.SECONDARY_TEXT}`}>{header}</th>
                 ))}
               </tr>
@@ -404,7 +298,7 @@ const MYSubIBSummary: React.FC = () => {
                     </button>
                   </td>
                   <td className={`p-4 text-${COLORS.SECONDARY_TEXT}`}>
-                    <div className="text-sm">{formatDate(member.created_on)}</div>
+                    <div className="text-sm">{member.created_at}</div>
                   </td>
                 </tr>
               ))}
@@ -416,12 +310,7 @@ const MYSubIBSummary: React.FC = () => {
         <div className={`px-4 py-3 border-t border-${COLORS.BORDER} bg-${COLORS.SECONDARY_BG}`}>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
             <div>
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
-              {filteredData.length !== downlineData?.recordsTotal && (
-                <span className="ml-2 text-gray-500">
-                  (filtered from {downlineData?.recordsTotal} total entries)
-                </span>
-              )}
+              Showing {startIndex + 1} to {Math.min(endIndex, displayData.length)} of {displayData.length} entries
             </div>
             
             {/* Pagination Controls */}
