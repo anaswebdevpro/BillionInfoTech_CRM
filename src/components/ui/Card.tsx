@@ -7,6 +7,7 @@ interface CardProps {
   className?: string;
   title?: string;
   subtitle?: string;
+  onClick?: () => void;
 }
 
 /**
@@ -18,9 +19,13 @@ const Card: React.FC<CardProps> = ({
   className,
   title,
   subtitle,
+  onClick,
 }) => {
   return (
-    <div className={cn(`bg-${COLORS.WHITE} rounded-lg shadow-sm border border-${COLORS.BORDER}`, className)}>
+    <div 
+      className={cn(`bg-${COLORS.WHITE} rounded-lg shadow-sm border border-${COLORS.BORDER}`, className)}
+      onClick={onClick}
+    >
       {(title || subtitle) && (
         <div className={`px-6 py-4 border-b border-${COLORS.BORDER}`}>
           {title && <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{title}</h3>}

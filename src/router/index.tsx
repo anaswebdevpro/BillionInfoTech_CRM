@@ -13,6 +13,7 @@ import TradingAccountCreation from '../pages/createTradingAccount/TradingAccount
 
 
 import { DepositFunds, WithdrawFunds,  InternalTransfer, TransactionHistory } from '../pages/funds';
+import BankTransfer from '../pages/funds/DepositFunds/BankTransfer';
 
 import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
 import MyAccounts from '../pages/MyAccount/MyAccount';
@@ -53,6 +54,8 @@ import {
   SetCommission, IBAccordian, IBRequestTree, IBtradeHistory, IBtransaction, IBBusiness, MYSubIBSummnary, CommissionReport
 } from "../pages/IBRequest/index";
 import SetCommissionForm from '../pages/IBRequest/SetCommission/SetCommissionForm';
+import TRC20 from '../pages/funds/DepositFunds/TRC20';
+import BEP20 from '../pages/funds/DepositFunds/BEP20';
 
 export const router = createBrowserRouter([
   {
@@ -116,6 +119,19 @@ export const router = createBrowserRouter([
             path: 'funds/deposit',
             element: <DepositFunds />,
           },
+          {
+            path: 'funds/deposit/bank-transfer',
+            element: <BankTransfer />,
+          },
+          {
+            path: 'funds/deposit/usdt-trc20',
+            element: <TRC20 />,
+          },
+          {
+            path: 'funds/deposit/usdt-bep20',
+            element: <BEP20 />,
+          },
+
           {
             path: 'funds/withdraw',
             element: <WithdrawFunds />,

@@ -2,8 +2,8 @@
 export { default as AdminSupport } from './admin/AdminSupport';
 export { default as CreateTicket } from './createTicket/CreateTicket';
 export { default as Dashboard } from './Dashboard/Dashboard';
-export { default as Deposits } from './Deposite/Deposits';
-export { default as InternalTransfer } from './funds/InternalTransfer';
+// export { default as Deposits } from './Deposite/Deposits';
+export { default as InternalTransfer } from './funds/internalTransfer/InternalTransfer';
 export * from './funds';
 // export { default as KYCVerification } from './KYCVerification';
 export { default as LiveAccounts } from './LiveAccount/LiveAccounts';

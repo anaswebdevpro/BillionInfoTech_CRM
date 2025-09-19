@@ -55,6 +55,9 @@ export const GET_PARTNER_BUSINESS="/get-partner-business";
 // funds
 export const INTERNAL_TRANSFER="/internal-transfer";
 export const SUBMIT_INTERNAL_TRANSFER="/do-internal-transfer";
+export const DEPOSIT_METHODS="/deposit-methods";
+export const DEPOSIT_METHODS_TRC20="/wallet-address/trc20";
+export const DEPOSIT_METHODS_BEP20="/wallet-address/bep20";
 
 
 
