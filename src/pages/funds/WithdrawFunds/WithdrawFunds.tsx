@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
 
 const WithdrawFunds: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();

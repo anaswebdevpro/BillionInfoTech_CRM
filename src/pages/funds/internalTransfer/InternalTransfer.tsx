@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Card, Button, Input } from '../../components/ui';
-import { apiRequest } from '../../services/api';
-import { INTERNAL_TRANSFER, SUBMIT_INTERNAL_TRANSFER } from '../../../api/api-variable';
-import { COLORS } from '../../constants/colors';
-import { useAuth } from '../../context';
+import { Card, Button, Input } from '../../../components/ui';
+import { apiRequest } from '../../../services/api';
+import { INTERNAL_TRANSFER, SUBMIT_INTERNAL_TRANSFER } from '../../../../api/api-variable';
+import { COLORS } from '../../../constants/colors';
+import { useAuth } from '../../../context';
 import { enqueueSnackbar } from 'notistack';
 
 interface LiveAccount {

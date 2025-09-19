@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../../components/ui/Card';
-import Input from '../../components/ui/Input';
+import Card from '../../../components/ui/Card';
+import Input from '../../../components/ui/Input';
 
 interface Transaction {
   id: string;
