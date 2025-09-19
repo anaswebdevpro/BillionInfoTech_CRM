@@ -1,16 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, TrendingUp, Eye, Filter, Search } from 'lucide-react';
+import { Plus, Settings, TrendingUp } from 'lucide-react';
 import Card from '../../components/ui/Card';
-  import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
 import { AccountType } from '../../types';
 import { COLORS } from '../../constants/colors';
+import logo from '../../assets/mt5logo.png';
 
 const ManageAccounts: React.FC = () => {
   const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
 
   useEffect(() => {
     // Dummy data for account types
@@ -74,15 +72,6 @@ const ManageAccounts: React.FC = () => {
     setAccountTypes(dummyAccountTypes);
   }, []);
 
-  const filteredAccountTypes = accountTypes.filter(accountType => {
-    const matchesSearch = accountType.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || 
-      (selectedFilter === 'premium' && ['Pro Account', 'VIP Account'].includes(accountType.name)) ||
-      (selectedFilter === 'standard' && ['Standard Account', 'ECN Account'].includes(accountType.name)) ||
-      (selectedFilter === 'special' && ['Islamic Account', 'Micro Account'].includes(accountType.name));
-    
-    return matchesSearch && matchesFilter;
-  });
 
   return (
     <div className="space-y-6">
@@ -94,53 +83,25 @@ const ManageAccounts: React.FC = () => {
         </p>
       </div>
 
-      {/* Search and Filter Controls */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-${COLORS.GRAY} h-4 w-4`} />
-            <Input
-              type="text"
-              placeholder="Search account types..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`pl-10 bg-${COLORS.WHITE} border-${COLORS.BORDER} text-${COLORS.SECONDARY}`}
-            />
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            className={`px-3 py-2 border border-${COLORS.BORDER} rounded-md bg-${COLORS.WHITE} text-${COLORS.SECONDARY} focus:outline-none focus:ring-2 focus:ring-${COLORS.PRIMARY}`}
-          >
-            <option value="all">All Types</option>
-            <option value="premium">Premium</option>
-            <option value="standard">Standard</option>
-            <option value="special">Special</option>
-          </select>
-          <Button className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-        </div>
-      </div>
 
       {/* Account Types Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAccountTypes.map((type) => (
+        {accountTypes.map((type) => (
           <Card key={type.id} className="hover:shadow-lg transition-all duration-200 hover:scale-105">
             <div className="p-6">
               {/* Account Header */}
               <div className="flex items-center mb-4">
                 <div className={`w-12 h-12 bg-${COLORS.PRIMARY_BG_LIGHT} rounded-lg flex items-center justify-center mr-4`}>
-                  <TrendingUp className={`h-6 w-6 text-${COLORS.PRIMARY}`} />
+                  {/* <TrendingUp className={`h-6 w-6 text-${COLORS.PRIMARY}`} /> */}
+                  <img src={logo} alt="MT5 Logo" className="h-10" />
+
                 </div>
                 <div className="flex-1">
                   <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{type.name}</h3>
                   {type.markUp === 'Zero Spread Account' && (
                     <span className={`text-${COLORS.PRIMARY} text-xs font-bold`}>Zero Spread</span>
                   )}
+                  <hr></hr> 
                 </div>
               </div>
 
@@ -191,54 +152,16 @@ const ManageAccounts: React.FC = () => {
       </div>
 
       {/* Empty State */}
-      {filteredAccountTypes.length === 0 && (
+      {accountTypes.length === 0 && (
         <Card className="text-center py-12">
           <TrendingUp className={`mx-auto h-12 w-12 text-${COLORS.GRAY}`} />
           <h3 className={`mt-2 text-sm font-medium text-${COLORS.SECONDARY}`}>No account types found</h3>
           <p className={`mt-1 text-sm text-${COLORS.SECONDARY_TEXT}`}>
-            Try adjusting your search or filter criteria.
+            No account types available at the moment.
           </p>
         </Card>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-        <Card className="p-4">
-          <div className="flex items-center">
-            <div className={`w-8 h-8 bg-${COLORS.PRIMARY_BG_LIGHT} rounded-lg flex items-center justify-center mr-3`}>
-              <TrendingUp className={`h-4 w-4 text-${COLORS.PRIMARY}`} />
-            </div>
-            <div>
-              <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Total Account Types</p>
-              <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{accountTypes.length}</p>
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="p-4">
-          <div className="flex items-center">
-            <div className={`w-8 h-8 bg-${COLORS.SECONDARY_BG} rounded-lg flex items-center justify-center mr-3`}>
-              <Settings className={`h-4 w-4 text-${COLORS.SECONDARY_TEXT}`} />
-            </div>
-            <div>
-              <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Available Now</p>
-              <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{filteredAccountTypes.length}</p>
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="p-4">
-          <div className="flex items-center">
-            <div className={`w-8 h-8 bg-${COLORS.YELLOW_BG} rounded-lg flex items-center justify-center mr-3`}>
-              <Eye className={`h-4 w-4 text-${COLORS.YELLOW_TEXT}`} />
-            </div>
-            <div>
-              <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Premium Options</p>
-              <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>2</p>
-            </div>
-          </div>
-        </Card>
-      </div>
     </div>
   );
 };

@@ -10,9 +10,9 @@ import Dashboard from '../pages/Dashboard/Dashboard';
 import LiveAccounts from '../pages/LiveAccount/LiveAccounts';
 import TradingAccountCreation from '../pages/createTradingAccount/TradingAccountCreation';
 
-import Deposits from '../pages/Deposite/Deposits';
-import InternalTransfer from '../pages/funds/InternalTransfer';
-import { DepositFunds, WithdrawFunds, InternalTransfer as FundsInternalTransfer, TransactionHistory } from '../pages/funds';
+
+
+import { DepositFunds, WithdrawFunds,  InternalTransfer, TransactionHistory } from '../pages/funds';
 
 import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
 import MyAccounts from '../pages/MyAccount/MyAccount';
@@ -110,19 +110,7 @@ export const router = createBrowserRouter([
           {
             path: 'trading-account',
             element: <TradingAccountCreation />,
-          },
-          // {
-          //   path: 'kyc',
-          //   element: <KYCVerification />,
-          // },
-          {
-            path: 'deposits',
-            element: <Deposits />,
-          },
-          {
-            path: 'internal-transfer',
-            element: <InternalTransfer />,
-          },
+          },                          
           // Funds Routes
           {
             path: 'funds/deposit',
@@ -134,7 +122,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'funds/transfer',
-            element: <FundsInternalTransfer />,
+            element: <InternalTransfer />,
           },
           {
             path: 'funds/history',
