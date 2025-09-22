@@ -3,6 +3,7 @@ import { apiRequest } from "@/services";
 import { GET_TRADES_HISTORY } from "../../../../api/api-variable";
 import { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui";
+import { useDebounce } from "../../../Hook/useDebounce";
 
 interface TradeData {
   order_id: number;
@@ -33,11 +34,11 @@ const IBtradeHistory = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchValue, setSearchValue] = useState('');
   const [entriesPerPage, setEntriesPerPage] = useState(10);
- 
- 
-//  page = currentPage, search = searchValue, length = entriesPerPage
- 
- const fetchData = useCallback((page = currentPage, search = searchValue, length = entriesPerPage) => {
+  const debouncedSearchValue = useDebounce(searchValue, 500);
+
+  //  page = currentPage, search = searchValue, length = entriesPerPage
+
+  const fetchData = useCallback((page = currentPage, search = debouncedSearchValue, length = entriesPerPage) => {
    setLoading(true);
     try {
       const requestBody = {
@@ -67,8 +68,8 @@ const IBtradeHistory = () => {
     } catch (error) {
       console.error("Failed to fetch trade history:", error);
       setLoading(false);
-    } 
-  }, [token, currentPage, searchValue, entriesPerPage]);
+    }
+  }, [token, currentPage, debouncedSearchValue, entriesPerPage]);
 
   useEffect(() => {
     fetchData();
@@ -81,12 +82,7 @@ const IBtradeHistory = () => {
     fetchData(newPage, searchValue, entriesPerPage);
   };
 
-  // Search handler
-  const handleSearch = (newSearchValue: string) => {
-    setSearchValue(newSearchValue);
-    setCurrentPage(0);
-    fetchData(0, newSearchValue, entriesPerPage);
-  };
+
 
   // Entries per page handler
   const handleEntriesPerPageChange = (newEntriesPerPage: number) => {
@@ -185,7 +181,7 @@ const IBtradeHistory = () => {
             <input
               type="text"
               value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search trades..."
               className="border border-gray-300 rounded px-3 py-1 text-sm"
             />
