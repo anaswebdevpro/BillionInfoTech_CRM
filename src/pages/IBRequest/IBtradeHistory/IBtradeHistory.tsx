@@ -1,627 +1,249 @@
+import { useAuth } from "@/context";
+import { apiRequest } from "@/services";
+import { GET_TRADES_HISTORY } from "../../../../api/api-variable";
+import { useEffect, useState, useCallback } from "react";
+import { Card } from "@/components/ui";
 
-import React, { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown, Search, Scale, ChevronLeft, ChevronRight } from 'lucide-react';
-import Card from '../../../components/ui/Card';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import { COLORS } from '../../../constants/colors';
-
-interface TradePosition {
-  ticket: string;
-  account: string;
-  level: number;
+interface TradeData {
+  order_id: number;
+  account_number: number;
   symbol: string;
-  type: 'BUY' | 'SELL';
-  openPrice: string;
-  closePrice?: string;
-  volume: string;
-  openedOn: string;
-  closedOn?: string;
+  side: string;
+  open_price: number;
+  volume: number;
+  status: number;
+  close_price: number;
+  profit: number;
+  created_on: string;
+  closed_on: string;
 }
 
-const IBtradeHistory: React.FC = () => {
-  const [openPositions] = useState<TradePosition[]>([]);
-  const [closedPositions, setClosedPositions] = useState<TradePosition[]>([]);
-  const [openLots, setOpenLots] = useState(0);
-  const [closedLots, setClosedLots] = useState(0);
-  const [openEntriesPerPage, setOpenEntriesPerPage] = useState(10);
-  const [closedEntriesPerPage, setClosedEntriesPerPage] = useState(10);
-  const [openCurrentPage, setOpenCurrentPage] = useState(1);
-  const [closedCurrentPage, setClosedCurrentPage] = useState(1);
-  const [openNetworkLevel, setOpenNetworkLevel] = useState('All');
-  const [closedNetworkLevel, setClosedNetworkLevel] = useState('All');
-  const [openSearchTerm, setOpenSearchTerm] = useState('');
-  const [closedSearchTerm, setClosedSearchTerm] = useState('');
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+interface TableData {
+  draw: number;
+  recordsTotal: number;
+  recordsFiltered: number;
+  data: Array<TradeData>;
+}
+
+
+const IBtradeHistory = () => {
+  const { token } = useAuth();
+  const [data, setData] = useState<TableData | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchValue, setSearchValue] = useState('');
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
+ 
+ 
+//  page = currentPage, search = searchValue, length = entriesPerPage
+ 
+ const fetchData = useCallback((page = currentPage, search = searchValue, length = entriesPerPage) => {
+   setLoading(true);
+    try {
+      const requestBody = {
+        start: page * length,
+        length: length,
+        search: search
+      };     
+        
+      apiRequest({
+        endpoint: GET_TRADES_HISTORY,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        data: requestBody
+      })
+      .then((response: unknown) => {
+         setData(response as TableData);
+        console.log('Trade History:', response);
+      })
+      
+     .catch((error) => {
+        console.error('Error fetching trade history:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+     
+    } catch (error) {
+      console.error("Failed to fetch trade history:", error);
+      setLoading(false);
+    } 
+  }, [token, currentPage, searchValue, entriesPerPage]);
 
   useEffect(() => {
-    // Mock data for closed positions
-    const mockClosedPositions: TradePosition[] = [
-      {
-        ticket: '162836138',
-        account: '2132630027',
-        level: 1,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.11',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836164',
-        account: '2132630053',
-        level: 2,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.01',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836165',
-        account: '2132630054',
-        level: 3,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.02',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836166',
-        account: '2132630055',
-        level: 4,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.03',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836167',
-        account: '2132630056',
-        level: 1,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.05',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836168',
-        account: '2132630057',
-        level: 2,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.06',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836169',
-        account: '2132630058',
-        level: 3,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.07',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836170',
-        account: '2132630059',
-        level: 4,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.08',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836171',
-        account: '2132630060',
-        level: 1,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.09',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      },
-      {
-        ticket: '162836172',
-        account: '2132630061',
-        level: 2,
-        symbol: 'EURUSD',
-        type: 'SELL',
-        openPrice: '1.17053',
-        closePrice: '1.17016',
-        volume: '0.10',
-        openedOn: '16 Aug, 2025 12:53 am',
-        closedOn: '16 Aug, 2025 12:53 am'
-      }
-    ];
+    fetchData();
+  }, [fetchData]);
 
-    // Set mock data
-    setClosedPositions(mockClosedPositions);
-    setOpenLots(0);
-    setClosedLots(10);
-  }, []);
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
+  // Pagination handlers
+  const handlePagination = (direction: 'next' | 'prev') => {
+    const newPage = direction === 'next' ? currentPage + 1 : Math.max(0, currentPage - 1);
+    setCurrentPage(newPage);
+    fetchData(newPage, searchValue, entriesPerPage);
   };
 
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) {
-      return <ChevronUp className="h-4 w-4 text-gray-400" />;
-    }
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="h-4 w-4 text-gray-600" /> : 
-      <ChevronDown className="h-4 w-4 text-gray-600" />;
+  // Search handler
+  const handleSearch = (newSearchValue: string) => {
+    setSearchValue(newSearchValue);
+    setCurrentPage(0);
+    fetchData(0, newSearchValue, entriesPerPage);
   };
 
-  const filteredClosedPositions = closedPositions.filter(position => {
-    const matchesSearch = position.ticket.includes(closedSearchTerm) || 
-                         position.account.includes(closedSearchTerm) ||
-                         position.symbol.includes(closedSearchTerm);
-    const matchesLevel = closedNetworkLevel === 'All' || position.level.toString() === closedNetworkLevel;
-    return matchesSearch && matchesLevel;
-  });
+  // Entries per page handler
+  const handleEntriesPerPageChange = (newEntriesPerPage: number) => {
+    setEntriesPerPage(newEntriesPerPage);
+    setCurrentPage(0);
+    fetchData(0, searchValue, newEntriesPerPage);
+  };
 
-  const filteredOpenPositions = openPositions.filter(position => {
-    const matchesSearch = position.ticket.includes(openSearchTerm) || 
-                         position.account.includes(openSearchTerm) ||
-                         position.symbol.includes(openSearchTerm);
-    const matchesLevel = openNetworkLevel === 'All' || position.level.toString() === openNetworkLevel;
-    return matchesSearch && matchesLevel;
-  });
+  // Separate trades based on status
+  const openPositions = data?.data?.filter(trade => trade.status !== 1) || [];
+  const closedPositions = data?.data?.filter(trade => trade.status === 1) || [];
 
-  const totalClosedPages = Math.ceil(filteredClosedPositions.length / closedEntriesPerPage);
-  const totalOpenPages = Math.ceil(filteredOpenPositions.length / openEntriesPerPage);
-
-  const paginatedClosedPositions = filteredClosedPositions.slice(
-    (closedCurrentPage - 1) * closedEntriesPerPage,
-    closedCurrentPage * closedEntriesPerPage
-  );
-
-  const paginatedOpenPositions = filteredOpenPositions.slice(
-    (openCurrentPage - 1) * openEntriesPerPage,
-    openCurrentPage * openEntriesPerPage
-  );
-
-  return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="flex gap-4">
-        <div className={`w-16 h-16 bg-${COLORS.PRIMARY_BG} rounded-lg flex items-center justify-center`}>
-          <Scale className={`h-8 w-8 text-${COLORS.PRIMARY}`} />
-        </div>
-        <Card className="flex-1">
-          <div className="text-center">
-            <div className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>{openLots}</div>
-            <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Open Lots</div>
-          </div>
-        </Card>
-        
-        <div className={`w-16 h-16 bg-${COLORS.PRIMARY_BG_LIGHT} rounded-lg flex items-center justify-center`}>
-          <Scale className={`h-8 w-8 text-${COLORS.PRIMARY}`} />
-        </div>
-        <Card className="flex-1">
-          <div className="text-center">
-            <div className={`text-2xl font-bold text-${COLORS.SECONDARY}`}>{closedLots}</div>
-            <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>Closed Lots</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Open Positions Section */}
-      <Card>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>Open Positions</h2>
-          <div className="flex items-center gap-2">
-            <select
-              value={openEntriesPerPage}
-              onChange={(e) => setOpenEntriesPerPage(Number(e.target.value))}
-              className={`px-3 py-1 border border-${COLORS.BORDER} rounded text-sm`}
-            >
-              <option value={10}>Show 10 entries</option>
-              <option value={25}>Show 25 entries</option>
-              <option value={50}>Show 50 entries</option>
-              <option value={100}>Show 100 entries</option>
-            </select>
-          </div>
-        </div>
-
+  const renderTable = (trades: TradeData[], tableTitle: string) => (
+    <Card className="p-6 mb-6">
+      <h2 className="text-xl font-semibold mb-4">{tableTitle}</h2>
+      {loading ? (
+        <div className="text-center py-4">Loading...</div>
+      ) : trades.length === 0 ? (
+        <div className="text-center py-4 text-gray-500">No {tableTitle.toLowerCase()} found</div>
+      ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-full border-collapse border border-gray-300">
             <thead>
-              <tr className={`border-b border-${COLORS.BORDER}`}>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('ticket')}
-                >
-                  <div className="flex items-center gap-1">
-                    Ticket {getSortIcon('ticket')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('account')}
-                >
-                  <div className="flex items-center gap-1">
-                    Account {getSortIcon('account')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('level')}
-                >
-                  <div className="flex items-center gap-1">
-                    Level {getSortIcon('level')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('symbol')}
-                >
-                  <div className="flex items-center gap-1">
-                    Symbol {getSortIcon('symbol')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('type')}
-                >
-                  <div className="flex items-center gap-1">
-                    Type {getSortIcon('type')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('openPrice')}
-                >
-                  <div className="flex items-center gap-1">
-                    Open Price {getSortIcon('openPrice')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('volume')}
-                >
-                  <div className="flex items-center gap-1">
-                    Volume {getSortIcon('volume')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('openedOn')}
-                >
-                  <div className="flex items-center gap-1">
-                    Opened On {getSortIcon('openedOn')}
-                  </div>
-                </th>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 px-4 py-2 text-left">Account Number</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Order ID</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Symbol</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Side</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Volume</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Open Price</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Close Price</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Created On</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Closed On</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Profit</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedOpenPositions.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-8 text-gray-500">
-                    No matching records found
-                  </td>
-                </tr>
-              ) : (
-                paginatedOpenPositions.map((position, index) => (
-                  <tr key={index} className={`border-b border-${COLORS.BORDER} hover:bg-gray-50`}>
-                    <td className="py-3 px-4">{position.ticket}</td>
-                    <td className="py-3 px-4">
-                      <span className="text-orange-600">{position.account}</span>
-                    </td>
-                    <td className="py-3 px-4">{position.level}</td>
-                    <td className="py-3 px-4">
-                      <span className={`bg-${COLORS.PRIMARY_BG} text-${COLORS.PRIMARY} px-2 py-1 rounded-full text-xs`}>
-                        {position.symbol}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs`}>
-                        {position.type}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">{position.openPrice}</td>
-                    <td className="py-3 px-4">{position.volume}</td>
-                    <td className="py-3 px-4">{position.openedOn}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-between items-center mt-4">
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
-            Showing {paginatedOpenPositions.length === 0 ? 0 : 1} to {paginatedOpenPositions.length} of {filteredOpenPositions.length} entries (filtered from 180 total entries)
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm">Network Level:</label>
-              <select
-                value={openNetworkLevel}
-                onChange={(e) => setOpenNetworkLevel(e.target.value)}
-                className={`px-2 py-1 border border-${COLORS.BORDER} rounded text-sm`}
-              >
-                <option value="All">All</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={openSearchTerm}
-                onChange={(e) => setOpenSearchTerm(e.target.value)}
-                className="w-32"
-              />
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setOpenCurrentPage(Math.max(1, openCurrentPage - 1))}
-                disabled={openCurrentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setOpenCurrentPage(Math.min(totalOpenPages, openCurrentPage + 1))}
-                disabled={openCurrentPage === totalOpenPages}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Closed Positions Section */}
-      <Card>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>Closed Positions</h2>
-          <div className="flex items-center gap-2">
-            <select
-              value={closedEntriesPerPage}
-              onChange={(e) => setClosedEntriesPerPage(Number(e.target.value))}
-              className={`px-3 py-1 border border-${COLORS.BORDER} rounded text-sm`}
-            >
-              <option value={10}>Show 10 entries</option>
-              <option value={25}>Show 25 entries</option>
-              <option value={50}>Show 50 entries</option>
-              <option value={100}>Show 100 entries</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b border-${COLORS.BORDER}`}>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('ticket')}
-                >
-                  <div className="flex items-center gap-1">
-                    Ticket {getSortIcon('ticket')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('account')}
-                >
-                  <div className="flex items-center gap-1">
-                    Account {getSortIcon('account')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('level')}
-                >
-                  <div className="flex items-center gap-1">
-                    Level {getSortIcon('level')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('symbol')}
-                >
-                  <div className="flex items-center gap-1">
-                    Symbol {getSortIcon('symbol')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('type')}
-                >
-                  <div className="flex items-center gap-1">
-                    Type {getSortIcon('type')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('openPrice')}
-                >
-                  <div className="flex items-center gap-1">
-                    Open Price {getSortIcon('openPrice')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('closePrice')}
-                >
-                  <div className="flex items-center gap-1">
-                    Close Price {getSortIcon('closePrice')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('volume')}
-                >
-                  <div className="flex items-center gap-1">
-                    Volume {getSortIcon('volume')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('closedOn')}
-                >
-                  <div className="flex items-center gap-1">
-                    Closed On {getSortIcon('closedOn')}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedClosedPositions.map((position, index) => (
-                <tr key={index} className={`border-b border-${COLORS.BORDER} hover:bg-gray-50`}>
-                  <td className="py-3 px-4">{position.ticket}</td>
-                  <td className="py-3 px-4">
-                    <span className="text-orange-600">{position.account}</span>
-                  </td>
-                  <td className="py-3 px-4">{position.level}</td>
-                  <td className="py-3 px-4">
-                    <span className={`bg-${COLORS.PRIMARY_BG} text-${COLORS.PRIMARY} px-2 py-1 rounded-full text-xs`}>
-                      {position.symbol}
+              {trades.map((trade, index) => (
+                <tr key={trade.order_id || index} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">{trade.account_number}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.order_id}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.symbol}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      trade.side?.toLowerCase() === 'buy' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {trade.side}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    <span className={`bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs`}>
-                      {position.type}
+                  <td className="border border-gray-300 px-4 py-2">{trade.volume}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.open_price}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.close_price}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.created_on}</td>
+                  <td className="border border-gray-300 px-4 py-2">{trade.closed_on}</td>
+                  <td className={`border border-gray-300 px-4 py-2 font-medium ${
+                    trade.profit >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {trade.profit >= 0 ? '+' : ''}{trade.profit}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      trade.status === 1 
+                        ? 'bg-gray-100 text-gray-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {trade.status === 1 ? 'Closed' : 'Open'}
                     </span>
                   </td>
-                  <td className="py-3 px-4">{position.openPrice}</td>
-                  <td className="py-3 px-4">{position.closePrice}</td>
-                  <td className="py-3 px-4">{position.volume}</td>
-                  <td className="py-3 px-4">{position.closedOn}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+    </Card>
+  );
 
-        <div className="flex justify-between items-center mt-4">
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
-            Showing {paginatedClosedPositions.length === 0 ? 0 : 1} to {paginatedClosedPositions.length} of {filteredClosedPositions.length} entries (filtered from 180 total entries)
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Trade History</h1>
+        <p className="text-gray-600 mt-2">
+          View your open and closed trading positions
+        </p>
+      </div>
+
+      {/* Search and Controls */}
+      <Card className="p-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          {/* Search Input */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Search:</label>
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Search trades..."
+              className="border border-gray-300 rounded px-3 py-1 text-sm"
+            />
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm">Network Level:</label>
-              <select
-                value={closedNetworkLevel}
-                onChange={(e) => setClosedNetworkLevel(e.target.value)}
-                className={`px-2 py-1 border border-${COLORS.BORDER} rounded text-sm`}
-              >
-                <option value="All">All</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={closedSearchTerm}
-                onChange={(e) => setClosedSearchTerm(e.target.value)}
-                className="w-32"
-              />
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setClosedCurrentPage(Math.max(1, closedCurrentPage - 1))}
-                disabled={closedCurrentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              
-              {/* Page Numbers */}
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalClosedPages) }, (_, i) => {
-                  const pageNum = i + 1;
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={closedCurrentPage === pageNum ? "primary" : "outline"}
-                      size="sm"
-                      onClick={() => setClosedCurrentPage(pageNum)}
-                    >
-                      {pageNum}
-                    </Button>
-                  );
-                })}
-                {totalClosedPages > 5 && (
-                  <>
-                    <span className="px-2">...</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setClosedCurrentPage(totalClosedPages)}
-                    >
-                      {totalClosedPages}
-                    </Button>
-                  </>
-                )}
-              </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setClosedCurrentPage(Math.min(totalClosedPages, closedCurrentPage + 1))}
-                disabled={closedCurrentPage === totalClosedPages}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+          {/* Entries Per Page */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Show:</label>
+            <select
+              value={entriesPerPage}
+              onChange={(e) => handleEntriesPerPageChange(Number(e.target.value))}
+              className="border border-gray-300 rounded px-3 py-1 text-sm"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className="text-sm">entries</span>
+          </div>
+
+          {/* Pagination Info */}
+          <div className="text-sm text-gray-600">
+            Showing {currentPage * entriesPerPage + 1} to {Math.min((currentPage + 1) * entriesPerPage, data?.recordsFiltered || 0)} of {data?.recordsFiltered || 0} entries
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between mt-4">
+          <button
+            onClick={() => handlePagination('prev')}
+            disabled={currentPage === 0}
+            className="px-4 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {currentPage + 1} of {Math.ceil((data?.recordsFiltered || 0) / entriesPerPage)}
+          </span>
+
+          <button
+            onClick={() => handlePagination('next')}
+            disabled={!data || (currentPage + 1) * entriesPerPage >= data.recordsFiltered}
+            className="px-4 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       </Card>
+
+      {/* Open Positions Table */}
+      {renderTable(openPositions, "Open Positions")}
+
+      {/* Closed Positions Table */}
+      {renderTable(closedPositions, "Closed Positions")}
     </div>
   );
-};
+}
 
-export default IBtradeHistory;
+export default IBtradeHistory

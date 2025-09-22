@@ -35,9 +35,9 @@ const LotWiseCommissionsTable: React.FC = () => {
       const requestBody = {
         start: page * length,
         length: length,
-        search: { value: search }  // Object format for Lot Wise API
+        search: search  
       };
-      
+
       console.log('Lot Wise Commissions Request:', {
         endpoint: GET_LOT_WISE_TRANSACTIONS,
         requestBody,

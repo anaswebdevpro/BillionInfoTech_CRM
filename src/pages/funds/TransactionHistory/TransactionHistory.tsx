@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../../components/ui/Card';
 import Input from '../../../components/ui/Input';
 import { apiRequest } from '../../../services/api';
-import { GET_WALLET_TRANSACTION_REPORT } from '../../../../api/api-variable';
+import { GET_BROKERAGE_REPORTS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
 
 interface Transaction {
@@ -45,7 +45,7 @@ const TransactionHistory: React.FC = () => {
       };
       
       const response = await apiRequest<ApiResponse>({
-        endpoint: GET_WALLET_TRANSACTION_REPORT,
+        endpoint: GET_BROKERAGE_REPORTS,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         data: requestBody
