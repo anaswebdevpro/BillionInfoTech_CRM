@@ -1,99 +1,101 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../../components/ui/Card';
 import Input from '../../../components/ui/Input';
+import { apiRequest } from '../../../services/api';
+import { GET_WALLET_TRANSACTION_REPORT } from '../../../../api/api-variable';
+import { useAuth } from '../../../context/AuthContext/AuthContext';
 
 interface Transaction {
-  id: string;
-  type: 'deposit' | 'withdrawal' | 'transfer';
-  amount: number;
-  status: 'pending' | 'completed' | 'failed';
-  date: string;
-  description: string;
-  reference: string;
+  id: number;
+  transaction_id: string;
+  amount: string;
+  type: 'credit' | 'debit';
+  txn_type: string;
+  remarks: string;
+  created_on: string;
+}
+
+interface ApiResponse {
+  draw: number;
+  recordsTotal: number;
+  recordsFiltered: number;
+  data: Transaction[];
+  custom_data: {
+    total: string;
+  };
 }
 
 const TransactionHistory: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { token } = useAuth();
+  const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState({
-    type: '',
-    status: '',
-    dateFrom: '',
-    dateTo: ''
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchValue, setSearchValue] = useState('');
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
 
-  // Mock data - replace with actual API call
-  useEffect(() => {
-    const mockTransactions: Transaction[] = [
-      {
-        id: '1',
-        type: 'deposit',
-        amount: 1000,
-        status: 'completed',
-        date: '2024-01-15',
-        description: 'Bank Transfer Deposit',
-        reference: 'DEP-001'
-      },
-      {
-        id: '2',
-        type: 'withdrawal',
-        amount: 250,
-        status: 'pending',
-        date: '2024-01-14',
-        description: 'Bank Transfer Withdrawal',
-        reference: 'WTH-002'
-      },
-      {
-        id: '3',
-        type: 'transfer',
-        amount: 500,
-        status: 'completed',
-        date: '2024-01-13',
-        description: 'Internal Transfer - MT5 to MT4',
-        reference: 'TRF-003'
+  const fetchData = useCallback(async (page = currentPage, search = searchValue, length = entriesPerPage) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const requestBody = {
+        start: page * length,
+        length: length,
+        search: search
+      };
+      
+      const response = await apiRequest<ApiResponse>({
+        endpoint: GET_WALLET_TRANSACTION_REPORT,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        data: requestBody
+      });
+      
+      if (response) {
+        setData(response);
+      } else {
+        setError("No data received from API");
       }
-    ];
-
-    setTimeout(() => {
-      setTransactions(mockTransactions);
+    } catch (error) {
+      console.error("Failed to fetch wallet transactions:", error);
+      setError("Failed to fetch wallet transactions");
+    } finally {
       setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
     }
-  };
+  }, [token, currentPage, searchValue, entriesPerPage]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'deposit':
+      case 'credit':
         return 'text-green-600';
-      case 'withdrawal':
+      case 'debit':
         return 'text-red-600';
-      case 'transfer':
-        return 'text-blue-600';
       default:
         return 'text-gray-600';
     }
   };
 
-  const filteredTransactions = transactions.filter(transaction => {
-    return (
-      (!filter.type || transaction.type === filter.type) &&
-      (!filter.status || transaction.status === filter.status) &&
-      (!filter.dateFrom || transaction.date >= filter.dateFrom) &&
-      (!filter.dateTo || transaction.date <= filter.dateTo)
-    );
-  });
+  const handlePagination = (direction: 'next' | 'prev') => {
+    const newPage = direction === 'next' ? currentPage + 1 : Math.max(0, currentPage - 1);
+    setCurrentPage(newPage);
+    fetchData(newPage, searchValue, entriesPerPage);
+  };
+
+  const handleSearch = useCallback((newSearchValue: string) => {
+    setSearchValue(newSearchValue);
+    setCurrentPage(0);
+    fetchData(0, newSearchValue, entriesPerPage);
+  }, [fetchData, entriesPerPage]);
+
+  const handleEntriesPerPageChange = useCallback((newEntriesPerPage: number) => {
+    setEntriesPerPage(newEntriesPerPage);
+    setCurrentPage(0);
+    fetchData(0, searchValue, newEntriesPerPage);
+  }, [fetchData, searchValue]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -103,58 +105,40 @@ const TransactionHistory: React.FC = () => {
           <p className="text-gray-600">View all your financial transactions</p>
         </div>
 
-        {/* Filters */}
+        {/* Search and Controls */}
         <Card className="p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Transaction Type
-              </label>
-              <select
-                value={filter.type}
-                onChange={(e) => setFilter({ ...filter, type: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">All Types</option>
-                <option value="deposit">Deposit</option>
-                <option value="withdrawal">Withdrawal</option>
-                <option value="transfer">Transfer</option>
-              </select>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex gap-4 items-center">
+              <div>
+                <Input
+                  label="Search Transactions"
+                  type="text"
+                  value={searchValue}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search by remarks, amount, or transaction type..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Entries per page
+                </label>
+                <select
+                  value={entriesPerPage}
+                  onChange={(e) => handleEntriesPerPageChange(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                value={filter.status}
-                onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
-            </div>
-
-            <div>
-              <Input
-                label="From Date"
-                type="date"
-                value={filter.dateFrom}
-                onChange={(e) => setFilter({ ...filter, dateFrom: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Input
-                label="To Date"
-                type="date"
-                value={filter.dateTo}
-                onChange={(e) => setFilter({ ...filter, dateTo: e.target.value })}
-              />
-            </div>
+            {data && (
+              <div className="text-sm text-gray-600">
+                Total Balance: <span className="font-semibold">${data.custom_data.total}</span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -165,64 +149,105 @@ const TransactionHistory: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-2 text-gray-600">Loading transactions...</p>
             </div>
-          ) : filteredTransactions.length === 0 ? (
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-500">{error}</p>
+            </div>
+          ) : !data || data.data.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500">No transactions found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Transaction
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Reference
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className={`text-sm font-medium ${getTypeColor(transaction.type)}`}>
-                            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                          </div>
-                          <div className="text-sm text-gray-500">{transaction.description}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`text-sm font-medium ${getTypeColor(transaction.type)}`}>
-                          {transaction.type === 'withdrawal' ? '-' : '+'}${transaction.amount.toFixed(2)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
-                          {transaction.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {transaction.reference}
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        S.No
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Transaction ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Transaction Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Remarks
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {data.data.map((transaction, index) => (
+                      <tr key={transaction.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                          {currentPage * entriesPerPage + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.transaction_id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`text-sm font-medium ${getTypeColor(transaction.type)}`}>
+                            {transaction.type === 'debit' ? '-' : '+'}{transaction.amount}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            transaction.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.txn_type}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {transaction.remarks}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.created_on}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Pagination */}
+              <div className="flex items-center justify-between mt-6">
+                <div className="text-sm text-gray-700">
+                  Showing {currentPage * entriesPerPage + 1} to {Math.min((currentPage + 1) * entriesPerPage, data.recordsTotal)} of {data.recordsTotal} entries
+                  {data.recordsFiltered !== data.recordsTotal && (
+                    <span> (filtered from {data.recordsFiltered} total entries)</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePagination('prev')}
+                    disabled={currentPage === 0}
+                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePagination('next')}
+                    disabled={(currentPage + 1) * entriesPerPage >= data.recordsTotal}
+                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </Card>
       </div>

@@ -4,31 +4,34 @@ import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
+import WithdrawalRecords from './WithdrawalRecords';
+import { COLORS } from '../../../constants/colors';
 
 const WithdrawFunds: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object({
+    withdrawFrom: Yup.string()
+      .required('Withdraw from is required'),
+    accountPassword: Yup.string()
+      .required('Account password is required'),
+    paymentMethod: Yup.string()
+      .required('Payment method is required'),
+    walletAddress: Yup.string()
+      .required('Wallet address is required'),
     amount: Yup.number()
       .min(1, 'Amount must be at least $1')
-      .required('Amount is required'),
-    withdrawalMethod: Yup.string()
-      .required('Withdrawal method is required'),
-    bankAccount: Yup.string()
-      .required('Bank account is required'),
-    reason: Yup.string()
-      .required('Reason is required')
-      .max(200, 'Reason cannot exceed 200 characters')
+      .required('Amount is required')
   });
 
   const formik = useFormik({
     initialValues: {
-      amount: '',
-      withdrawalMethod: '',
-      bankAccount: '',
-      reason: ''
+      withdrawFrom: '',
+      accountPassword: '',
+      paymentMethod: '',
+      walletAddress: '',
+      amount: ''
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -48,99 +51,171 @@ const WithdrawFunds: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Withdraw Funds</h1>
-          <p className="text-gray-600">Withdraw funds from your trading account</p>
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>Withdraw Funds</h1>
+          <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>
+            Withdraw funds from your trading account to your preferred payment method
+          </p>
         </div>
+      </div>
 
-        <Card className="p-6">
+      {/* Form Section - Centered */}
+      <div className="max-w-2xl mx-auto px-4 mb-8">
+        <Card className="p-8 shadow-lg border-0">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Withdrawal Request</h2>
+            <p className="text-gray-600">Fill in the details below to process your withdrawal</p>
+          </div>
+
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Input
-                  label="Amount *"
-                  type="number"
-                  name="amount"
-                  value={formik.values.amount}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                //   error={formik.touched.amount && formik.errors.amount}
-                  placeholder="Enter amount"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Withdrawal Method *
+              {/* Withdraw From */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Withdraw From
                 </label>
                 <select
-                  name="withdrawalMethod"
-                  value={formik.values.withdrawalMethod}
+                  name="withdrawFrom"
+                  value={formik.values.withdrawFrom}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    formik.touched.withdrawalMethod && formik.errors.withdrawalMethod ? 'border-red-500' : ''
+                  className={`w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                    formik.touched.withdrawFrom && formik.errors.withdrawFrom ? 'border-red-500' : ''
                   }`}
                 >
-                  <option value="">Select withdrawal method</option>
+                  <option value="">Select wallet</option>
+                  <option value="main_wallet">Main Wallet ($1000.96)</option>
+                  <option value="trading_wallet">Trading Wallet</option>
+                </select>
+                {formik.touched.withdrawFrom && formik.errors.withdrawFrom && (
+                  <p className="text-red-500 text-sm mt-2">{formik.errors.withdrawFrom}</p>
+                )}
+              </div>
+
+              {/* Demo's Account Password */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Demo's Account Password
+                </label>
+                <input
+                  type="password"
+                  name="accountPassword"
+                  value={formik.values.accountPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="Enter account password"
+                  className={`w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                    formik.touched.accountPassword && formik.errors.accountPassword ? 'border-red-500' : ''
+                  }`}
+                />
+                {formik.touched.accountPassword && formik.errors.accountPassword && (
+                  <p className="text-red-500 text-sm mt-2">{formik.errors.accountPassword}</p>
+                )}
+              </div>
+
+              {/* Payment Method */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Payment Method
+                </label>
+                <select
+                  name="paymentMethod"
+                  value={formik.values.paymentMethod}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                    formik.touched.paymentMethod && formik.errors.paymentMethod ? 'border-red-500' : ''
+                  }`}
+                >
+                  <option value="">Select One</option>
                   <option value="bank_transfer">Bank Transfer</option>
-                  <option value="wire_transfer">Wire Transfer</option>
                   <option value="crypto">Cryptocurrency</option>
+                  <option value="wire_transfer">Wire Transfer</option>
                 </select>
-                {formik.touched.withdrawalMethod && formik.errors.withdrawalMethod && (
-                  <p className="text-red-500 text-xs mt-1">{formik.errors.withdrawalMethod}</p>
+                {formik.touched.paymentMethod && formik.errors.paymentMethod && (
+                  <p className="text-red-500 text-sm mt-2">{formik.errors.paymentMethod}</p>
                 )}
               </div>
 
+              {/* Amount to Withdraw */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bank Account *
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Amount to Withdraw
                 </label>
-                <select
-                  name="bankAccount"
-                  value={formik.values.bankAccount}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    formik.touched.bankAccount && formik.errors.bankAccount ? 'border-red-500' : ''
-                  }`}
-                >
-                  <option value="">Select bank account</option>
-                  <option value="account1">****1234 - Chase Bank</option>
-                  <option value="account2">****5678 - Bank of America</option>
-                  <option value="account3">****9012 - Wells Fargo</option>
-                </select>
-                {formik.touched.bankAccount && formik.errors.bankAccount && (
-                  <p className="text-red-500 text-xs mt-1">{formik.errors.bankAccount}</p>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">$</span>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formik.values.amount}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder="0.00"
+                    className={`w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                      formik.touched.amount && formik.errors.amount ? 'border-red-500' : ''
+                    }`}
+                  />
+                </div>
+                {formik.touched.amount && formik.errors.amount && (
+                  <p className="text-red-500 text-sm mt-2">{formik.errors.amount}</p>
                 )}
               </div>
 
-              <div>
-                <Input
-                  label="Reason for Withdrawal *"
+              {/* Wallet Address */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Wallet Address
+                </label>
+                <input
                   type="text"
-                  name="reason"
-                  value={formik.values.reason}
+                  name="walletAddress"
+                  value={formik.values.walletAddress}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                //   error={formik.touched.reason && formik.errors.reason}
-                  placeholder="Enter reason for withdrawal"
+                  placeholder="Enter wallet address"
+                  className={`w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all font-mono text-sm ${
+                    formik.touched.walletAddress && formik.errors.walletAddress ? 'border-red-500' : ''
+                  }`}
                 />
+                {formik.touched.walletAddress && formik.errors.walletAddress && (
+                  <p className="text-red-500 text-sm mt-2">{formik.errors.walletAddress}</p>
+                )}
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+            <div className="pt-6 border-t border-gray-200 mt-8">
               <Button
                 type="submit"
                 disabled={isLoading || !formik.isValid}
-                className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {isLoading ? 'Processing...' : 'Submit Withdrawal Request'}
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </div>
+                ) : (
+                  'Send Withdrawal Request'
+                )}
               </Button>
             </div>
           </form>
         </Card>
+      </div>
+
+      {/* Withdrawal Records Table - Full Width */}
+      <div className="max-w-7xl mx-auto px-4">
+        <WithdrawalRecords />
       </div>
     </div>
   );

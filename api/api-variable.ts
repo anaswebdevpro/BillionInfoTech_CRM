@@ -61,6 +61,7 @@ export const DEPOSIT_METHODS_BEP20="/wallet-address/bep20";
 export const GET_DEPOSIT_REPORT="/get-deposit-request";
 export const DEMO_BANK_DETAILS="/fait-request";
 export const SUBMIT_DEPOSIT_REQUEST="/submit-deposit-request";
+export const GET_WALLET_TRANSACTION_REPORT="/get-wallet-transation-report";
 
 
 
