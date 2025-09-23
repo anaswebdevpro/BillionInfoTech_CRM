@@ -3,7 +3,7 @@ import { Trash2, Settings, TrendingUp, Lock, BarChart3, ArrowDownToLine, ArrowUp
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 
-import type { Account } from '../../types';
+// import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '@/services';
 import { TRADE_ACCOUNT } from '../../../api/api-variable';
@@ -13,6 +13,18 @@ import { useAuth } from '@/context';
  * Manage Account page component
  * Allows users to view, edit, and manage their trading accounts
  */
+
+export interface Account {
+  id: number;
+  account_name: string;
+  account_number: number;
+  currency_symbol: string;
+  leverage_show_value: string;
+  leverage_value: string;
+  platform_slug: string;
+  status: string;
+  type: string;
+}
 
 const MyAccounts: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
