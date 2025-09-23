@@ -4,15 +4,20 @@ import Input from '../../../components/ui/Input';
 import { apiRequest } from '../../../services/api';
 import { GET_BROKERAGE_REPORTS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { useDebounce } from '@/Hook/useDebounce';
 
 interface Transaction {
   id: number;
-  transaction_id: string;
-  amount: string;
-  type: 'credit' | 'debit';
-  txn_type: string;
-  remarks: string;
-  created_on: string;
+  account: string;
+  account_type: string;
+  category: string;
+  commision: string;
+  create_on: string;
+  email: string;
+  level: string;
+  symbol: string;
+  ticket: string;
+  volume: number;
 }
 
 interface ApiResponse {
@@ -33,8 +38,9 @@ const TransactionHistory: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchValue, setSearchValue] = useState('');
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+   const debouncedSearchValue = useDebounce(searchValue, 500);
 
-  const fetchData = useCallback(async (page = currentPage, search = searchValue, length = entriesPerPage) => {
+  const fetchData = useCallback(async (page = currentPage, search = debouncedSearchValue, length = entriesPerPage) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -62,40 +68,25 @@ const TransactionHistory: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [token, currentPage, searchValue, entriesPerPage]);
+  }, [token, currentPage, debouncedSearchValue, entriesPerPage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'credit':
-        return 'text-green-600';
-      case 'debit':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
   const handlePagination = (direction: 'next' | 'prev') => {
     const newPage = direction === 'next' ? currentPage + 1 : Math.max(0, currentPage - 1);
     setCurrentPage(newPage);
-    fetchData(newPage, searchValue, entriesPerPage);
+    fetchData(newPage, debouncedSearchValue, entriesPerPage);
   };
 
-  const handleSearch = useCallback((newSearchValue: string) => {
-    setSearchValue(newSearchValue);
-    setCurrentPage(0);
-    fetchData(0, newSearchValue, entriesPerPage);
-  }, [fetchData, entriesPerPage]);
+
 
   const handleEntriesPerPageChange = useCallback((newEntriesPerPage: number) => {
     setEntriesPerPage(newEntriesPerPage);
     setCurrentPage(0);
-    fetchData(0, searchValue, newEntriesPerPage);
-  }, [fetchData, searchValue]);
+    fetchData(0, debouncedSearchValue, newEntriesPerPage);
+  }, [fetchData, debouncedSearchValue]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -114,7 +105,7 @@ const TransactionHistory: React.FC = () => {
                   label="Search Transactions"
                   type="text"
                   value={searchValue}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="Search by remarks, amount, or transaction type..."
                 />
               </div>
@@ -167,19 +158,28 @@ const TransactionHistory: React.FC = () => {
                         S.No
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction ID
+                        Account
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Amount
+                        Email
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
+                        Level
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction Type
+                        Account Type
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Remarks
+                        Symbol
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Ticket
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Volume
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Commission
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date
@@ -193,28 +193,33 @@ const TransactionHistory: React.FC = () => {
                           {currentPage * entriesPerPage + index + 1}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {transaction.transaction_id}
+                          {transaction.account}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.email}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.level}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className={`text-sm font-medium ${getTypeColor(transaction.type)}`}>
-                            {transaction.type === 'debit' ? '-' : '+'}{transaction.amount}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            transaction.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {transaction.account_type}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {transaction.txn_type}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {transaction.remarks}
+                          {transaction.symbol}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {transaction.created_on}
+                          {transaction.ticket}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.volume}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                          ${parseFloat(transaction.commision).toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {transaction.create_on}
                         </td>
                       </tr>
                     ))}
