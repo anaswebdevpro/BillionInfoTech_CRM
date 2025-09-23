@@ -22,7 +22,9 @@ export const SAVE_BANK="/save-bank";
 export const DELETE_BANK="/delete-bank"
 
 //Meta accounts 
-export const MANAGE_ACCOUNTS="/manage-accounts";
+export const MANAGE_ACCOUNTS="/open-trade-account-list";
+export const TRADE_ACCOUNT="/trade-account";
+
 
 
 
@@ -64,6 +66,8 @@ export const GET_DEPOSIT_REPORT="/get-deposit-request";
 export const DEMO_BANK_DETAILS="/fait-request";
 export const SUBMIT_DEPOSIT_REQUEST="/submit-deposit-request";
 export const GET_WALLET_TRANSACTION_REPORT="/get-wallet-transation-report";
+export const WITHDRAW_FUNDS_OPTIONS = "/withdraw";
+export const SUBMIT_WITHDRAW_FUNDS="/withdraw-funds";
 
 
 

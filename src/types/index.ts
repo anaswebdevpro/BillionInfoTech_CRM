@@ -1,13 +1,26 @@
 // AccountType for account type grids
-export interface AccountType {
-  id: string;
-  name: string;
-  markUp: string;
-  commission: string;
-  swap: string;
-  ib: string;
-  minDeposit: string;
-}
+
+// export interface AccountType {
+//   success: boolean;
+//   data: {
+//     id: number;
+//     name: string;
+//     type: number;
+//     group_slug: string;
+//     bonus: number;
+//     created_on: string;
+//     currency_id: number;
+//     income_copied: number | null;
+//     income_type: number;
+//     is_dedicated: number;
+//     is_visible: number;
+//     leverage: string;
+//     master_ids: number | null;
+//     min_deposit: number;
+//     platform_id: number;
+//     status: number;
+//     updated_on: string;
+//   }[];}
 
 // User type
 export interface User {
@@ -47,16 +60,7 @@ export interface ExtendedUser extends User {
 }
 
 // Account type for user accounts
-export interface Account {
-  id: string;
-  userId: string | number;
-  accountNumber: string;
-  accountType: string;
-  balance: number;
-  currency: string;
-  leverage: string;
-  status: string;
-}
+
 
 // Internal Transfer API Response types
 export interface InternalTransferResponse {
@@ -299,4 +303,19 @@ export interface CreateSupportTicketFormData {
   subject: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   description: string;
+}
+
+
+
+
+export interface Account {
+  id: number;
+  account_name: string;
+  account_number: number;
+  currency_symbol: string;
+  leverage_show_value: string;
+  leverage_value: string;
+  platform_slug: string;
+  status: string;
+  type: string;
 }

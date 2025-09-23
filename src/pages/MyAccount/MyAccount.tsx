@@ -1,102 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Eye, Settings, TrendingUp } from 'lucide-react';
+import { Trash2, Settings, TrendingUp, Lock, BarChart3, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-// import { apiRequest } from '../services/api';
+
 import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
+import { apiRequest } from '@/services';
+import { TRADE_ACCOUNT } from '../../../api/api-variable';
+import { useAuth } from '@/context';
 
 /**
  * Manage Account page component
  * Allows users to view, edit, and manage their trading accounts
  */
+
 const MyAccounts: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {token}= useAuth();
+  const [loading, setLoading] = useState(false);
 
-
-  useEffect(() => {
-    loadAccounts();
-  }, []);
-
-  const loadAccounts = async () => {
+  const fetchAccount = () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      apiRequest({
+        endpoint: TRADE_ACCOUNT,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response: unknown) => {
+         const res = response as { data: Account[] };
+         setAccounts(res.data);
+         setLoading(false);
+        console.log('Trade Account:', response);
+      })
+      .catch((error) => {
+        console.error('Error fetching trade account:', error);
+        setLoading(false);
+      })
       
-      // Dummy data for demonstration
-      const dummyAccounts: Account[] = [
-        {
-          id: '1',
-          userId: 'user123',
-          accountNumber: 'MT5-001234',
-          accountType: 'Live',
-          balance: 15420.50,
-          currency: 'USD',
-          leverage: '1:100',
-          status: 'Active'
-        },
-        {
-          id: '2',
-          userId: 'user123',
-          accountNumber: 'MT5-001235',
-          accountType: 'Demo',
-          balance: 10000.00,
-          currency: 'EUR',
-          leverage: '1:200',
-          status: 'Active'
-        },
-        {
-          id: '3',
-          userId: 'user123',
-          accountNumber: 'MT5-001236',
-          accountType: 'Live',
-          balance: 8750.25,
-          currency: 'GBP',
-          leverage: '1:50',
-          status: 'Pending'
-        },
-        {
-          id: '4',
-          userId: 'user123',
-          accountNumber: 'MT5-001237',
-          accountType: 'Live',
-          balance: 0.00,
-          currency: 'USD',
-          leverage: '1:100',
-          status: 'Inactive'
-        },
-        {
-          id: '5',
-          userId: 'user123',
-          accountNumber: 'MT5-001238',
-          accountType: 'Demo',
-          balance: 50000.00,
-          currency: 'USD',
-          leverage: '1:500',
-          status: 'Active'
-        },
-        {
-          id: '6',
-          userId: 'user123',
-          accountNumber: 'MT5-001239',
-          accountType: 'Live',
-          balance: 22350.75,
-          currency: 'JPY',
-          leverage: '1:100',
-          status: 'Active'
-        }
-      ];
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setAccounts(dummyAccounts);
+     
     } catch (error) {
-      console.error('Failed to load accounts:', error);
-    } finally {
+      console.error("Failed to fetch trade account:", error);
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAccount();
+  }, []);
+  
+     
+  
 
   const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -131,19 +85,20 @@ const MyAccounts: React.FC = () => {
       </div>
 
       {/* Account Grid */}
+       {/* Account Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {accounts.map((account) => (
-          <Card key={account.id} className="hover:shadow-lg transition-shadow">
+          <Card key={account.account_number} className="hover:shadow-lg transition-shadow">
             <div className="p-6">
               {/* Account Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  {getAccountTypeIcon(account.accountType)}
+                  {getAccountTypeIcon(account.type)}
                   <div>
                     <h3 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>
-                      {account.accountNumber}
+                      {account.account_number}
                     </h3>
-                    <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>{account.accountType} Account</p>
+                    <p className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>{account.type} Account</p>
                   </div>
                 </div>
                 <span
@@ -159,51 +114,84 @@ const MyAccounts: React.FC = () => {
               <div className="mt-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>Balance</p>
+                    <p className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>Account Name</p>
                     <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>
-                      ${account.balance.toLocaleString()} {account.currency}
+                      {account.account_name}
                     </p>
                   </div>
                   <div>
                     <p className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>Leverage</p>
-                    <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{account.leverage}</p>
+                    <p className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>{account.leverage_show_value}</p>
                   </div>
                 </div>
-
-                <div>
+<div className="grid grid-cols-2 gap-4">
+    <div>
                   <p className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>Currency</p>
-                  <p className={`text-sm text-${COLORS.SECONDARY}`}>{account.currency}</p>
+                  <p className={`text-sm text-${COLORS.SECONDARY}`}>{account.currency_symbol}</p>
                 </div>
+                
+                <div>
+                  <p className={`text-sm font-medium text-${COLORS.SECONDARY_TEXT}`}>Platform</p>
+                  <p className={`text-sm text-${COLORS.SECONDARY}`}>{account.platform_slug}</p>
+                </div>
+</div>
+              
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-6 flex space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
+              <div className="mt-6 space-y-3">
+                {/* First Row - Main Actions */}
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Overview
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    disabled={account.status !== 'Active'}
+                  >
+                    <Lock className="h-4 w-4 mr-2" />
+                    Password
+                  </Button>
+                 
+                </div>
+                
+                {/* Second Row - Secondary Actions */}
+                <div className="flex space-x-2">
                   
-                  className="flex-1"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  disabled={account.status !== 'Active'}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  disabled={account.status === 'Active'}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                   <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                    disabled={account.status !== 'Active'}
+                  >
+                    <ArrowDownToLine className="h-4 w-4 mr-2" />
+                    Deposit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    disabled={account.status !== 'Active'}
+                  >
+                    <ArrowUpFromLine className="h-4 w-4 mr-2" />
+                    Withdraw
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    disabled={account.status === 'Active'}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>

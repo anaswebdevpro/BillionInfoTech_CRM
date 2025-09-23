@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
@@ -6,10 +6,87 @@ import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import WithdrawalRecords from './WithdrawalRecords';
 import { COLORS } from '../../../constants/colors';
+import { apiRequest } from '@/services';
+import { useAuth } from '@/context';
+import { SUBMIT_WITHDRAW_FUNDS, WITHDRAW_FUNDS_OPTIONS } from '../../../../api/api-variable';
+
+export interface WithdrawResponse {
+  response: boolean;
+  title: string;
+  profit_wallet: string;
+  main_balance: string;
+  fiat_symbol: string;
+  conversion_rate: string;
+  banks: {
+    id: number;
+    account_holder: string;
+    account_number: string;
+    bank_name: string;
+  }[];
+  payment_methods: {
+    id: number;
+    name: string;
+  }[];
+}
 
 const WithdrawFunds: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
+  const {token} =useAuth();
+  const [data, setData] = useState<WithdrawResponse | null>(null);
+
+ const fetchData = () => {
+   setIsLoading(true);
+    try {
+     
+      apiRequest({
+        endpoint: WITHDRAW_FUNDS_OPTIONS,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        
+        
+      })
+      .then((response: unknown) => {
+         setData(response as WithdrawResponse);
+             })
+      
+     .catch((error) => {
+        console.error('Error fetching trade history:', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+     
+    } catch (error) {
+      console.error("Failed to fetch trade history:", error);
+     
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   const validationSchema = Yup.object({
     withdrawFrom: Yup.string()
@@ -36,10 +113,32 @@ const WithdrawFunds: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
+      const requestedbody = {
+        withdraw_from: values.withdrawFrom,
+        password: values.accountPassword,
+        payment_method: values.paymentMethod,
+        wallet_address: values.walletAddress,
+        amount: values.amount
+      };
+
       try {
-        // TODO: Implement withdraw funds API call
-        console.log('Withdraw funds:', values);
-        enqueueSnackbar('Withdrawal request submitted successfully!', { variant: 'success' });
+ apiRequest({
+        endpoint: SUBMIT_WITHDRAW_FUNDS,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        data: requestedbody
+      })
+      .then((response) => {
+        console.log('Withdraw funds response:', response);
+          enqueueSnackbar('Withdrawal request submitted successfully!', { variant: 'success' });
+      })
+      .catch((error) => {
+        console.error('Error withdrawing funds:', error);
+        enqueueSnackbar('Failed ! Please try again.', { variant: 'error' });       
+      });
+            
+      
+
       } catch (error) {
         console.error('Failed to submit withdrawal request:', error);
         enqueueSnackbar('Failed to submit withdrawal request. Please try again.', { variant: 'error' });
@@ -85,14 +184,15 @@ const WithdrawFunds: React.FC = () => {
                   name="withdrawFrom"
                   value={formik.values.withdrawFrom}
                   onChange={formik.handleChange}
+                  
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
                     formik.touched.withdrawFrom && formik.errors.withdrawFrom ? 'border-red-500' : ''
                   }`}
                 >
                   <option value="">Select wallet</option>
-                  <option value="main_wallet">Main Wallet ($1000.96)</option>
-                  <option value="trading_wallet">Trading Wallet</option>
+                  <option value="main_wallet">Main Wallet {data?.main_balance}</option>
+                  {/* <option value="trading_wallet">Trading Wallet</option> */}
                 </select>
                 {formik.touched.withdrawFrom && formik.errors.withdrawFrom && (
                   <p className="text-red-500 text-sm mt-2">{formik.errors.withdrawFrom}</p>
@@ -134,10 +234,12 @@ const WithdrawFunds: React.FC = () => {
                     formik.touched.paymentMethod && formik.errors.paymentMethod ? 'border-red-500' : ''
                   }`}
                 >
-                  <option value="">Select One</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="crypto">Cryptocurrency</option>
-                  <option value="wire_transfer">Wire Transfer</option>
+                  <option value="">Select</option>
+                  {data?.payment_methods.map((method) => (
+                    <option key={method.id} value={method.id}>
+                      {method.name}
+                    </option>
+                  ))}
                 </select>
                 {formik.touched.paymentMethod && formik.errors.paymentMethod && (
                   <p className="text-red-500 text-sm mt-2">{formik.errors.paymentMethod}</p>
