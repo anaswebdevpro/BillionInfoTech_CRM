@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../../components/ui/Card';
-import Input from '../../../components/ui/Input';
+// import Input from '../../../components/ui/Input';
 import { apiRequest } from '../../../services/api';
 import { GET_BROKERAGE_REPORTS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
 import { useDebounce } from '@/Hook/useDebounce';
+import { COLORS } from '@/constants';
 
 interface Transaction {
   id: number;
@@ -39,33 +40,36 @@ const TransactionHistory: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [entriesPerPage, setEntriesPerPage] = useState(10);
    const debouncedSearchValue = useDebounce(searchValue, 500);
-
-  const fetchData = useCallback(async (page = currentPage, search = debouncedSearchValue, length = entriesPerPage) => {
-    setIsLoading(true);
-    setError(null);
+   const fetchData = useCallback((page = currentPage, search = debouncedSearchValue, length = entriesPerPage) => {
+   setIsLoading(true);
     try {
       const requestBody = {
         start: page * length,
         length: length,
         search: search
-      };
-      
-      const response = await apiRequest<ApiResponse>({
+      };     
+        
+      apiRequest({
         endpoint: GET_BROKERAGE_REPORTS,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         data: requestBody
-      });
+      })
+      .then((response: unknown) => {
+         setData(response as ApiResponse);
+        console.log('Trade History:', response);
+      })
       
-      if (response) {
-        setData(response);
-      } else {
-        setError("No data received from API");
-      }
+     .catch((error) => {
+        console.error('Error fetching trade history:', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+     
     } catch (error) {
-      console.error("Failed to fetch wallet transactions:", error);
-      setError("Failed to fetch wallet transactions");
-    } finally {
+      console.error("Failed to fetch trade history:", error);
+      setError('Failed to load data. Please try again later.');
       setIsLoading(false);
     }
   }, [token, currentPage, debouncedSearchValue, entriesPerPage]);
@@ -74,19 +78,23 @@ const TransactionHistory: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
+  // Pagination handlers
   const handlePagination = (direction: 'next' | 'prev') => {
     const newPage = direction === 'next' ? currentPage + 1 : Math.max(0, currentPage - 1);
     setCurrentPage(newPage);
-    fetchData(newPage, debouncedSearchValue, entriesPerPage);
+    fetchData(newPage, searchValue, entriesPerPage);
   };
 
 
 
-  const handleEntriesPerPageChange = useCallback((newEntriesPerPage: number) => {
+  // Entries per page handler
+  const handleEntriesPerPageChange = (newEntriesPerPage: number) => {
     setEntriesPerPage(newEntriesPerPage);
     setCurrentPage(0);
-    fetchData(0, debouncedSearchValue, newEntriesPerPage);
-  }, [fetchData, debouncedSearchValue]);
+    fetchData(0, searchValue, newEntriesPerPage);
+  };
+
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -97,41 +105,50 @@ const TransactionHistory: React.FC = () => {
         </div>
 
         {/* Search and Controls */}
-        <Card className="p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="flex gap-4 items-center">
-              <div>
-                <Input
-                  label="Search Transactions"
-                  type="text"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  placeholder="Search by remarks, amount, or transaction type..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Entries per page
-                </label>
-                <select
-                  value={entriesPerPage}
-                  onChange={(e) => handleEntriesPerPageChange(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
+       <Card className={`p-6 mb-6 bg-${COLORS.WHITE} border border-${COLORS.BORDER} ${COLORS.SHADOW} rounded-xl`}>
+       
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          
+          
+          {/* Search Bar */}
+          <div className="flex items-center gap-3">
+            <div className={`p-2 bg-${COLORS.PRIMARY_BG_LIGHT} rounded-lg`}>
+              <svg className={`w-5 h-5 text-${COLORS.PRIMARY}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search trades..."
+              className={`border border-${COLORS.GRAY_BORDER} rounded-lg px-4 py-2 text-sm w-80 focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-${COLORS.PRIMARY} transition-all duration-200`}
+            />
+          </div>
+
+          {/* Small Stats Grid */}
+          <div className="flex items-center gap-3">
+            <div className={`px-4 py-3 bg-green-50 border border-green-200 rounded-lg`}>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">10</div>
+                <div className="text-xs text-green-600 font-medium">Open</div>
               </div>
             </div>
-            {data && (
-              <div className="text-sm text-gray-600">
-                Total Balance: <span className="font-semibold">${data.custom_data.total}</span>
+            <div className={`px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg`}>
+              <div className="text-center">
+                <div className="text-lg font-bold text-gray-600">42</div>
+                <div className="text-xs text-gray-600 font-medium">Closed</div>
               </div>
-            )}
+            </div>
+            {/* <div className={`px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg`}>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">{data?.recordsFiltered || 0}</div>
+                <div className="text-xs text-blue-600 font-medium">Total</div>
+              </div>
+            </div> */}
           </div>
-        </Card>
+        </div>
+      </Card>
 
         {/* Transactions Table */}
         <Card className="p-6">
@@ -228,34 +245,80 @@ const TransactionHistory: React.FC = () => {
               </div>
               
               {/* Pagination */}
-              <div className="flex items-center justify-between mt-6">
-                <div className="text-sm text-gray-700">
-                  Showing {currentPage * entriesPerPage + 1} to {Math.min((currentPage + 1) * entriesPerPage, data.recordsTotal)} of {data.recordsTotal} entries
-                  {data.recordsFiltered !== data.recordsTotal && (
-                    <span> (filtered from {data.recordsFiltered} total entries)</span>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handlePagination('prev')}
-                    disabled={currentPage === 0}
-                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handlePagination('next')}
-                    disabled={(currentPage + 1) * entriesPerPage >= data.recordsTotal}
-                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+              
+              
             </>
           )}
         </Card>
+         {/* Pagination Controls at Bottom */}
+      <Card className={`p-6 bg-${COLORS.WHITE} border border-${COLORS.BORDER} ${COLORS.SHADOW} rounded-xl`}>
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          {/* Entries Per Page */}
+          <div className="flex items-center gap-3">
+            <label className={`text-sm font-medium text-${COLORS.SECONDARY}`}>Show:</label>
+            <select
+              value={entriesPerPage}
+              onChange={(e) => handleEntriesPerPageChange(Number(e.target.value))}
+              className={`border border-${COLORS.GRAY_BORDER} rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-${COLORS.PRIMARY} focus:border-${COLORS.PRIMARY} transition-all duration-200`}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>entries</span>
+          </div>
+
+          {/* Pagination Navigation */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => handlePagination('prev')}
+              disabled={currentPage === 0}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                currentPage === 0
+                  ? `bg-${COLORS.GRAY_LIGHT} text-${COLORS.GRAY} cursor-not-allowed`
+                  : `bg-${COLORS.WHITE} text-${COLORS.SECONDARY} border border-${COLORS.BORDER} hover:bg-${COLORS.PRIMARY_BG_LIGHT} hover:text-${COLORS.PRIMARY} hover:border-${COLORS.PRIMARY}`
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous
+            </button>
+
+            <div className={`px-3 py-1 bg-${COLORS.PRIMARY_BG_LIGHT} text-${COLORS.PRIMARY_TEXT} rounded-lg font-medium text-sm`}>
+              Page {currentPage + 1} of {Math.ceil((data?.recordsFiltered || 0) / entriesPerPage)}
+            </div>
+
+            <button
+              onClick={() => handlePagination('next')}
+              disabled={!data || (currentPage + 1) * entriesPerPage >= data.recordsFiltered}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                !data || (currentPage + 1) * entriesPerPage >= data.recordsFiltered
+                  ? `bg-${COLORS.GRAY_LIGHT} text-${COLORS.GRAY} cursor-not-allowed`
+                  : `bg-${COLORS.WHITE} text-${COLORS.SECONDARY} border border-${COLORS.BORDER} hover:bg-${COLORS.PRIMARY_BG_LIGHT} hover:text-${COLORS.PRIMARY} hover:border-${COLORS.PRIMARY}`
+              }`}
+            >
+              Next
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Page Info */}
+          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
+            Showing {currentPage * entriesPerPage + 1} to {Math.min((currentPage + 1) * entriesPerPage, data?.recordsFiltered || 0)} of {data?.recordsFiltered || 0} entries
+          </div>
+        </div>
+      </Card>
+
       </div>
+
+
+
+
+      
     </div>
   );
 };
