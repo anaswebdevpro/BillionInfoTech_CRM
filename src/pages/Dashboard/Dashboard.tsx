@@ -1,9 +1,92 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useCallback} from "react";
 import { COLORS } from "../../constants/colors";
 import { apiRequest } from "../../services";
 
-import type { DashboardStats, Transaction, Position } from "../../types";
+// Local interfaces matching the actual API response
+interface LiveAccount {
+  name: string;
+  account_number: number;
+  symbol: string;
+  leverage: string;
+  slug: string;
+}
+
+interface RecentTrade {
+  account_number: number;
+  category: string;
+  close_price: number;
+  closed_on: string;
+  created_on: string;
+  execution_id: number;
+  id: number;
+  is_distributed: number;
+  is_haze: number;
+  open_price: number;
+  order_id: number;
+  platform_id: number;
+  profit: number;
+  profit_update: number;
+  sent_to_meta: number;
+  side: string;
+  status: number;
+  stop_loss: number;
+  symbol: string;
+  take_profit: number;
+  user_id: number;
+  volume: number;
+  zero_profit: number;
+}
+
+interface RecentTransaction {
+  txn_type: string;
+  type: string;
+  amount: number;
+  remarks: string;
+  created_on: string;
+}
+
+interface Stats {
+  commission: string;
+  deposits: string;
+  withdrawals: string;
+  eta_drawals: string;
+}
+
+interface DashboardData {
+  version: string;
+  name: string;
+  description: string;
+  wallet_balance: string;
+  referral_link: string;
+  live_accounts: LiveAccount[];
+  recent_trades: RecentTrade[];
+  recent_transactions: RecentTransaction[];
+  stats: Stats;
+}
+
+interface Position {
+  srNo: number;
+  orderId: string;
+  account: string;
+  type: string;
+  openPrice: number;
+  symbol: string;
+  volume: number;
+  id: string;
+}
+
+interface Transaction {
+  id: string;
+  userId: string;
+  type: string;
+  amount: number;
+  currency: string;
+  method?: string;
+  status: string;
+  date: string;
+  fromAccount?: string;
+  toAccount?: string;
+}
 import {
   StatsGrid,
   TradingPerformanceChart,
@@ -20,94 +103,86 @@ import { useAuth } from '../../context/AuthContext/AuthContext';
  * Implements data fetching and responsive layout
  */
 const Dashboard: React.FC = () => {
-const {token} =useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(
-    []
-  );
+  const { token } = useAuth();
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [closedPositions] = useState<Position[]>([]);
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showOpenPositions, setShowOpenPositions] = useState(true);
-  const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
-  const fetchDashboardData = () => {
-    // setLoading(true);
-    try {
-      apiRequest({
-        endpoint: DASHBOARD_DATA,
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((response: any) => {
-        // setLoading(false);
-        console.log("Dashboard data received:", response);
-        
-        // Type the response data properly
-        const data = response as Record<string, unknown>;
-        
-        if (data) {
-          // Set dashboard stats from API response
-          setStats({
-            totalBalance: parseFloat(((data.wallet_balance as string) || '0').replace(/,/g, '')) || 0,
-            totalProfit: parseFloat((((data.stats as Record<string, unknown>)?.deposits as string) || '0').replace(/,/g, '')) - parseFloat((((data.stats as Record<string, unknown>)?.withdrawals as string) || '0').replace(/,/g, '')) || 0,
-            totalTrades: Array.isArray(data.recent_trades) ? data.recent_trades.length : 0,
-            activeAccounts: Array.isArray(data.live_accounts) ? data.live_accounts.length : 0,
-            monthlyGrowth: 0 // Calculate if needed
-          });
-          
-          // Set recent transactions from API response
-          if (data.recent_transactions && Array.isArray(data.recent_transactions)) {
-            setRecentTransactions(data.recent_transactions.map((tx: unknown, index: number) => {
-              const transaction = tx as Record<string, unknown>;
-              return {
-                id: (transaction.id as string) || index.toString(),
-                userId: (transaction.userId as string) || '',
-                type: (transaction.type as string) || 'Unknown',
-                amount: parseFloat((transaction.amount as string) || '0') || 0,
-                currency: (transaction.currency as string) || 'USD',
-                method: (transaction.method as string) || '',
-                status: (transaction.status as string) || 'pending',
-                date: (transaction.date as string) || new Date().toISOString(),
-                fromAccount: (transaction.fromAccount as string) || '',
-                toAccount: (transaction.toAccount as string) || ''
-              };
-            }));
-          }
-          
-          // Set trading positions if available
-          if (data.recent_trades && Array.isArray(data.recent_trades)) {
-            setPositions(data.recent_trades.map((trade: unknown, index: number) => {
-              const position = trade as Record<string, unknown>;
-              return {
-                srNo: index + 1,
-                orderId: (position.orderId as string) || (position.id as string) || index.toString(),
-                account: (position.account as string) || 'Demo Account',
-                type: (position.type as string) || 'BUY',
-                openPrice: parseFloat((position.openPrice as string) || '0') || 0,
-                symbol: (position.symbol as string) || 'EURUSD',
-                volume: parseFloat((position.volume as string) || '0') || 0,
-                id: (position.id as string) || index.toString()
-              };
-            }));
-          }
-          
-          setDashboardData(data);
+  // Fetch dashboard data from API
+  const fetchDashboardData = useCallback(() => {
+    setLoading(true);
+    apiRequest({
+      endpoint: DASHBOARD_DATA,
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((response) => {
+      console.log("Dashboard data received:", response);
+      
+      // Type the response data properly
+      const data = response as DashboardData;
+
+      if (data) {
+        // Set recent transactions from API response
+        if (data.recent_transactions && Array.isArray(data.recent_transactions)) {
+          setRecentTransactions(data.recent_transactions.map((tx: RecentTransaction, index: number) => {
+            return {
+              id: index.toString(),
+              userId: '',
+              type: tx.type,
+              amount: tx.amount,
+              currency: 'USD',
+              method: tx.txn_type,
+              status: 'Completed',
+              date: tx.created_on,
+              fromAccount: '',
+              toAccount: ''
+            };
+          }));
         }
-      })
-        .catch((error: any) => {
-          console.error("Failed to fetch dashboard data:", error);
-        });
-    } catch (error) {
+
+        // Set trading positions if available
+        if (data.recent_trades && Array.isArray(data.recent_trades)) {
+          setPositions(data.recent_trades.map((trade: RecentTrade, index: number) => {
+            return {
+              srNo: index + 1,
+              orderId: trade.order_id.toString(),
+              account: `Account ${trade.account_number}`,
+              type: trade.side === 'sell' ? 'Sell' : 'Buy',
+              openPrice: trade.open_price,
+              symbol: trade.symbol,
+              volume: trade.volume,
+              id: trade.id.toString()
+            };
+          }));
+        }
+
+        setDashboardData(data);
+      }
+    }).catch((error) => {
       console.error("Failed to fetch dashboard data:", error);
-    } finally {
-      // setLoading(false);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [token]);  useEffect(() => {
+    if (token) {
+      fetchDashboardData();
     }
-  };
+  }, [token, fetchDashboardData]);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className={`text-${COLORS.SECONDARY_TEXT}`}>Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show a message if no token is available
   if (!token) {
@@ -123,11 +198,11 @@ const {token} =useAuth();
   return (
     <div className="space-y-2">
       {/* Stats Grid */}
-      <StatsGrid stats={stats} />
+      {dashboardData && <StatsGrid dashboardData={dashboardData } />}
 
       {/* Charts and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TradingPerformanceChart stats={stats} />
+        <TradingPerformanceChart dashboardData={dashboardData} />
         <RecentTransactions recentTransactions={recentTransactions} />
       </div>
 

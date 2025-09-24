@@ -1,15 +1,75 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import type { DashboardStats } from '../../../types';
 import { GRADIENTS } from '../../../constants/colors';
 
-interface TradingPerformanceChartProps {
-  stats: DashboardStats | null;
-  loading?: boolean;
+// Local interface matching Dashboard component's DashboardData
+interface LiveAccount {
+  name: string;
+  account_number: number;
+  symbol: string;
+  leverage: string;
+  slug: string;
 }
 
-const TradingPerformanceChart: React.FC<TradingPerformanceChartProps> = ({ stats }) => {
+interface RecentTrade {
+  account_number: number;
+  category: string;
+  close_price: number;
+  closed_on: string;
+  created_on: string;
+  execution_id: number;
+  id: number;
+  is_distributed: number;
+  is_haze: number;
+  open_price: number;
+  order_id: number;
+  platform_id: number;
+  profit: number;
+  profit_update: number;
+  sent_to_meta: number;
+  side: string;
+  status: number;
+  stop_loss: number;
+  symbol: string;
+  take_profit: number;
+  user_id: number;
+  volume: number;
+  zero_profit: number;
+}
+
+interface RecentTransaction {
+  txn_type: string;
+  type: string;
+  amount: number;
+  remarks: string;
+  created_on: string;
+}
+
+interface Stats {
+  commission: string;
+  deposits: string;
+  withdrawals: string;
+  eta_drawals: string;
+}
+
+interface DashboardData {
+  version: string;
+  name: string;
+  description: string;
+  wallet_balance: string;
+  referral_link: string;
+  live_accounts: LiveAccount[];
+  recent_trades: RecentTrade[];
+  recent_transactions: RecentTransaction[];
+  stats: Stats;
+}
+
+interface TradingPerformanceChartProps {
+  dashboardData: DashboardData | null;
+}
+
+const TradingPerformanceChart: React.FC<TradingPerformanceChartProps> = ({ dashboardData }) => {
   return (
     <Card title="Trading Performance" subtitle="Monthly growth overview">
       <div className={`h-64 relative ${GRADIENTS.CARD} rounded-lg overflow-hidden`}>
@@ -107,10 +167,10 @@ const TradingPerformanceChart: React.FC<TradingPerformanceChartProps> = ({ stats
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <TrendingUp className="h-4 w-4 text-green-600" />
             <span className="text-2xl font-bold text-green-600">
-              +{stats?.monthlyGrowth || 12.5}%
+              +{dashboardData?.stats?.commission ? parseFloat(dashboardData.stats.commission.replace(/,/g, '')).toFixed(1) : '12.5'}%
             </span>
           </div>
-          <p className="text-xs text-gray-600 mt-1">Monthly Growth</p>
+          <p className="text-xs text-gray-600 mt-1">Commission</p>
           <p className="text-xs text-green-600 font-medium">
             ↗ +2.3% vs last month
           </p>

@@ -1,7 +1,19 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-import type { Transaction } from '../../../types';
+
+interface Transaction {
+  id: string;
+  userId: string;
+  type: string;
+  amount: number;
+  currency: string;
+  method?: string;
+  status: string;
+  date: string;
+  fromAccount?: string;
+  toAccount?: string;
+}
 
 interface RecentTransactionsProps {
   recentTransactions: Transaction[];
