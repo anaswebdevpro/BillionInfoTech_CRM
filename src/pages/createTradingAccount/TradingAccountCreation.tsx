@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CheckCircle } from "lucide-react";
+// import { CheckCircle } from "lucide-react";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
+
 import { apiRequest } from "../../services/api";
-import type { AccountCreationFormData, AccountType } from "../../types/index";
+import type { AccountCreationFormData } from "../../types/index";
+import { CREATE_TRADE_ACCOUNT_OPTIONS, OPEN_MT_ACCOUNT } from "../../../api/api-variable";
+import { useAuth } from "@/context";
+
 
 /**
  * Trading Account Creation page component
@@ -14,8 +18,10 @@ import type { AccountCreationFormData, AccountType } from "../../types/index";
  */
 const TradingAccountCreation: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [accountTypes, setAccountTypes] = useState<AccountType[]>([]);
+  
+  const [options, setOptions] = useState<any>(null);
+  
+  const {token}= useAuth();
 
   // Function to generate random 8-digit password
   const generateRandomPassword = (): string => {
@@ -37,28 +43,54 @@ const TradingAccountCreation: React.FC = () => {
    
   };
 
-  // Fetch account types from db.json
-  useEffect(() => {
-    fetch("/data/db.json")
-      .then((res) => res.json())
-      .then((data) => setAccountTypes(data.accountTypes || []))
-      .catch((error) => console.error("Failed to fetch account types:", error));
-  }, []);
+
+
+
+
+  // Fetch account types dropdown and other options from API
+ const fetchOptions = () => {
+    try {
+      apiRequest({
+        endpoint: CREATE_TRADE_ACCOUNT_OPTIONS,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response: any) => {
+          setOptions(response);
+        console.log('data:', response);
+      })
+      .catch((error: any) => {
+        console.error('Failed to fetch options:', error);
+      });
+    } catch (error) {
+      console.error('Failed to fetch options :', error);
+    }
+  };
+
+  useEffect(() => {fetchOptions();
+    },[]
+  );
+
+
+
+
+
+
+
 
   // Validation schema for account creation
   const validationSchema = Yup.object({
     platformType: Yup.string()
-      .oneOf(["MT5", "MT4"], "Invalid platform type")
+      // .oneOf(["MT5", "MT4"], "Invalid platform type")
       .required("Platform type is required"),
     accountVariant: Yup.string()
       .oneOf(["Live", "Demo"], "Invalid account variant")
       .required("Account variant is required"),
     accountType: Yup.string().required("Account type is required"),
     currency: Yup.string()
-      .oneOf(["USD", "EUR", "GBP"], "Invalid currency")
+      // .oneOf(["USD", "EUR", "GBP"], "Invalid currency")
       .required("Currency is required"),
     leverage: Yup.string()
-      .oneOf(["1:50", "1:100", "1:200", "1:500"], "Invalid leverage")
+      // .oneOf(["1:50", "1:100", "1:200", "1:500"], "Invalid leverage")
       .required("Leverage is required"),
     investorPassword: Yup.string()
       .min(8, "Investor password must be 8 characters")
@@ -79,29 +111,41 @@ const TradingAccountCreation: React.FC = () => {
   // Form handling with Formik
   const formik = useFormik<AccountCreationFormData>({
     initialValues: {
-      platformType: "MT5",
+      platformType: "", // Will be set to platform ID
       accountVariant: "Demo",
-      accountType: "",
-      currency: "USD",
-      leverage: "1:100",
+      accountType: "", // Will be set to account type ID
+      currency: "", // Will be set to currency ID
+      leverage: "", // Will be set to leverage ID
       investorPassword: generateRandomPassword(),
       masterPassword: generateRandomPassword(),
-      initialDeposit: undefined,
+      
     },
     validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
+        // Map form values to API required fields
+        const apiData = {
+          type: values.accountVariant.toLowerCase(), // "Demo" -> "demo", "Live" -> "live"
+          account_type: parseInt(values.accountType), // Convert to number
+          currency_id: parseInt(values.currency), // Convert to number
+          leverage_id: parseInt(values.leverage), // Convert to number
+          platform: parseInt(values.platformType), // Convert to number
+          password: values.investorPassword,
+          master_password: values.masterPassword
+        };
+
+        console.log('Submitting API data:', apiData);
+
         await apiRequest({
-          endpoint: '/accounts',
+          endpoint: OPEN_MT_ACCOUNT,
           method: 'POST',
-          data: {
-            ...values,
-            // userId will be handled by the backend from the auth token
-          }
+          data: apiData,
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setSuccess(true);
+      
         formik.resetForm();
+        console.log('Account created successfully!');
       } catch (error) {
         console.error("Failed to create account:", error);
       } finally {
@@ -110,28 +154,7 @@ const TradingAccountCreation: React.FC = () => {
     },
   });
 
-  if (success) {
-    return (
-      <div className="max-w-2xl mx-auto">
-        <Card>
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Account Created Successfully!
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Your trading account has been created and is ready to use.
-            </p>
-            <Button onClick={() => setSuccess(false)}>
-              Create Another Account
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -158,8 +181,12 @@ const TradingAccountCreation: React.FC = () => {
               onBlur={formik.handleBlur}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="MT5">MT5</option>
-              <option value="MT4">MT4</option>
+              <option value="">Select Platform</option>
+              {options?.data?.platforms?.map((platform: any) => (
+                <option key={platform.id} value={platform.id}>
+                  {platform.name}
+                </option>
+              ))}
             </select>
             {formik.touched.platformType && formik.errors.platformType && (
               <p className="mt-1 text-sm text-red-600">
@@ -218,10 +245,10 @@ const TradingAccountCreation: React.FC = () => {
               onBlur={formik.handleBlur}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="">Select One</option>
-              {accountTypes.map((type) => (
-                <option key={type.id} value={type.name}>
-                  {type.name}
+              <option value="">Select Account Type</option>
+              {options?.data?.accountsType?.map((group: any) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
                 </option>
               ))}
             </select>
@@ -244,9 +271,12 @@ const TradingAccountCreation: React.FC = () => {
               onBlur={formik.handleBlur}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="USD">USD - US Dollar</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="GBP">GBP - British Pound</option>
+              <option value="">Select Currency</option>
+              {options?.data?.currencies?.map((currency: any) => (
+                <option key={currency.id} value={currency.id}>
+                  {currency.symbol}
+                </option>
+              ))}
             </select>
             {formik.touched.currency && formik.errors.currency && (
               <p className="mt-1 text-sm text-red-600">
@@ -267,10 +297,12 @@ const TradingAccountCreation: React.FC = () => {
               onBlur={formik.handleBlur}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="1:50">1:50</option>
-              <option value="1:100">1:100</option>
-              <option value="1:200">1:200</option>
-              <option value="1:500">1:500</option>
+              <option value="">Select Leverage</option>
+              {options?.data?.leverages?.map((leverages: any) => (
+                <option key={leverages.id} value={leverages.value}>
+                  {leverages.show_value}
+                </option>
+              ))}
             </select>
             {formik.touched.leverage && formik.errors.leverage && (
               <p className="mt-1 text-sm text-red-600">
@@ -351,7 +383,7 @@ const TradingAccountCreation: React.FC = () => {
           </div>
 
           {/* Initial Deposit (Live accounts only) */}
-          {formik.values.accountVariant === "Live" && (
+          {/* {formik.values.accountVariant === "Live" && (
             <Input
               label="Initial Deposit"
               type="number"
@@ -367,7 +399,7 @@ const TradingAccountCreation: React.FC = () => {
               }
               required
             />
-          )}
+          )} */}
 
           {/* Terms and Conditions */}
           <div className="bg-gray-50 rounded-lg p-4">

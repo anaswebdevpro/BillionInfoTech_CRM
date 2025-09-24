@@ -8,6 +8,8 @@ import { COLORS } from '../../constants/colors';
 import { apiRequest } from '@/services';
 import { TRADE_ACCOUNT } from '../../../api/api-variable';
 import { useAuth } from '@/context';
+import { useNavigate } from 'react-router';
+
 
 /**
  * Manage Account page component
@@ -30,7 +32,7 @@ const MyAccounts: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const {token}= useAuth();
   const [loading, setLoading] = useState(false);
-
+ const navigate = useNavigate();
   const fetchAccount = () => {
     setLoading(true);
     try {
@@ -158,6 +160,7 @@ const MyAccounts: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="flex-1"
+                    
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Overview
@@ -182,6 +185,7 @@ const MyAccounts: React.FC = () => {
                     size="sm"
                     className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
                     disabled={account.status !== 'Active'}
+                    onClick={() => navigate('/dashboard/funds/deposit')}
                   >
                     <ArrowDownToLine className="h-4 w-4 mr-2" />
                     Deposit
@@ -191,6 +195,7 @@ const MyAccounts: React.FC = () => {
                     size="sm"
                     className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                     disabled={account.status !== 'Active'}
+                    onClick={() => navigate('/dashboard/funds/withdraw')}
                   >
                     <ArrowUpFromLine className="h-4 w-4 mr-2" />
                     Withdraw
@@ -200,6 +205,7 @@ const MyAccounts: React.FC = () => {
                     size="sm"
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     disabled={account.status === 'Active'}
+                    
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
