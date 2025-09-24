@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Settings, TrendingUp, Lock, BarChart3, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
+import { Trash2, Settings, TrendingUp, Lock,  ArrowDownToLine, ArrowUpFromLine, Info } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 
@@ -9,6 +9,7 @@ import { apiRequest } from '@/services';
 import { TRADE_ACCOUNT } from '../../../api/api-variable';
 import { useAuth } from '@/context';
 import { useNavigate } from 'react-router';
+
 
 
 /**
@@ -105,7 +106,7 @@ const MyAccounts: React.FC = () => {
           <Card key={account.account_number} className="hover:shadow-lg transition-shadow">
             <div className="p-6">
               {/* Account Header */}
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between border-b-1 border-gray-200 pb-2">
                 <div className="flex items-center space-x-3">
                   {getAccountTypeIcon(account.type)}
                   <div>
@@ -154,36 +155,43 @@ const MyAccounts: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="mt-6 space-y-3">
-                {/* First Row - Main Actions */}
-                <div className="flex space-x-2">
+                {/* First Row - Icon Actions */}
+                <div className="flex justify-end space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1"
-                    
+                    className="p-2 hover:bg-blue-50"
+                    title="Account Overview"
                   >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Overview
+                    {/* <RiInformation2Line className="h-4 w-4 text-blue-600" /> */}
+                    <Info className="h-4 w-4 text-blue-600" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1"
+                    className="p-2 hover:bg-gray-50"
                     disabled={account.status !== 'Active'}
+                    title="Change Password"
                   >
-                    <Lock className="h-4 w-4 mr-2" />
-                    Password
+                    <Lock className="h-4 w-4 text-gray-600" />
                   </Button>
-                 
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    disabled={account.status === 'Active'}
+                    title="Delete Account"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
                 
-                {/* Second Row - Secondary Actions */}
+                {/* Second Row - Main Actions */}
                 <div className="flex space-x-2">
-                  
                    <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 border-emerald-600 text-white hover:from-emerald-600 hover:to-green-600 hover:border-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold"
                     disabled={account.status !== 'Active'}
                     onClick={() => navigate('/dashboard/funds/deposit')}
                   >
@@ -193,21 +201,12 @@ const MyAccounts: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 border-blue-600 text-white hover:from-blue-600 hover:to-indigo-600 hover:border-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold"
                     disabled={account.status !== 'Active'}
                     onClick={() => navigate('/dashboard/funds/withdraw')}
                   >
                     <ArrowUpFromLine className="h-4 w-4 mr-2" />
                     Withdraw
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    disabled={account.status === 'Active'}
-                    
-                  >
-                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
