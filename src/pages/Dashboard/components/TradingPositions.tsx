@@ -71,6 +71,7 @@ const TradingPositions: React.FC<TradingPositionsProps> = ({
                       <tr key={pos.orderId} className="">
                         <td className="px-2 py-2">{pos.srNo}</td>
                         <td className="px-2 py-2">{pos.orderId}</td>
+                    
                         <td className="px-2 py-2">{pos.account}</td>
                         <td className="px-2 py-2">
                           <span

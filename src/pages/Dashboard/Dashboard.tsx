@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
             return {
               srNo: index + 1,
               orderId: trade.order_id.toString(),
-              account: `Account ${trade.account_number}`,
+              account: ` ${trade.account_number}`,
               type: trade.side === 'sell' ? 'Sell' : 'Buy',
               openPrice: trade.open_price,
               symbol: trade.symbol,
