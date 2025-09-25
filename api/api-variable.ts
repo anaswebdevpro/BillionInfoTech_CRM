@@ -26,6 +26,8 @@ export const MANAGE_ACCOUNTS="/open-trade-account-list";
 export const TRADE_ACCOUNT="/trade-account";
 export const CREATE_TRADE_ACCOUNT_OPTIONS="/live-account";
 export const OPEN_MT_ACCOUNT="/open-mt-account";
+export const UPDATE_ACCOUNT_PASSWORD="/update-account-password";
+export const GET_ACCOUNT_INFO="/account-info";
 
 
 

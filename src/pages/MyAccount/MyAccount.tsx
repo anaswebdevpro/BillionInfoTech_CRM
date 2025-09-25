@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { Trash2, Settings, TrendingUp, Lock,  ArrowDownToLine, ArrowUpFromLine, Info } from 'lucide-react';
 import Card from '../../components/ui/Card';
@@ -7,9 +8,11 @@ import { ShimmerLoader } from '../../components/ui';
 // import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '@/services';
-import { TRADE_ACCOUNT } from '../../../api/api-variable';
+import { GET_ACCOUNT_INFO, TRADE_ACCOUNT } from '../../../api/api-variable';
 import { useAuth } from '@/context';
 import { useNavigate } from 'react-router';
+import InfoModal from './InfoModal';
+import PasswordModal from './PasswordModal';
 
 
 
@@ -35,6 +38,13 @@ const MyAccounts: React.FC = () => {
   const {token}= useAuth();
   const [loading, setLoading] = useState(false);
  const navigate = useNavigate();
+const [modalInfoData, setModalInfoData] = useState<any>(null);
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+const [selectedAccountNumber, setSelectedAccountNumber] = useState<number | null>(null);
+
+
+
   const fetchAccount = () => {
     setLoading(true);
     try {
@@ -65,7 +75,48 @@ const MyAccounts: React.FC = () => {
     fetchAccount();
   }, []);
   
+  const modalInfo = (accountId: number) => {
+    
+    try {
+      apiRequest({
+        endpoint: GET_ACCOUNT_INFO,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        data: {"account": accountId}
+      })
+      .then((response: unknown) => {
+       
+        console.log("fetching modal info ",response);
+        setModalInfoData(response);
+        setIsModalOpen(true);
+      })
+      .catch((error) => {
+        console.error('Error fetching modal account:', error);
+       
+      })      
      
+    } catch (error) {
+      console.error("Failed to fetch trade account:", error);
+      
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalInfoData(null);
+  };
+
+  const openPasswordModal = (accountNumber: number) => {
+    setSelectedAccountNumber(accountNumber);
+    setIsPasswordModalOpen(true);
+  };
+
+  const closePasswordModal = () => {
+    setIsPasswordModalOpen(false);
+    setSelectedAccountNumber(null);
+  };
+
+
   
 
   const getStatusColor = (status: string) => {
@@ -89,17 +140,13 @@ const MyAccounts: React.FC = () => {
     );
   };
 
-
+  
   if (loading) {
     return (
-      <div className="space-y-6">
-        <ShimmerLoader variant="dashboard" width={1200} height={200} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <ShimmerLoader variant="card" width={300} height={200} />
-          <ShimmerLoader variant="card" width={300} height={200} />
-          <ShimmerLoader variant="card" width={300} height={200} />
-        </div>
-      </div>
+   
+      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+    <ShimmerLoader variant="dashboard" width={1200} height={400} />
+  </div>
     );
   }
 
@@ -176,8 +223,9 @@ const MyAccounts: React.FC = () => {
                     size="sm"
                     className="p-2 hover:bg-blue-50"
                     title="Account Overview"
+                    onClick={() => modalInfo(account.account_number)}
                   >
-                    {/* <RiInformation2Line className="h-4 w-4 text-blue-600" /> */}
+                
                     <Info className="h-4 w-4 text-blue-600" />
                   </Button>
                   <Button
@@ -186,6 +234,7 @@ const MyAccounts: React.FC = () => {
                     className="p-2 hover:bg-gray-50"
                     disabled={account.status !== 'Active'}
                     title="Change Password"
+                    onClick={() => openPasswordModal(account.account_number)}
                   >
                     <Lock className="h-4 w-4 text-gray-600" />
                   </Button>
@@ -229,7 +278,7 @@ const MyAccounts: React.FC = () => {
         ))}
       </div>
 
-   
+ 
 
       {/* Empty State */}
       {accounts.length === 0 && !loading && (
@@ -244,6 +293,20 @@ const MyAccounts: React.FC = () => {
           </div>
         </Card>
       )}
+
+      {/* Info Modal */}
+      <InfoModal 
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        data={modalInfoData}
+      />
+
+      {/* Password Modal */}
+      <PasswordModal 
+        isOpen={isPasswordModalOpen}
+        onClose={closePasswordModal}
+        accountNumber={selectedAccountNumber || 0}
+      />
     </div>
   );
 };
