@@ -157,16 +157,22 @@ const InternalTransfer: React.FC = () => {
       
         });
 
-        if (response) {
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Transfer failed!', { variant: 'error' });
+        } else if (response) {
           // Reset form on successful submission
           formik.resetForm();
           // Refresh data
           await fetchData();
-          enqueueSnackbar('Transfer completed successfully!', { variant: 'success' });
+          enqueueSnackbar(responseData.message || 'Transfer completed successfully!', { variant: 'success' });
         }
       } catch (error) {
         console.error('Transfer failed:', error);
-          enqueueSnackbar('Transfer failed. Please try again.', { variant: 'error' });
+        const errorMessage = error instanceof Error ? error.message : 'Transfer failed. Please try again.';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       } finally {
         setIsSubmitting(false);
       }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback} from "react";
 import { COLORS } from "../../constants/colors";
 import { apiRequest } from "../../services";
+import { enqueueSnackbar } from 'notistack';
 
 // Local interfaces matching the actual API response
 interface LiveAccount {
@@ -164,6 +165,8 @@ const Dashboard: React.FC = () => {
       }
     }).catch((error) => {
       console.error("Failed to fetch dashboard data:", error);
+      const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch dashboard data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }).finally(() => {
       setLoading(false);
     });

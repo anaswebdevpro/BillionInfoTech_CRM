@@ -13,6 +13,7 @@ import { useAuth } from '@/context';
 import { useNavigate } from 'react-router';
 import InfoModal from './InfoModal';
 import PasswordModal from './PasswordModal';
+import { enqueueSnackbar } from 'notistack';
 
 
 
@@ -54,19 +55,31 @@ const [selectedAccountNumber, setSelectedAccountNumber] = useState<number | null
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response: unknown) => {
-         const res = response as { data: Account[] };
-         setAccounts(res.data);
-         setLoading(false);
         console.log('Trade Account:', response);
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string; data?: Account[] };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch accounts!', { variant: 'error' });
+        } else {
+          const res = response as { data: Account[] };
+          setAccounts(res.data);
+        }
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching trade account:', error);
+        const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch accounts';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
         setLoading(false);
       })
       
      
     } catch (error) {
       console.error("Failed to fetch trade account:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch accounts';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setLoading(false);
     }
   };
@@ -85,19 +98,28 @@ const [selectedAccountNumber, setSelectedAccountNumber] = useState<number | null
         data: {"account": accountId}
       })
       .then((response: unknown) => {
-       
-        console.log("fetching modal info ",response);
-        setModalInfoData(response);
-        setIsModalOpen(true);
+        console.log("fetching modal info ", response);
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch account info!', { variant: 'error' });
+        } else {
+          setModalInfoData(response);
+          setIsModalOpen(true);
+        }
       })
       .catch((error) => {
         console.error('Error fetching modal account:', error);
-       
+        const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch account info';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       })      
      
     } catch (error) {
       console.error("Failed to fetch trade account:", error);
-      
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch account info';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 

@@ -79,18 +79,16 @@ const TradingAccountCreation: React.FC = () => {
 
   // Validation schema for account creation
   const validationSchema = Yup.object({
-    platformType: Yup.string()
-      // .oneOf(["MT5", "MT4"], "Invalid platform type")
+    platformType: Yup.string()     
       .required("Platform type is required"),
-    accountVariant: Yup.string()
-      .oneOf(["Live", "Demo"], "Invalid account variant")
+    accountVariant: Yup.string()     
       .required("Account variant is required"),
     accountType: Yup.string().required("Account type is required"),
     currency: Yup.string()
-      // .oneOf(["USD", "EUR", "GBP"], "Invalid currency")
+    
       .required("Currency is required"),
     leverage: Yup.string()
-      // .oneOf(["1:50", "1:100", "1:200", "1:500"], "Invalid leverage")
+     
       .required("Leverage is required"),
     investorPassword: Yup.string()
       .min(8, "Investor password must be 8 characters")
@@ -98,14 +96,7 @@ const TradingAccountCreation: React.FC = () => {
     masterPassword: Yup.string()
       .min(8, "Master password must be 8 characters")
       .required("Master password is required"),
-    initialDeposit: Yup.number()
-      .min(100, "Minimum deposit is $100")
-      .when("accountVariant", {
-        is: "Live",
-        then: (schema) =>
-          schema.required("Initial deposit is required for live accounts"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
+   
   });
 
   // Form handling with Formik
@@ -382,24 +373,7 @@ const TradingAccountCreation: React.FC = () => {
             )}
           </div>
 
-          {/* Initial Deposit (Live accounts only) */}
-          {/* {formik.values.accountVariant === "Live" && (
-            <Input
-              label="Initial Deposit"
-              type="number"
-              name="initialDeposit"
-              placeholder="100"
-              value={formik.values.initialDeposit || ""}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.initialDeposit && formik.errors.initialDeposit
-                  ? formik.errors.initialDeposit
-                  : undefined
-              }
-              required
-            />
-          )} */}
+         
 
           {/* Terms and Conditions */}
           <div className="bg-gray-50 rounded-lg p-4">
@@ -423,6 +397,7 @@ const TradingAccountCreation: React.FC = () => {
             >
               Reset
             </Button>
+           
             <Button type="submit" disabled={isSubmitting || !formik.isValid}>
               {isSubmitting ? "Creating..." : "Create Account"}
             </Button>

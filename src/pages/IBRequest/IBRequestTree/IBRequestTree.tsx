@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
@@ -5,6 +6,7 @@ import { ShimmerLoader } from '../../../components/ui'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
+import { enqueueSnackbar } from 'notistack'
 
 
 // Types for our data structure
@@ -235,24 +237,34 @@ const IBRequestTree = () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: unknown) => {
-        // The API returns data directly, not nested under 'data' property
-        const networkResponse = response as NetworkData;
         console.log('Full API Response:', response);
-       
         
-        setNetworkData(networkResponse || null);
-        if (networkResponse?.tree?.[0]) {
-          console.log('Setting selected member ID to:', networkResponse.tree[0].memberId);
-          setSelectedMemberId(networkResponse.tree[0].memberId);
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch network data!', { variant: 'error' });
+        } else {
+          // The API returns data directly, not nested under 'data' property
+          const networkResponse = response as NetworkData;
+          setNetworkData(networkResponse || null);
+          if (networkResponse?.tree?.[0]) {
+            console.log('Setting selected member ID to:', networkResponse.tree[0].memberId);
+            setSelectedMemberId(networkResponse.tree[0].memberId);
+          }
         }
         setIsLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
+          const errorMessage = error?.message || (error as any)?.response?.data?.message || 'Failed to fetch network data';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setIsLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch network data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setIsLoading(false);
     } 
   };

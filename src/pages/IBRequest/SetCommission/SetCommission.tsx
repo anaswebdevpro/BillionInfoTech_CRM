@@ -5,6 +5,7 @@ import { apiRequest } from '../../../services/api';
 import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
 
 
 
@@ -109,27 +110,36 @@ const SetCommission: React.FC = () => {
         }
       })
       .then((response: unknown) => {         
-        
-        
         console.log('Data API Response:', response);
-
-
-      if (Array.isArray(response)) {
-          setData(response);
-        } else if (response && typeof response === 'object' && 'data' in response) {
-          setData((response as { data: UserData[] }).data || []);
-        } else {
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch user data!', { variant: 'error' });
           setData([]);
+        } else {
+          if (Array.isArray(response)) {
+            setData(response);
+          } else if (response && typeof response === 'object' && 'data' in response) {
+            setData((response as { data: UserData[] }).data || []);
+          } else {
+            setData([]);
+          }
         }
         setLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
+          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch user data';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setData([]);
           setLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setLoading(false);
     }
   };  

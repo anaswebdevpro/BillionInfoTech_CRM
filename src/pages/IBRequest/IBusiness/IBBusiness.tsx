@@ -5,6 +5,7 @@ import { ShimmerLoader } from '../../../components/ui';
 import { apiRequest } from '../../../services';
 import { GET_PARTNER_BUSINESS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { enqueueSnackbar } from 'notistack';
 
 interface PartnerData {
   no: number;
@@ -44,15 +45,29 @@ const IBBusiness = () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: any) => {
+        console.log('Partner Business Response:', response);
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch partner data!', { variant: 'error' });
+        } else {
+          setPartnerData(response);
+        }
         setLoading(false);
-        setPartnerData(response);
-        console.log(response);
       })
         .catch((error: any) => {
           console.error("Failed to fetch partner data:", error);
+          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch partner data';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
+          setLoading(false);
         });
     } catch (error) {
       console.error("Failed to fetch partner data:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch partner data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+      setLoading(false);
     } 
   }, [token]);
 

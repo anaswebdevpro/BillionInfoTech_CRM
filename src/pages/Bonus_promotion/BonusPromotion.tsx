@@ -84,18 +84,26 @@ const BonusPromotion: React.FC = () => {
       })
       
       .then((response: unknown) => {
-        const data = response as { bonuses?: Bonus[]; success?: boolean };
-        setBonuses(data.bonuses || []);
         console.log('Bonuses Data:', response);
-       
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string; bonuses?: Bonus[] };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch bonuses!', { variant: 'error' });
+        } else {
+          setBonuses(responseData.bonuses || []);
+        }
       }) 
         .catch((error: Error) => {
           console.error('Failed to fetch bonuses:', error);
-          enqueueSnackbar('Failed to fetch bonuses: ' + error.message, { variant: 'error' });
+          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch bonuses';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
         });
     } catch (error) {
       console.error('Failed to fetch bonuses:', error);
-      enqueueSnackbar('Failed to fetch bonuses. Please try again.', { variant: 'error' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bonuses';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   }, [token]);
     
@@ -110,28 +118,33 @@ const BonusPromotion: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
         data: { bonus_id: bonusId },
         }).then((response: unknown) => {
-          const data = response as { success?: boolean; status?: string; message?: string };
           setClaiming(null);
           console.log('Claim Bonus Response:', response);
-          if (data && (data.success || data.status === 'success')) {
-            console.log('Bonus claimed successfully!');
-            enqueueSnackbar(data.message || 'Bonus claimed successfully!', { variant: 'success' });
+          
+          // Check if response indicates success or failure
+          const responseData = response as { response?: boolean; message?: string; success?: boolean; status?: string };
+          
+          if (responseData.response === false) {
+            enqueueSnackbar(responseData.message || 'Failed to claim bonus!', { variant: 'error' });
+          } else if (responseData.response === true || responseData.success || responseData.status === 'success') {
+            enqueueSnackbar(responseData.message || 'Bonus claimed successfully!', { variant: 'success' });
             // Optionally refresh the bonuses list
             FetchBonuses();
           } else {
-            console.error('Failed to claim bonus:', response);
-            enqueueSnackbar(data.message || 'Failed to claim bonus. Please try again.', { variant: 'error' });  
+            enqueueSnackbar(responseData.message || 'Failed to claim bonus. Please try again.', { variant: 'error' });
           }
         })
         .catch((error: Error) => {
           setClaiming(null);
           console.error('Failed to claim bonus:', error);
-          enqueueSnackbar('Failed to claim bonus: ' + error.message, { variant: 'error' });
+          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to claim bonus';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
         });
     } catch (error) {
       setClaiming(null);
       console.error('Failed to claim bonus:', error);
-      enqueueSnackbar('Failed to claim bonus. Please try again.', { variant: 'error' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to claim bonus';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 

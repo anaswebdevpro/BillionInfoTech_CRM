@@ -7,6 +7,7 @@ import { GET_BROKERAGE_REPORTS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
 import { useDebounce } from '@/Hook/useDebounce';
 import { COLORS } from '@/constants';
+import { enqueueSnackbar } from 'notistack';
 
 interface Transaction {
   id: number;
@@ -57,19 +58,31 @@ const TransactionHistory: React.FC = () => {
         data: requestBody
       })
       .then((response: unknown) => {
-         setData(response as ApiResponse);
-        console.log('Trade History:', response);
+        console.log('Transaction History:', response);
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch transaction history!', { variant: 'error' });
+        } else {
+          setData(response as ApiResponse);
+        }
       })
       
      .catch((error) => {
-        console.error('Error fetching trade history:', error);
+        console.error('Error fetching transaction history:', error);
+        const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch transaction history';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       })
       .finally(() => {
         setIsLoading(false);
       });
      
     } catch (error) {
-      console.error("Failed to fetch trade history:", error);
+      console.error("Failed to fetch transaction history:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load data. Please try again later.';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setError('Failed to load data. Please try again later.');
       setIsLoading(false);
     }

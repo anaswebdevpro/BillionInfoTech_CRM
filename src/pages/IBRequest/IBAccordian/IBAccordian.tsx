@@ -5,6 +5,7 @@ import { ShimmerLoader } from '../../../components/ui'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
+import { enqueueSnackbar } from 'notistack'
 
 // Types for our data structure
 interface TreeMember {
@@ -62,18 +63,29 @@ const IBAccordian = () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: unknown) => {
-        const networkResponse = response as NetworkData;
-        console.log('Accordion API Response:', networkResponse);
+        console.log('Accordion API Response:', response);
         
-        setNetworkData(networkResponse || null);
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch network data!', { variant: 'error' });
+        } else {
+          const networkResponse = response as NetworkData;
+          setNetworkData(networkResponse || null);
+        }
         setLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
+          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch network data';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch network data';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setLoading(false);
     } 
   }, [token]);

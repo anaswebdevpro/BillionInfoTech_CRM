@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Card, ShimmerLoader } from "@/components/ui";
 import { useDebounce } from "../../../Hook/useDebounce";
 import { COLORS } from "@/constants/colors";
+import { enqueueSnackbar } from 'notistack';
 
 interface TradeData {
   order_id: number;
@@ -55,12 +56,22 @@ const IBtradeHistory = () => {
         data: requestBody
       })
       .then((response: unknown) => {
-         setData(response as TableData);
         console.log('Trade History:', response);
+        
+        // Check if response indicates success or failure
+        const responseData = response as { response?: boolean; message?: string };
+        
+        if (responseData.response === false) {
+          enqueueSnackbar(responseData.message || 'Failed to fetch trade history!', { variant: 'error' });
+        } else {
+          setData(response as TableData);
+        }
       })
       
      .catch((error) => {
         console.error('Error fetching trade history:', error);
+        const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch trade history';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       })
       .finally(() => {
         setLoading(false);
@@ -68,6 +79,8 @@ const IBtradeHistory = () => {
      
     } catch (error) {
       console.error("Failed to fetch trade history:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch trade history';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setLoading(false);
     }
   }, [token, currentPage, debouncedSearchValue, entriesPerPage]);
