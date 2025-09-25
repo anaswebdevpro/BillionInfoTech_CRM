@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect} from 'react';
 import { COLORS } from '../../../constants/colors';
+import { ShimmerLoader } from '../../../components/ui';
 import { apiRequest } from '../../../services/api';
 import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
@@ -91,11 +92,13 @@ const SetCommission: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(DEFAULT_ENTRIES_PER_PAGE);
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
   const { token } = useAuth();
   const navigate = useNavigate();
 
 
   const FetchData  =() => {
+    setLoading(true);
     try {
       apiRequest({
         endpoint: GET_USER_DOWNLINE,
@@ -118,13 +121,16 @@ const SetCommission: React.FC = () => {
         } else {
           setData([]);
         }
+        setLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
           setData([]);
+          setLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      setLoading(false);
     }
   };  
 
@@ -200,6 +206,14 @@ const SetCommission: React.FC = () => {
     setCurrentPage(1);
   };
 
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="table" width={1200} height={600} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

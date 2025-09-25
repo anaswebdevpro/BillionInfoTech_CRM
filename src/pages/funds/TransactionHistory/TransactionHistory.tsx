@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../../components/ui/Card';
+import { ShimmerLoader } from '../../../components/ui';
 // import Input from '../../../components/ui/Input';
 import { apiRequest } from '../../../services/api';
 import { GET_BROKERAGE_REPORTS } from '../../../../api/api-variable';
@@ -153,10 +154,7 @@ const TransactionHistory: React.FC = () => {
         {/* Transactions Table */}
         <Card className="p-6">
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading transactions...</p>
-            </div>
+            <ShimmerLoader variant="table" width={1000} height={400} />
           ) : error ? (
             <div className="text-center py-8">
               <p className="text-red-500">{error}</p>

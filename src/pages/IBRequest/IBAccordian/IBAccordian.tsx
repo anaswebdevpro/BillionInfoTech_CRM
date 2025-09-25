@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { COLORS } from '../../../constants/colors'
+import { ShimmerLoader } from '../../../components/ui'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
@@ -43,213 +44,18 @@ interface AccordionNode {
 
 
 
-// const networkData: NetworkData = {
-//   "title": "Network Tree",
-//   "gototop": false,
-//   "tree": [
-//       {
-//           "memberId": 1,
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkJIdmRRMTJxSzZLQTBGZjkyZkpwblE9PSIsInZhbHVlIjoiU1R3VENQVnR6djRsQWp0WWxkUlNMZz09IiwibWFjIjoiMmM5YmQxNGQ2YzM0NTJlOGM5MDhlNzRhZDQ2MGJhOTljOGZiNGYzY2EwODRlNmMwYjY5MGRjNTE4ZDliNDZhNiIsInRhZyI6IiJ9",
-//           "parentId": null,
-//           "otherInfo": "billioninfotech@gmail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6Ikorbjk2YUQvY1RLMFFXZjZCaWRQbWc9PSIsInZhbHVlIjoidUpiNVJ5ZTVrVDNnVzBPV2Zlc2gvdz09IiwibWFjIjoiOGNiNTBmYmFiNjM3N2MzNzg4ZGY2YmVjODMwNjYzZjdhMjQzOTc3MjU1NGU3ZTllZjQ1OGQ1NTIwZThlYzFjNiIsInRhZyI6IiJ9",
-//           "memberId": 2,
-//           "parentId": 1,
-//           "otherInfo": "Test1.1@yopmail.com",
-//           "account_number": 22107,
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkF5N2NtVmhod3Q1N01QOHdKZ1Rzdnc9PSIsInZhbHVlIjoicEd3YmpkMy9pUmVBdk9uMFFWd3dzQT09IiwibWFjIjoiYTI3N2QwNjcyMmE1YzdiODY1NTJkNjJhNjM3N2YzNzgyZjhhZTEzODEyZjkxMWRmNTZhNmQ0ZGJlNDdiODcxZSIsInRhZyI6IiJ9",
-//           "memberId": 7,
-//           "parentId": 1,
-//           "otherInfo": "test@mail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkdDR0FocXFaYUQ0OGhXVHZ6RS9FaGc9PSIsInZhbHVlIjoiUTFtK1BYanA1N2xVRFhtTzEyVUQ1QT09IiwibWFjIjoiYTk3ZDI5MTY5MjdhM2I2MDhmZDYyMTYzZWU2Y2YzMDdmZWY5NTkwOGI3MjQzMzc1ZGU2Yjg5NWFiOGE3MTdmMyIsInRhZyI6IiJ9",
-//           "memberId": 8,
-//           "parentId": 1,
-//           "otherInfo": "karan@mail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlJPcXRTQmROU0RpNXhpVFQvUnRWQ0E9PSIsInZhbHVlIjoiY0Nyd1BVb05ETFRRRDcyT2VDSzZxdz09IiwibWFjIjoiMzQ1Yjg3NjcyMGQ0MTFlMzAyOGQ4ODlmNThhZjdkMDZhMWE1YTExMzA2MjViNjZlNDU0ZTUwMTJjZmZlNmZiZiIsInRhZyI6IiJ9",
-//           "memberId": 9,
-//           "parentId": 1,
-//           "otherInfo": "karan12@mail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlBmM2YwUEZTWG5VbWVnM2pwbXE4TWc9PSIsInZhbHVlIjoiVnFXZ3Fnd0JveHp2RTY4S0Q5SDMvUT09IiwibWFjIjoiNzRmMjgzNGRkNjNhNDM1NDc2YjBkZDY1Y2U4YWI4ZThiYTU1YjIwNDQxMjM5MTUxMjI4MjViZjM4Nzc5ZDNmOSIsInRhZyI6IiJ9",
-//           "memberId": 10,
-//           "parentId": 1,
-//           "otherInfo": "guri@mail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IjZ6eFJBQlhLaFEybmUvMWMzZkViV0E9PSIsInZhbHVlIjoiL29FK01ZbFVrd1RLM3d6TGpkcTRKQT09IiwibWFjIjoiMzdiZGJhMjcxMDVlZGE3ZjZhYjZhYjFmMmUwODdmZDk2MmQxOGM4YzdiZmQxNDdiZjU5NjBlMmIyYzYzM2Q2MiIsInRhZyI6IiJ9",
-//           "memberId": 19,
-//           "parentId": 1,
-//           "otherInfo": "testfromapi@gmail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6Im5yVzJnY3ZOeUIxVW9xbjExVE1uMVE9PSIsInZhbHVlIjoibzdlaEJ2MFM3RkdRRVVtbTJMK002Zz09IiwibWFjIjoiZWFkOTdhZjExZTdmZWVmNDllODg5ZmVmOTdmMDllNjIxNjQzOTQ4MDI5MmVjMDlhNmVlNzFhMjFkMzYyNDFlMiIsInRhZyI6IiJ9",
-//           "memberId": 3,
-//           "parentId": 2,
-//           "otherInfo": "Test1.2@yopmail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IlNmUS9BS29QRnd0SUtRdUhEdWJkeUE9PSIsInZhbHVlIjoiQmhSQmh4QmJSeXEvM243VjJ0WnZVdz09IiwibWFjIjoiNDFiNWYyZDgzMjQzMzM0NWU1YmFlMzZhNjIxZjA2Mjg5NTQ0ZWM5NjdlZTU4OWQ2YWNlNTMwNDhjMzM0ZWQwOCIsInRhZyI6IiJ9",
-//           "memberId": 4,
-//           "parentId": 3,
-//           "otherInfo": "Test1.3@yopmail.com",
-//           "account_number": "N.A.",
-//           "business": "0.000"
-//       },
-//       {
-//           "encryptedmemberId": "https://crmdemo.test/network-tree/eyJpdiI6IkFQNVI4Z0ovVXg4S00wMUNUcEUvckE9PSIsInZhbHVlIjoiN3poalhzQWlXaWVRaTJrb3hYU2t5QT09IiwibWFjIjoiNzgzN2Q2YzY1Y2ZjMWEzNmY0MTExMDA5MDA0N2RhMWI4MzA4M2JmZjAwOWU1YTc2MDY5ZTA2MDAyMDIzNTZlOSIsInRhZyI6IiJ9",
-//           "memberId": 5,
-//           "parentId": 4,
-//           "otherInfo": "Test1.4@yopmail.com",
-//           "account_number": 22081,
-//           "business": "0.000"
-//       }
-//   ],
-//   "tooltip": [
-//       {
-//           "id": 1,
-//           "name": "Company  Horizon",
-//           "join_on": "2025-01-14",
-//           "buss": "0",
-//           "activated_on": "2025-01-14",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       },
-//       {
-//           "id": 2,
-//           "name": "test  1",
-//           "join_on": "2025-02-12",
-//           "buss": "0",
-//           "activated_on": "2025-02-12",
-//           "account_number": 22107,
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       },
-//       {
-//           "id": 7,
-//           "name": "test test",
-//           "join_on": "2025-07-16",
-//           "buss": "0",
-//           "activated_on": "2025-07-16",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "Client"
-//       },
-//       {
-//           "id": 8,
-//           "name": "karan vir",
-//           "join_on": "2025-07-16",
-//           "buss": "0",
-//           "activated_on": "2025-07-16",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "Client"
-//       },
-//       {
-//           "id": 9,
-//           "name": "karan vir singh",
-//           "join_on": "2025-07-16",
-//           "buss": "0",
-//           "activated_on": "2025-07-16",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "Client"
-//       },
-//       {
-//           "id": 10,
-//           "name": "gurpreet gurpreet",
-//           "join_on": "2025-07-17",
-//           "buss": "0",
-//           "activated_on": "2025-07-17",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       },
-//       {
-//           "id": 19,
-//           "name": "testfromapi ",
-//           "join_on": "2025-09-01",
-//           "buss": "0",
-//           "activated_on": "2025-09-01",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "Client"
-//       },
-//       {
-//           "id": 3,
-//           "name": "test  2",
-//           "join_on": "2025-02-12",
-//           "buss": "0",
-//           "activated_on": "2025-02-12",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       },
-//       {
-//           "id": 4,
-//           "name": "test  3",
-//           "join_on": "2025-02-12",
-//           "buss": "0",
-//           "activated_on": "2025-02-12",
-//           "account_number": "N.A.",
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       },
-//       {
-//           "id": 5,
-//           "name": "test  4",
-//           "join_on": "2025-02-12",
-//           "buss": "0",
-//           "activated_on": "2025-02-12",
-//           "account_number": 22081,
-//           "business": "0.000",
-//           "class": "inactive",
-//           "ib_status": "IB"
-//       }
-//   ]
-// }
+
 
 
 const IBAccordian = () => {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null)
   const [accordionData, setAccordionData] = useState<AccordionNode[]>([])
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set())
+  const [loading, setLoading] = useState(true)
   const { token } = useAuth()
 
   const FetchNetwork = React.useCallback(() => {
+    setLoading(true)
     try {
       apiRequest({
         endpoint: MY_NETWORK,
@@ -260,12 +66,15 @@ const IBAccordian = () => {
         console.log('Accordion API Response:', networkResponse);
         
         setNetworkData(networkResponse || null);
+        setLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch user data:', error);
+          setLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      setLoading(false);
     } 
   }, [token]);
 
@@ -448,6 +257,15 @@ const IBAccordian = () => {
     )
   }
 
+
+  // Show loading state first
+  if (loading) {
+    return (
+      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+        <ShimmerLoader variant="dashboard" width={1200} height={400} />
+      </div>
+    );
+  }
 
   // Handle case when no data is available but not loading
   if (!networkData) {

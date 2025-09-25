@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Input from "../../components/ui/Input";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
+import { ShimmerLoader } from "../../components/ui";
 import type { LoginFormData } from "../../types";
 import { IoMdTime } from "react-icons/io";
 import { RiSecurePaymentLine } from "react-icons/ri";
@@ -83,6 +84,40 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
     },
   });
 
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex">
+        {/* Left side - Branding */}
+        <div className="max-w-[35%] hidden md:block items-center justify-center">
+          <div className={`${GRADIENTS.SIDEBAR} w-full h-screen flex justify-center flex-col items-center p-10`}>
+            <img src={logo} alt="Billion Infotech" className="w-40 " />
+            <img src={laptop} alt="Billion Infotech" className="" />
+            <div className="">
+              <h1 className={`text-${COLORS.WHITE} text-4xl font-bold`}>
+                Manage. <span className={`text-${COLORS.SECONDARY}`}>Monitor.</span> Grow.
+              </h1>
+              <div className="flex gap-4 px-4 my-5">
+                <p className="text-xl font-extrabold">
+                  <RiSecurePaymentLine className="inline-block" /> SSL Secure
+                  Login
+                </p>
+                <p className="text-xl font-extrabold">
+                  <IoMdTime className="inline-block" />
+                  99% Uptime{" "}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Login form shimmer */}
+        <div className={`flex-1 flex items-center justify-center p-12 bg-${COLORS.SECONDARY_BG}`}>
+          <ShimmerLoader variant="form" width={400} height={500} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">

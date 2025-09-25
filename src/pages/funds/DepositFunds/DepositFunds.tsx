@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Landmark, CreditCard } from 'lucide-react';
 
 import Card from '../../../components/ui/Card';
+import { ShimmerLoader } from '../../../components/ui';
 import { COLORS } from '../../../constants/colors';
 import { apiRequest } from '@/services';
 import { DEPOSIT_METHODS } from '../../../../api/api-variable';
@@ -115,9 +116,11 @@ const DepositFunds: React.FC = () => {
       {/* Payment Method Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          <div className="col-span-full text-center py-8">
-            <div className={`text-${COLORS.SECONDARY_TEXT}`}>Loading deposit methods...</div>
-          </div>
+          <>
+            <ShimmerLoader variant="card" width={300} height={200} />
+            <ShimmerLoader variant="card" width={300} height={200} />
+            <ShimmerLoader variant="card" width={300} height={200} />
+          </>
         ) : depositMethods.length === 0 ? (
           <div className="col-span-full text-center py-8">
             <div className={`text-${COLORS.SECONDARY_TEXT}`}>No deposit methods available</div>

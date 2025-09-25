@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../../../constants/colors';
+import { ShimmerLoader } from '../../../components/ui';
 import { apiRequest } from '@/services';
 import { GET_USER_DOWNLINE } from '../../../../api/api-variable';
 import { useAuth } from '@/context';
@@ -57,10 +58,12 @@ const MYSubIBSummary: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [downlineData, setDownlineData] = useState<DownlineResponse | null>(null);
+  const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
   // Fetch downline data from API
   const FetchDownline = () => {
+    setLoading(true);
     try {
       apiRequest({
         endpoint: GET_USER_DOWNLINE,
@@ -72,12 +75,15 @@ const MYSubIBSummary: React.FC = () => {
         console.log('Downline API Response:', downlineResponse);
         
         setDownlineData(downlineResponse || null);
+        setLoading(false);
       })
         .catch((error: Error) => {
           console.error('Failed to fetch downline data:', error);
+          setLoading(false);
         });
     } catch (error) {
       console.error('Failed to fetch downline data:', error);
+      setLoading(false);
     } 
   };
 
@@ -99,6 +105,16 @@ const MYSubIBSummary: React.FC = () => {
 
 
 
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={200} />
+        <ShimmerLoader variant="table" width={1200} height={400} />
+      </div>
+    );
+  }
 
   // No data state
   if (!downlineData?.data || downlineData.data.length === 0) {

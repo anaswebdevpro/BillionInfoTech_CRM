@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
 import { COLORS } from '../../../constants/colors';
+import { ShimmerLoader } from '../../../components/ui';
 import { apiRequest } from '../../../services';
 import { GET_PARTNER_BUSINESS } from '../../../../api/api-variable';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
@@ -77,6 +78,14 @@ const IBBusiness = () => {
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = startIndex + entriesPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  if (loading) {
+    return (
+      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+        <ShimmerLoader variant="table" width={1200} height={600} />
+      </div>
+    );
+  }
 
   return (
     <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>

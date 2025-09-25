@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { COLORS } from '../../constants/colors';
+import { ShimmerLoader } from '../../components/ui';
 
 const AdminReports: React.FC = () => {
+  const [loading, setLoading] = useState(true);
 
+  // Simulate loading for demonstration
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="card" width={800} height={400} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

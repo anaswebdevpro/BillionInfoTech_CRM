@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { ShimmerLoader } from '../../../components/ui';
 import WithdrawalRecords from './WithdrawalRecords';
 import { COLORS } from '../../../constants/colors';
 import { apiRequest } from '@/services';
@@ -147,6 +148,14 @@ const WithdrawFunds: React.FC = () => {
       }
     }
   });
+
+  if (isLoading && !data) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <ShimmerLoader variant="form" width={800} height={600} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, Settings, TrendingUp, Lock,  ArrowDownToLine, ArrowUpFromLine, Info } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { ShimmerLoader } from '../../components/ui';
 
 // import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
@@ -88,6 +89,19 @@ const MyAccounts: React.FC = () => {
     );
   };
 
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={200} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ShimmerLoader variant="card" width={300} height={200} />
+          <ShimmerLoader variant="card" width={300} height={200} />
+          <ShimmerLoader variant="card" width={300} height={200} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

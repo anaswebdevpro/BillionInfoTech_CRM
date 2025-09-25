@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Settings, TrendingUp } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { ShimmerLoader } from '../../components/ui';
 // import { AccountType } from '../../types';
 import { COLORS } from '../../constants/colors';
 import logo from '../../assets/mt5logo.png';
@@ -34,13 +35,13 @@ export interface AccountType {
 
 const ManageAccounts: React.FC = () => {
   const [accountTypes, setAccountTypes] = useState<AccountType['data']>([]);
-  // const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const {token}= useAuth();
 
 
 
   const fetchAccount = () => {
-    // setLoading(true);
+    setLoading(true);
     try {
       apiRequest({
         endpoint: MANAGE_ACCOUNTS,
@@ -48,17 +49,17 @@ const ManageAccounts: React.FC = () => {
 
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: unknown) => {
-        // setIsLoading(false);
+        setLoading(false);
         const res = response as AccountType;
         setAccountTypes(res.data);
       })
         .catch((error: unknown) => {
           console.error("Failed:", error);
+          setLoading(false);
         });
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
-    } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -69,6 +70,18 @@ const ManageAccounts: React.FC = () => {
 
 
  console.log(accountTypes);
+
+  if (loading) {
+    return (
+      <div >
+          <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+        <ShimmerLoader variant="dashboard" width={1200} height={400} />
+      </div>
+       
+        
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

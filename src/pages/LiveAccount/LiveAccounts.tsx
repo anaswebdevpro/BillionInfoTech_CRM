@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Settings } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { ShimmerLoader } from '../../components/ui';
 import { apiRequest } from '../../services/api';
 import type { Account } from '../../types';
 import { COLORS } from '../../constants/colors';
@@ -36,8 +37,13 @@ const LiveAccounts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className={`animate-spin rounded-full h-8 w-8 border-b-2 border-${COLORS.PRIMARY}`}></div>
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={200} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ShimmerLoader variant="card" width={300} height={200} />
+          <ShimmerLoader variant="card" width={300} height={200} />
+          <ShimmerLoader variant="card" width={300} height={200} />
+        </div>
       </div>
     );
   }

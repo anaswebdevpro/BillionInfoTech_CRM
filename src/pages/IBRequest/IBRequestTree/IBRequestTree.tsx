@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
+import { ShimmerLoader } from '../../../components/ui'
 import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
@@ -325,6 +326,14 @@ const IBRequestTree = () => {
   // Reset node counter for each render and count root if present
   renderCountRef.current = selectedMember ? 1 : 0
 
+
+  if (isLoading) {
+    return (
+      <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>
+        <ShimmerLoader variant="dashboard" width={1200} height={600} />
+      </div>
+    );
+  }
 
   return (
     <div className={`p-6 bg-${COLORS.SECONDARY_BG} min-h-screen`}>

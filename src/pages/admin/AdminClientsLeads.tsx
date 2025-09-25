@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, UserPlus, Search, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
 import { COLORS } from '../../constants/colors';
+import { ShimmerLoader } from '../../components/ui';
 
 const AdminClientsLeads: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading for demonstration
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <ShimmerLoader variant="dashboard" width={1000} height={600} />
+      </div>
+    );
+  }
   const clientsData = [
     { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+1234567890', status: 'Active', type: 'Client', joined: '2024-01-15' },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '+1234567891', status: 'Pending', type: 'Lead', joined: '2024-02-10' },

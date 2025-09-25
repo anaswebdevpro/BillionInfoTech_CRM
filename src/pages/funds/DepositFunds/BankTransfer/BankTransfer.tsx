@@ -3,6 +3,7 @@ import { ArrowLeft, Upload, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } 
 import Card from '../../../../components/ui/Card';
 import Button from '../../../../components/ui/Button';
 import Input from '../../../../components/ui/Input';
+import { ShimmerLoader } from '../../../../components/ui';
 import { COLORS } from '../../../../constants/colors';
 import { apiRequest } from '@/services';
 import { useAuth } from '@/context';
@@ -257,9 +258,7 @@ const BankTransfer: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="text-center py-8">
-          <div className={`text-${COLORS.SECONDARY_TEXT}`}>Loading bank transfer data...</div>
-        </div>
+        <ShimmerLoader variant="form" width={800} height={600} />
       </div>
     );
   }

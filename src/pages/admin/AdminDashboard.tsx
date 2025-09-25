@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { COLORS } from '../../constants/colors';
 import Card from '../../components/ui/Card';
+import { ShimmerLoader } from '../../components/ui';
 import { 
   Users, 
   UserCheck, 
@@ -34,6 +35,7 @@ interface DashboardStats {
 }
 
 const AdminDashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [dashboardStats] = useState<DashboardStats>({
     totalUsers: 17,
     activeUsers: 8,
@@ -52,8 +54,34 @@ const AdminDashboard: React.FC = () => {
     pendingIBRequest: 0
   });
 
+  // Simulate loading for demonstration
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
 
+
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={400} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <ShimmerLoader variant="card" width={300} height={150} />
+          <ShimmerLoader variant="card" width={300} height={150} />
+          <ShimmerLoader variant="card" width={300} height={150} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <ShimmerLoader variant="card" width={300} height={150} />
+          <ShimmerLoader variant="card" width={300} height={150} />
+          <ShimmerLoader variant="card" width={300} height={150} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

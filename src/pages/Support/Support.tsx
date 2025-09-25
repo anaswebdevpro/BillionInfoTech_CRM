@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import { ShimmerLoader } from '../../components/ui';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
 import {
@@ -124,6 +125,15 @@ const Support: React.FC = () => {
 
 
   if (loading) {
+    return (
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={200} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ShimmerLoader variant="table" width={600} height={400} />
+          <ShimmerLoader variant="card" width={600} height={400} />
+        </div>
+      </div>
+    );
   }
 
   return (

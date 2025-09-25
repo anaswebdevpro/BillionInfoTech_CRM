@@ -2,7 +2,7 @@ import { useAuth } from "@/context";
 import { apiRequest } from "@/services";
 import { GET_TRADES_HISTORY } from "../../../../api/api-variable";
 import { useEffect, useState, useCallback } from "react";
-import { Card } from "@/components/ui";
+import { Card, ShimmerLoader } from "@/components/ui";
 import { useDebounce } from "../../../Hook/useDebounce";
 import { COLORS } from "@/constants/colors";
 
@@ -222,6 +222,14 @@ const IBtradeHistory = () => {
       )}
     </Card>
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <ShimmerLoader variant="table" width={1200} height={600} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

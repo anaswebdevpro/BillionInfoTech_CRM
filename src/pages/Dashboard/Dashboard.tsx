@@ -97,6 +97,7 @@ import {
 } from "./components/index";
 import { DASHBOARD_DATA } from "../../../api/api-variable";
 import { useAuth } from '../../context/AuthContext/AuthContext';
+import { ShimmerLoader } from '../../components/ui';
 
 /**
  * Main Dashboard component displaying key metrics and recent activities
@@ -176,10 +177,13 @@ const Dashboard: React.FC = () => {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className={`text-${COLORS.SECONDARY_TEXT}`}>Loading dashboard data...</p>
+      <div className="space-y-6">
+        <ShimmerLoader variant="dashboard" width={1200} height={400} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ShimmerLoader variant="chart" width={600} height={300} />
+          <ShimmerLoader variant="card" width={600} height={300} />
         </div>
+        <ShimmerLoader variant="table" width={1200} height={200} />
       </div>
     );
   }

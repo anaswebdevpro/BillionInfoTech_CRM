@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Card, Button, Input } from '../../../components/ui';
+import { ShimmerLoader } from '../../../components/ui';
 import { apiRequest } from '../../../services/api';
 import { INTERNAL_TRANSFER, SUBMIT_INTERNAL_TRANSFER } from '../../../../api/api-variable';
 import { COLORS } from '../../../constants/colors';
@@ -203,10 +204,7 @@ const InternalTransfer: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-gray-500 mt-4">Loading Internal Transfer...</p>
-          </div>
+          <ShimmerLoader variant="form" width={800} height={600} />
         </div>
       </div>
     );

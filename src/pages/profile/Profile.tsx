@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '../../context/AuthContext/AuthContext';
+import { ShimmerLoader } from '../../components/ui';
 import { apiRequest } from '../../services/api';
 import { GET_PROFILE, PROFILE_UPDATE, UPDATE_PASSWORD, ADD_BANK_ACCOUNT, FETCH_BANK_DETAILS, DELETE_BANK_ACCOUNT } from '../../../api/api-variable';
 import type { ProfileFormData, PasswordChangeFormData, BankDetailsFormData, BankAccount, ExtendedUser } from '../../types';
@@ -308,6 +309,17 @@ console.log(token);
     }
   };
 
+
+  // Show loading state
+  if (isLoading && !profileData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ShimmerLoader variant="profile" width={800} height={600} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

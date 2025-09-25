@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, BarChart3, Download, Calendar, Filter } from 'lucide-react';
 import { COLORS } from '../../constants/colors';
+import { ShimmerLoader } from '../../components/ui';
 
 const AdminFinancial: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading for demonstration
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <ShimmerLoader variant="dashboard" width={1000} height={600} />
+      </div>
+    );
+  }
   const financialData = [
     { id: 1, type: 'Deposit', amount: '$5,000', account: 'ACC001', status: 'Completed', date: '2024-03-15' },
     { id: 2, type: 'Withdrawal', amount: '$2,500', account: 'ACC002', status: 'Pending', date: '2024-03-14' },

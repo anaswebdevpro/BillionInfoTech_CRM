@@ -4,6 +4,7 @@ import { ArrowLeft, Copy, Download, FileSpreadsheet, Printer, ChevronUp, Chevron
 import Card from '../../../../components/ui/Card';
 import Button from '../../../../components/ui/Button';
 import Input from '../../../../components/ui/Input';
+import { ShimmerLoader } from '../../../../components/ui';
 import { COLORS } from '../../../../constants/colors';
 import { apiRequest } from '@/services';
 import { DEPOSIT_METHODS_TRC20 } from '../../../../../api/api-variable';
@@ -130,9 +131,7 @@ const TRC20: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-center py-8">
-          <div className={`text-${COLORS.SECONDARY_TEXT}`}>Loading TRC20 data...</div>
-        </div>
+        <ShimmerLoader variant="form" width={800} height={600} />
       </div>
     );
   }
