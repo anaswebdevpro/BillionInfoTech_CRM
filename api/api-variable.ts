@@ -74,6 +74,7 @@ export const SUBMIT_DEPOSIT_REQUEST="/submit-deposit-request";
 export const GET_WALLET_TRANSACTION_REPORT="/get-wallet-transation-report";
 export const WITHDRAW_FUNDS_OPTIONS = "/withdraw";
 export const SUBMIT_WITHDRAW_FUNDS="/withdraw-funds";
+export const GET_WITHDRAWAL_HISTORY="/get-withdrawal-history";
 
 
 
