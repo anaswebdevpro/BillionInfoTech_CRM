@@ -294,7 +294,7 @@ console.log(token);
           />
         );
       case 'kyc':
-        return <KYCVerification profileData={profileData} />;
+        return <KYCVerification profileData={{ kycDocuments: [] }} />;
       case 'bank':
         return (
           <BankDetailsForm

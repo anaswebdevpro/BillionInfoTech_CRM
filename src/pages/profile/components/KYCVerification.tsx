@@ -139,7 +139,27 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
       }
     } catch (error) {
       console.error('Document upload failed:', error);
-      enqueueSnackbar('Failed to upload documents. Please try again.', { variant: 'error' });
+      
+      // Handle different types of errors
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string; success?: boolean } } };
+        const errorMessage = axiosError.response?.data?.message || 'Failed to upload documents. Please try again.';
+        console.log('API Error:', axiosError.response?.data);
+        console.log('Error response data:', axiosError.response?.data);
+        console.log('Error message:', errorMessage);
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+        
+        // If it's an "already uploaded" error, clear the files
+        if (errorMessage.includes('already uploaded')) {
+          setSelectedFiles([]);
+          const inputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+          inputs.forEach(input => input.value = '');
+        }
+      } else {
+        // Handle other types of errors
+        const errorMessage = error instanceof Error ? error.message : 'Failed to upload documents. Please try again.';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+      }
     } finally {
       setUploading(false);
     }
@@ -303,7 +323,7 @@ const KYCVerification: React.FC<KYCVerificationProps> = ({ profileData }) => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Uploaded Documents</h4>
               <div className="space-y-2">
-                {kycDocuments.map((doc, index: number) => (
+                {kycDocuments.map((doc: { name: string; uploadedAt: string; status: string }, index: number) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <FileText className="h-5 w-5 text-gray-400" />
