@@ -48,11 +48,19 @@ const WithdrawFunds: React.FC = () => {
         
       })
       .then((response: unknown) => {
+         console.log('Withdraw options response:', response);
          setData(response as WithdrawResponse);
-             })
+      })
       
-     .catch((error) => {
-        console.error('Error fetching trade history:', error);
+      .catch((error) => {
+        console.error('Error fetching withdrawal options:', error);
+        console.log('Error response data:', error?.response?.data);
+        console.log('Error message:', error?.response?.data?.message);
+        
+        setData(null);
+        // Show the exact error message from API
+        const errorMessage = error?.response?.data?.message || 'Failed to fetch withdrawal options!';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       })
       .finally(() => {
         setIsLoading(false);
@@ -129,20 +137,26 @@ const WithdrawFunds: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
         data: requestedbody
       })
-      .then((response) => {
-        console.log('Withdraw funds response:', response);
-          enqueueSnackbar('Withdrawal request submitted successfully!', { variant: 'success' });
+       .then((response) => {
+         console.log('Withdraw funds response:', response);
+         enqueueSnackbar('Withdrawal request submitted successfully!', { variant: 'success' });
+         formik.resetForm();
       })
-      .catch((error) => {
-        console.error('Error withdrawing funds:', error);
-        enqueueSnackbar('Failed ! Please try again.', { variant: 'error' });       
-      });
+       .catch((error) => {
+        
+         console.log('Error message:', error?.response?.data?.message);
+         
+         // Show the exact error message from API
+         const errorMessage = error?.response?.data?.message || 'Withdrawal failed!';
+         enqueueSnackbar(errorMessage, { variant: 'error' });
+       });
             
       
 
       } catch (error) {
         console.error('Failed to submit withdrawal request:', error);
         enqueueSnackbar('Failed to submit withdrawal request. Please try again.', { variant: 'error' });
+      
       } finally {
         setIsLoading(false);
       }

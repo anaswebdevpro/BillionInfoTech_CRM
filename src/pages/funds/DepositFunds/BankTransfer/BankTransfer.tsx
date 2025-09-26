@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback } from 'react';
 import { ArrowLeft, Upload, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from '../../../../components/ui/Card';
@@ -7,7 +8,8 @@ import { ShimmerLoader } from '../../../../components/ui';
 import { COLORS } from '../../../../constants/colors';
 import { apiRequest } from '@/services';
 import { useAuth } from '@/context';
-import { GET_DEPOSIT_REPORT, DEMO_BANK_DETAILS, SUBMIT_DEPOSIT_REQUEST } from '../../../../../api/api-variable'; 
+import { GET_DEPOSIT_REPORT, DEMO_BANK_DETAILS, SUBMIT_DEPOSIT_REQUEST } from '../../../../../api/api-variable';
+import { enqueueSnackbar } from 'notistack'; 
 
 // TypeScript interfaces - Updated to match API response
 interface BankInfo {
@@ -88,12 +90,16 @@ const BankTransfer: React.FC = () => {
         setDepositRequests(depositResponse.data || []);
         console.log('Deposit requests:', depositResponse);
       })
-        .catch((error: Error) => {
-          console.error("Failed to fetch deposit requests:", error);
+        .catch((error: any) => {
+          console.log('Error message:', error?.response?.data?.message);
+          const errorMessage = error?.response?.data?.message || 'Failed to fetch deposit requests!';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setDepositRequests([]);
         });
-    } catch (error) {
-      console.error("Failed to fetch deposit requests:", error);
+    } catch (error: any) {
+      console.log('Error message:', error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message || 'Failed to fetch deposit requests!';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setDepositRequests([]);
     } finally {
       setLoading(false);
@@ -111,12 +117,16 @@ const BankTransfer: React.FC = () => {
         setBankData(bankResponse);
         console.log('Bank data loaded:', bankResponse);
       })
-        .catch((error: Error) => {
-          console.error("Failed to fetch bank data:", error);
+        .catch((error: any) => {
+          console.log('Error message:', error?.response?.data?.message);
+          const errorMessage = error?.response?.data?.message || 'Failed to fetch bank data!';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setBankData(null);
         });
-    } catch (error) {
-      console.error("Failed to fetch bank data:", error);
+    } catch (error: any) {
+      console.log('Error message:', error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message || 'Failed to fetch bank data!';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setBankData(null);
     }
   }, [token]);
@@ -168,7 +178,7 @@ const BankTransfer: React.FC = () => {
       });
 
       console.log('Deposit request submitted successfully:', response);
-      alert('Deposit request submitted successfully!');
+      enqueueSnackbar('Deposit request submitted successfully!', { variant: 'success' });
       
       // Reset form
       setFormData({
@@ -181,9 +191,10 @@ const BankTransfer: React.FC = () => {
       
       // Refresh the deposit requests after successful submission
       fetchDepositeRequest();
-    } catch (error) {
-      console.error('Failed to submit deposit request:', error);
-      alert('Failed to submit deposit request. Please try again.');
+    } catch (error: any) {
+      console.log('Error message:', error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message || 'Failed to submit deposit request!';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setSubmitting(false);
     }

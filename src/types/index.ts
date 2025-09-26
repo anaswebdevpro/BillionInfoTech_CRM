@@ -21,29 +21,39 @@ export interface User {
   profileImage?: string;
 }
 
-// Extended User type with additional profile fields
-export interface ExtendedUser extends User {
+// Extended User type with additional profile fields - matches actual API response
+export interface ExtendedUser {
+  id: number;
+  sponsor: number;
+  email: string;
+  d_password: string;
+  remember_token: string;
+  address: string | null;
+  city: string | null;
+  country: string | null;
+  created_on: string;
+  disable_commission: number;
+  email_verified_at: string | null;
   first_name: string;
+  franchise_id: number | null;
+  institute_id: number | null;
+  is_paid: number;
+  isd_code: number;
+  last_login: string;
+  last_login_ip: string;
   last_name: string;
-  middle_name?: string;
-  phone?: string;
-  isd_code?: number;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  zip_code?: string;
-  referral_code?: string;
-  profile_picture?: string;
-  sponsor?: string;
-  status?: number;
-  theme?: number;
-  withdrawal_status?: number;
-  kycDocuments?: Array<{
-    name: string;
-    uploadedAt: string;
-    status: string;
-  }>;
+  main_balance: number;
+  middle_name: string | null;
+  phone: string;
+  profile_picture: string | null;
+  profit_balance: number;
+  referral_code: string;
+  state: string | null;
+  status: number;
+  theme: number;
+  updated_on: string | null;
+  withdrawal_status: number;
+  zip_code: string | null;
 }
 
 // Account type for user accounts
@@ -257,9 +267,9 @@ export interface LoginFormData {
 
 
 export interface AuthContextType {
-  user: User | null;
+  user: ExtendedUser | null;
   token: string | null;
-  login: (user: User, token: string) => void;
+  login: (user: ExtendedUser, token: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -345,4 +355,51 @@ export interface CreateSupportTicketFormData {
   subject: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   description: string;
+}
+
+// Network/Tree types for IB Request components
+export interface TreeMember {
+  memberId: number;
+  encryptedmemberId: string;
+  parentId: number | null;
+  otherInfo: string;
+  account_number: string | number;
+  business: string;
+  status?: number | string;
+}
+
+export interface TooltipData {
+  id: number;
+  name: string;
+  join_on: string;
+  buss: string;
+  activated_on: string;
+  account_number: string | number;
+  business: string;
+  class: string;
+  ib_status: string;
+}
+
+export interface NetworkData {
+  title: string;
+  gototop: boolean;
+  tree: TreeMember[];
+  tooltip: TooltipData[];
+}
+
+// API Response types
+export interface ApiResponse<T = unknown> {
+  response: boolean;
+  message?: string;
+  data?: T;
+}
+
+// Error types for better error handling
+export interface ApiError {
+  message: string;
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 }

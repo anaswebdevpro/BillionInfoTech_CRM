@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useState, useEffect } from 'react';
@@ -11,6 +12,7 @@ import logo from '../../assets/mt5logo.png';
 import { apiRequest } from '@/services';
 import { MANAGE_ACCOUNTS } from '../../../api/api-variable';
 import { useAuth } from '@/context';
+import { enqueueSnackbar } from 'notistack';
 
 export interface AccountType {
   success: boolean;
@@ -54,12 +56,16 @@ const ManageAccounts: React.FC = () => {
         const res = response as AccountType;
         setAccountTypes(res.data);
       })
-        .catch((error: unknown) => {
-          console.error("Failed:", error);
+        .catch((error: any) => {
+          console.log('Error message:', error?.response?.data?.message);
+          const errorMessage = error?.response?.data?.message || 'Failed to fetch accounts!';
+          enqueueSnackbar(errorMessage, { variant: 'error' });
           setLoading(false);
         });
-    } catch (error) {
-      console.error("Failed to fetch dashboard data:", error);
+    } catch (error: any) {
+      console.log('Error message:', error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message || 'Failed to fetch accounts!';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setLoading(false);
     }
   };

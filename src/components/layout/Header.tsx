@@ -3,7 +3,7 @@ import { Menu, Bell, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { COLORS } from '../../constants/colors';
-import type { User as UserType } from '../../types';
+import type { ExtendedUser } from '../../types';
 
 interface HeaderProps {
   title: string;
@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 const ProfileButton: React.FC<{
-  user: UserType | null;
+  user: ExtendedUser | null;
   isAdmin: boolean;
   onClick: () => void;
 }> = ({ user, isAdmin, onClick }) => {
@@ -25,12 +25,14 @@ const ProfileButton: React.FC<{
       className="-m-1.5 flex items-center p-1.5 hover:bg-gray-50 rounded-lg transition-colors"
       onClick={onClick}
     >
+        
       <span className="sr-only">Open user menu</span>
-      <div className={`h-8 w-8 rounded-full overflow-hidden flex items-center justify-center border-2 ${profileImageBorder}`}>
-        {user?.profileImage ? (
+      <div className={`h-8 w-8 rounded-full overflow-hidden flex items-center justify-center border-1 ${profileImageBorder}`}>
+    
+        {user?.profile_picture ? (
           <img
-            src={user.profileImage}
-            alt={user.name || 'Profile'}
+          src={`https://amf.billioninfotech.com/${user?.profile_picture}`}
+            alt={user?.first_name+' '+user?.last_name || 'Profile'}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -38,8 +40,8 @@ const ProfileButton: React.FC<{
         )}
       </div>
       <span className="hidden lg:flex lg:items-center">
-        <span className={`ml-4 text-sm font-semibold leading-6 ${textColor}`}>
-          {user?.name || 'User'}
+        <span className={`ml-2 text-sm font-semibold leading-6 ${textColor}`}>
+          {user?.first_name+' '+user?.last_name || 'User'}
         </span>
       </span>
     </button>
@@ -53,6 +55,7 @@ const ProfileButton: React.FC<{
 const Header: React.FC<HeaderProps> = ({ title, onMobileMenuClick, isAdmin = false }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
 
   const handleProfileClick = () => {
     navigate('/dashboard/profile');

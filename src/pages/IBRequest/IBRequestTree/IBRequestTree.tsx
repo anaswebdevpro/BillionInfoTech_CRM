@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from 'react'
 import { Tree, TreeNode } from 'react-organizational-chart'
 import { COLORS } from '../../../constants/colors'
@@ -7,37 +6,7 @@ import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
 import { enqueueSnackbar } from 'notistack'
-
-
-// Types for our data structure
-interface TreeMember {
-  memberId: number
-  encryptedmemberId: string
-  parentId: number | null
-  otherInfo: string
-  account_number: string | number
-  business: string
-  status?: number | string
-}
-
-interface TooltipData {
-  id: number
-  name: string
-  join_on: string
-  buss: string
-  activated_on: string
-  account_number: string | number
-  business: string
-  class: string
-  ib_status: string
-}
-
-interface NetworkData {
-  title: string
-  gototop: boolean
-  tree: TreeMember[]
-  tooltip: TooltipData[]
-}
+import type { TreeMember, TooltipData, NetworkData, ApiResponse, ApiError } from '@/types'
 
 
 
@@ -229,7 +198,7 @@ const IBRequestTree = () => {
     setZoom(prev => Math.max(MIN_ZOOM, parseFloat((prev - step).toFixed(2))))
   }
 
-  const FetchNetwork =() => {
+  const FetchNetwork = React.useCallback(() => {
     setIsLoading(true);
     try {
       apiRequest({
@@ -240,7 +209,7 @@ const IBRequestTree = () => {
         console.log('Full API Response:', response);
         
         // Check if response indicates success or failure
-        const responseData = response as { response?: boolean; message?: string };
+        const responseData = response as ApiResponse<NetworkData>;
         
         if (responseData.response === false) {
           enqueueSnackbar(responseData.message || 'Failed to fetch network data!', { variant: 'error' });
@@ -255,23 +224,24 @@ const IBRequestTree = () => {
         }
         setIsLoading(false);
       })
-        .catch((error: Error) => {
+        .catch((error: unknown) => {
           console.error('Failed to fetch user data:', error);
-          const errorMessage = error?.message || (error as any)?.response?.data?.message || 'Failed to fetch network data';
+          const apiError = error as ApiError;
+          const errorMessage = apiError?.message || apiError?.response?.data?.message || 'Failed to fetch network data';
           enqueueSnackbar(errorMessage, { variant: 'error' });
           setIsLoading(false);
         });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch user data:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch network data';
       enqueueSnackbar(errorMessage, { variant: 'error' });
       setIsLoading(false);
     } 
-  };
+  }, [token]);
 
   useEffect(() => {
     FetchNetwork();
-  }, []);
+  }, [FetchNetwork]);
 
   // Get the selected member data
   const selectedMember = networkData?.tree?.find(member => member.memberId === selectedMemberId) || null

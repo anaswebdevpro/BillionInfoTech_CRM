@@ -94,7 +94,7 @@ const ProfileInfoForm: React.FC<ProfileInfoFormProps> = ({
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
               {profileImage || profileData?.profile_picture ? (
                 <img
-                  src={profileImage || profileData?.profile_picture}
+                  src={profileImage || profileData?.profile_picture || ''}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />

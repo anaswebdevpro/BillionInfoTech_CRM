@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { COLORS } from '../../constants/colors';
@@ -84,7 +85,7 @@ const BonusPromotion: React.FC = () => {
       })
       
       .then((response: unknown) => {
-        console.log('Bonuses Data:', response);
+        // console.log('Bonuses Data:', response);
         
         // Check if response indicates success or failure
         const responseData = response as { response?: boolean; message?: string; bonuses?: Bonus[] };
@@ -95,13 +96,14 @@ const BonusPromotion: React.FC = () => {
           setBonuses(responseData.bonuses || []);
         }
       }) 
-        .catch((error: Error) => {
-          console.error('Failed to fetch bonuses:', error);
-          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch bonuses';
-          enqueueSnackbar(errorMessage, { variant: 'error' });
+        .catch((error: any) => {
+          console.log('Error message:', error?.response?.data?.message);
+          const errorMessage = error?.response?.data?.message || 'Failed to fetch bonuses!';
+          const shortMsg = errorMessage.match(/Base table or view not found/)[0];
+          enqueueSnackbar(shortMsg, { variant: 'error' });
         });
     } catch (error) {
-      console.error('Failed to fetch bonuses:', error);
+      // console.error('Failed to fetch bonuses:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bonuses';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
@@ -119,7 +121,7 @@ const BonusPromotion: React.FC = () => {
         data: { bonus_id: bonusId },
         }).then((response: unknown) => {
           setClaiming(null);
-          console.log('Claim Bonus Response:', response);
+         
           
           // Check if response indicates success or failure
           const responseData = response as { response?: boolean; message?: string; success?: boolean; status?: string };
@@ -134,15 +136,18 @@ const BonusPromotion: React.FC = () => {
             enqueueSnackbar(responseData.message || 'Failed to claim bonus. Please try again.', { variant: 'error' });
           }
         })
-        .catch((error: Error) => {
+        .catch((error: any) => {
           setClaiming(null);
-          console.error('Failed to claim bonus:', error);
-          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to claim bonus';
+         
+          console.log('Error message:', error?.response?.data?.message);
+          const errorMessage = error?.response?.data?.message || 'Failed to claim bonus!';
+        
           enqueueSnackbar(errorMessage, { variant: 'error' });
         });
     } catch (error) {
       setClaiming(null);
       console.error('Failed to claim bonus:', error);
+    
       const errorMessage = error instanceof Error ? error.message : 'Failed to claim bonus';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }

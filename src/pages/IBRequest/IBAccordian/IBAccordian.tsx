@@ -6,6 +6,7 @@ import { apiRequest } from '@/services'
 import { MY_NETWORK } from '../../../../api/api-variable'
 import { useAuth } from '@/context'
 import { enqueueSnackbar } from 'notistack'
+import type { ApiError } from '@/types'
 
 // Types for our data structure
 interface TreeMember {
@@ -76,13 +77,14 @@ const IBAccordian = () => {
         }
         setLoading(false);
       })
-        .catch((error: Error) => {
+        .catch((error: unknown) => {
           console.error('Failed to fetch user data:', error);
-          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to fetch network data';
+          const apiError = error as ApiError;
+          const errorMessage = apiError?.message || apiError?.response?.data?.message || 'Failed to fetch network data';
           enqueueSnackbar(errorMessage, { variant: 'error' });
           setLoading(false);
         });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch user data:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch network data';
       enqueueSnackbar(errorMessage, { variant: 'error' });

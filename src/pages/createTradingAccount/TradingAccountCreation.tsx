@@ -10,6 +10,8 @@ import { apiRequest } from "../../services/api";
 import type { AccountCreationFormData } from "../../types/index";
 import { CREATE_TRADE_ACCOUNT_OPTIONS, OPEN_MT_ACCOUNT } from "../../../api/api-variable";
 import { useAuth } from "@/context";
+import type { ApiError } from '@/types';
+import { enqueueSnackbar } from 'notistack';
 
 
 /**
@@ -48,26 +50,31 @@ const TradingAccountCreation: React.FC = () => {
 
 
   // Fetch account types dropdown and other options from API
- const fetchOptions = () => {
+ const fetchOptions = React.useCallback(() => {
     try {
       apiRequest({
         endpoint: CREATE_TRADE_ACCOUNT_OPTIONS,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-      }).then((response: any) => {
+      }).then((response: unknown) => {
           setOptions(response);
         console.log('data:', response);
       })
-      .catch((error: any) => {
+      .catch((error: unknown) => {
         console.error('Failed to fetch options:', error);
+        const apiError = error as ApiError;
+        const errorMessage = apiError?.message || apiError?.response?.data?.message || 'Failed to fetch account options';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch options :', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch account options';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
-  };
+  }, [token]);
 
   useEffect(() => {fetchOptions();
-    },[]
+    },[fetchOptions]
   );
 
 
@@ -128,17 +135,33 @@ const TradingAccountCreation: React.FC = () => {
 
         console.log('Submitting API data:', apiData);
 
-        await apiRequest({
+        const response = await apiRequest({
           endpoint: OPEN_MT_ACCOUNT,
           method: 'POST',
           data: apiData,
           headers: { Authorization: `Bearer ${token}` },
         });
-      
-        formik.resetForm();
-        console.log('Account created successfully!');
-      } catch (error) {
+        
+        console.log('Account Creation Response:', response);
+        
+        // Check if response indicates success or failure
+        if (!response) {
+          enqueueSnackbar('Failed to create account - No response received!', { variant: 'error' });
+        } else {
+          const responseData = response as { response?: boolean; message?: string };
+          
+          if (responseData.response === false) {
+            enqueueSnackbar(responseData.message || 'Failed to create account!', { variant: 'error' });
+          } else {
+            formik.resetForm();
+            enqueueSnackbar(responseData.message || 'Account created successfully!', { variant: 'success' });
+            console.log('Account created successfully!');
+          }
+        }
+      } catch (error: unknown) {
         console.error("Failed to create account:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       } finally {
         setIsSubmitting(false);
       }

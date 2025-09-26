@@ -9,6 +9,7 @@ import { COLORS } from '../../../../constants/colors';
 import { apiRequest } from '@/services';
 import { DEPOSIT_METHODS_TRC20 } from '../../../../../api/api-variable';
 import { useAuth } from '@/context';
+import { enqueueSnackbar } from 'notistack';
 
 // TypeScript interfaces
 interface Currency {
@@ -62,8 +63,10 @@ const TRC20: React.FC = () => {
         setDepositHistory([]);
         console.log('TRC20 data loaded:', response);
       }
-    } catch (error) {
-      console.error("Failed to fetch TRC20 data:", error);
+    } catch (error: any) {
+      console.log('Error message:', error?.response?.data?.message);
+      const errorMessage = error?.response?.data?.message || 'Failed to fetch TRC20 data!';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       setTrc20Data(null);
       setDepositHistory([]);
     } finally {

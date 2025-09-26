@@ -133,7 +133,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
       submenu: [
         { name: 'My Accounts', href: '/dashboard/my-accounts', icon: ManageIcon },
         { name: 'Manage Accounts', href: '/dashboard/manage-accounts', icon: ManageIcon },
-        { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
+        // { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
       ]
     },
    

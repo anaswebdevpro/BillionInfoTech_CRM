@@ -31,10 +31,16 @@ export async function apiRequest<TResponse = unknown, TPayload = unknown>(
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error(" API Error:", error.response?.data || error.message);
+      // Log the error data for debugging
+      console.log("Error response data:", error.response?.data);
+      console.log("Error message:", error.response?.data?.message);
+      
+      // Throw the error so the component can catch it
+      throw error;
     } else {
       console.error(" Unexpected Error:", error);
+      throw error;
     }
-    return null;
   }
 }
 

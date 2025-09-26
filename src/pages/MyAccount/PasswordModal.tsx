@@ -64,8 +64,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ isOpen, onClose, accountN
           console.log("Password update response:", response);
           
           // Check if response indicates success or failure
-          const responseData = response as { response?: boolean; message?: string };
-          
+          const responseData = response as { response?: boolean; message?: string };          
           if (responseData.response === false) {
             // Show error message
             enqueueSnackbar(responseData.message || 'Password update failed!', { variant: 'error' });
@@ -77,7 +76,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ isOpen, onClose, accountN
         .catch((error) => {
           console.error('Error updating password:', error);
           // Extract error message from the error object
-          const errorMessage = error?.message || error?.response?.data?.message || 'Failed to update password';
+          const errorMessage = error?.response?.data?.message || 'Failed to update password';
           enqueueSnackbar(errorMessage, { variant: 'error' });
         })
        
