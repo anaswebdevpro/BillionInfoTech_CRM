@@ -67,6 +67,7 @@ export const SUBMIT_INTERNAL_TRANSFER="/do-internal-transfer";
 export const DEPOSIT_METHODS="/deposit-methods";
 export const DEPOSIT_METHODS_TRC20="/wallet-address/trc20";
 export const DEPOSIT_METHODS_BEP20="/wallet-address/bep20";
+export const GET_CRYPTO_DEPOSIT_LIST="/get-crypto-deposit";
 export const GET_DEPOSIT_REPORT="/get-deposit-request";
 export const DEMO_BANK_DETAILS="/fait-request";
 export const SUBMIT_DEPOSIT_REQUEST="/submit-deposit-request";

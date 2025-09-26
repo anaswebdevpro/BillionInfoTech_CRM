@@ -1,15 +1,15 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { ArrowLeft, Copy, Download, FileSpreadsheet, Printer, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Copy } from 'lucide-react';
 import Card from '../../../../components/ui/Card';
 import Button from '../../../../components/ui/Button';
-import Input from '../../../../components/ui/Input';
 import { ShimmerLoader } from '../../../../components/ui';
 import { COLORS } from '../../../../constants/colors';
 import { apiRequest } from '@/services';
 import { DEPOSIT_METHODS_TRC20 } from '../../../../../api/api-variable';
 import { useAuth } from '@/context';
 import { enqueueSnackbar } from 'notistack';
+import HistoryTable from './HistoryTable';
 
 // TypeScript interfaces
 interface Currency {
@@ -27,25 +27,11 @@ interface TRC20Response {
   title: string;
 }
 
-interface DepositHistoryItem {
-  sr_no: number;
-  amount: string;
-  txn_hash: string;
-  status: 'Pending' | 'Completed' | 'Failed';
-  date: string;
-}
-
 
 const TRC20: React.FC = () => {
   const { token } = useAuth();
   const [trc20Data, setTrc20Data] = useState<TRC20Response | null>(null);
-  const [depositHistory, setDepositHistory] = useState<DepositHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [copied, setCopied] = useState(false);
 
   const fetchTRC20Data = useCallback(async () => {
@@ -59,16 +45,22 @@ const TRC20: React.FC = () => {
 
       if (response && response.response) {
         setTrc20Data(response);
-        // TODO: Add deposit history API call here
-        setDepositHistory([]);
         console.log('TRC20 data loaded:', response);
       }
-    } catch (error: any) {
-      console.log('Error message:', error?.response?.data?.message);
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch TRC20 data!';
+    } catch (error: unknown) {
+      console.log('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      
+      // Type guard for axios error
+      const isAxiosError = (err: unknown): err is { response?: { data?: { message?: string } } } => {
+        return typeof err === 'object' && err !== null && 'response' in err;
+      };
+      
+      const errorMessage = isAxiosError(error) 
+        ? error.response?.data?.message || 'Failed to fetch TRC20 data!'
+        : 'Failed to fetch TRC20 data!';
+        
       enqueueSnackbar(errorMessage, { variant: 'error' });
       setTrc20Data(null);
-      setDepositHistory([]);
     } finally {
       setLoading(false);
     }
@@ -78,23 +70,6 @@ const TRC20: React.FC = () => {
     fetchTRC20Data();
   }, [fetchTRC20Data]);
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) {
-      return <ChevronUp className="h-4 w-4 text-gray-400" />;
-    }
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="h-4 w-4 text-gray-600" /> : 
-      <ChevronDown className="h-4 w-4 text-gray-600" />;
-  };
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -106,30 +81,6 @@ const TRC20: React.FC = () => {
     }
   };
 
-  const filteredHistory = depositHistory.filter(item => 
-    item.amount.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.txn_hash.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredHistory.length / entriesPerPage);
-  const paginatedHistory = filteredHistory.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return 'text-green-600 bg-green-100';
-      case 'Pending':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'Failed':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
 
   if (loading) {
     return (
@@ -215,165 +166,7 @@ const TRC20: React.FC = () => {
       )}
 
       {/* Deposit History Table */}
-      <Card>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-lg font-semibold text-${COLORS.SECONDARY}`}>Deposit History</h2>
-          <div className="flex items-center gap-2">
-            <select
-              value={entriesPerPage}
-              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-              className={`px-3 py-1 border border-${COLORS.BORDER} rounded text-sm`}
-            >
-              <option value={10}>Show 10 entries</option>
-              <option value={25}>Show 25 entries</option>
-              <option value={50}>Show 50 entries</option>
-              <option value={100}>Show 100 entries</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Export/Print Buttons */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Copy className="h-4 w-4 mr-1" />
-              Copy
-            </Button>
-            <Button variant="outline" size="sm">
-              <FileSpreadsheet className="h-4 w-4 mr-1" />
-              CSV
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-1" />
-              Excel
-            </Button>
-            <Button variant="outline" size="sm">
-              <Printer className="h-4 w-4 mr-1" />
-              Print
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm">Search:</label>
-            <Input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-48"
-            />
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b border-${COLORS.BORDER}`}>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('sr_no')}
-                >
-                  <div className="flex items-center gap-1">
-                    Sr.No. {getSortIcon('sr_no')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('amount')}
-                >
-                  <div className="flex items-center gap-1">
-                    Amount {getSortIcon('amount')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('txn_hash')}
-                >
-                  <div className="flex items-center gap-1">
-                    Txn Hash {getSortIcon('txn_hash')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('status')}
-                >
-                  <div className="flex items-center gap-1">
-                    Status {getSortIcon('status')}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-4 cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleSort('date')}
-                >
-                  <div className="flex items-center gap-1">
-                    Date {getSortIcon('date')}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {depositHistory.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-500">
-                    No deposit history available
-                  </td>
-                </tr>
-              ) : paginatedHistory.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-500">
-                    No matching records found
-                  </td>
-                </tr>
-              ) : (
-                paginatedHistory.map((item, index) => (
-                  <tr key={index} className={`border-b border-${COLORS.BORDER} hover:bg-gray-50`}>
-                    <td className="py-3 px-4">{item.sr_no}</td>
-                    <td className="py-3 px-4 font-medium">{item.amount}</td>
-                    <td className="py-3 px-4 font-mono text-sm">
-                      <span className="truncate block max-w-xs" title={item.txn_hash}>
-                        {item.txn_hash}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">{item.date}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <div className={`text-sm text-${COLORS.SECONDARY_TEXT}`}>
-            Showing {paginatedHistory.length === 0 ? 0 : 1} to {paginatedHistory.length} of {filteredHistory.length} entries
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </Card>
+      <HistoryTable />
     </div>
   );
 };
