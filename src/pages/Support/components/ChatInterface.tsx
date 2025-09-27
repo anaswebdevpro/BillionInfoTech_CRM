@@ -7,6 +7,7 @@ import Button from "../../../components/ui/Button";
 import { COLORS } from "../../../constants/colors";
 import { apiRequest } from "@/services";
 import { useAuth } from "@/context";
+import bgImage from "../../../assets/chatwallpapper.jpg";
 import {
   NEW_COMMENTS,
   SHOW_ALL_SPECIFIC_COMMENT,
@@ -44,14 +45,21 @@ const isImageUrl = (url: string) => {
   return /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url);
 };
 
-const formatDateTime = (input?: string) => {
+const formatDateTime = (input?: string | Date) => {
   if (!input) return "";
   try {
-    const d = new Date(input);
-    return d.toLocaleString();
+    // Always return current system time regardless of input
+    const currentSystemTime = new Date();
+    return currentSystemTime.toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   } catch (error) {
     console.log("Date parse error:", error);
-    return input;
+    return new Date().toLocaleString();
   }
 };
 
@@ -172,15 +180,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
     
     setSending(true);
     
-    // Create optimistic message
+    // Create optimistic message with current system time
+    const currentSystemTime = new Date();
     const optimisticMessage: CommentItem = {
       id: `temp-${Date.now()}`, // Temporary ID
       message: messageText,
       attachment: file ? file.name : null,
       user_type: "User",
       user_name: "You",
-      created_on: new Date().toISOString(),
+      created_on: currentSystemTime.toISOString(), // Use exact system time
     };
+    
+    console.log("🕐 Using system time:", currentSystemTime.toLocaleString());
     
     // Add optimistic message immediately
     setMessages(prev => [...prev, optimisticMessage]);
@@ -248,10 +259,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
   };
 
   return (
-    <div>
-      <Card className="flex flex-col h-full">
+    <div >
+      <Card className="flex flex-col h-full " >
         {/* Header */}
-        <div className={`flex items-center justify-between p-4 border-b border-${COLORS.BORDER}`}>
+        <div className={`flex items-center justify-between p-2 border-b border-${COLORS.BORDER}`}>
           <div>
             <h3 className={`font-semibold text-${COLORS.SECONDARY}`}>
               {ticket?.subject || "Support Ticket"}
@@ -276,7 +287,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
         </div>
 
         {/* Messages */}
-        <div ref={scrollerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div ref={scrollerRef} className={`flex-1   p-4 space-y-4 overflow-y-scroll max-h-[calc(100vh-400px)]`} style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}>
           {messages.length === 0 ? (
             <div className={`text-center py-8 text-${COLORS.SECONDARY_TEXT}`}>
               <MessageCircle className="mx-auto mb-2" />

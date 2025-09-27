@@ -23,6 +23,16 @@ const CreateTicket = () => {
   const [departments, setDepartments] = useState<any[]>([]);
   const [enquiry, setEnquiry] = useState<any[]>([]);
 
+  // Department colors for better visual distinction
+  const departmentColors = [
+    'bg-blue-100 text-blue-800 border-blue-300',
+    'bg-green-100 text-green-800 border-green-300', 
+    'bg-purple-100 text-purple-800 border-purple-300',
+    'bg-indigo-100 text-indigo-800 border-indigo-300',
+    'bg-pink-100 text-pink-800 border-pink-300',
+    'bg-cyan-100 text-cyan-800 border-cyan-300'
+  ];
+
   // Fetch Departments from API
   const fetchDepartments = () => {
     try {
@@ -43,7 +53,7 @@ const CreateTicket = () => {
   };
 
   // Fetch Enquiry from API
-  const fetchEnquiry = () => {
+  const fetchEnquiry =() => {
     try {
       apiRequest({
         endpoint: TICKET_ENQUIRY_LIST,
@@ -158,7 +168,7 @@ const CreateTicket = () => {
           if (response.success === true) {
                enqueueSnackbar(response.message,{variant:"success"})       // Reset form
             formik.resetForm();
-            // navigate('/dashboard/support');
+            navigate('/dashboard/support');
           } else {
             console.error('❌ API returned error:', response);
            
@@ -215,7 +225,11 @@ const CreateTicket = () => {
                   Department <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {departments.map((dept) => (
+                  {departments.map((dept, index) => {
+                    const selectedColor = departmentColors[index % departmentColors.length];
+                    const isSelected = formik.values.department === String(dept?.id);
+                    
+                    return (
                     <label key={dept.id} className="cursor-pointer">
                       <input
                         type="radio"
@@ -223,32 +237,31 @@ const CreateTicket = () => {
                         value={dept?.id}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        checked={formik.values.department === dept?.id}
+                        checked={isSelected}
                         className="sr-only"
                       />
                       <div
-                        className={`p-4 border-2 rounded-lg transition-all hover:bg-gray-50 ${
-                          formik.values.department === dept?.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200"
-                        }`}
+                        className={`p-4 border-2 rounded-lg transition-all duration-300 hover:opacity-80 text-center ${
+                          isSelected
+                            ? dept?.status === 1 
+                              ? selectedColor
+                              : "bg-gray-100 text-gray-600 border-gray-300"
+                            : "bg-gray-50 text-gray-700 border-gray-300"
+                        } ${dept?.status !== 1 ? 'opacity-60' : ''}`}
                          onClick={() => {
-                          // ✅ Add click handler for better UX
-                          console.log('Selecting department:', dept.id);
-                          formik.setFieldValue('department', String(dept.id));
+                          if (dept?.status === 1) {
+                            formik.setFieldValue('department', String(dept.id));
+                          }
                         }}
                       >
-                        <div className="flex items-start space-x-3">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{dept?.name}</h3>
-                            <p className="text-sm text-gray-600">
-                              Status: {dept?.status === 1 ? "Active" : "Inactive"}
-                            </p>
-                          </div>
+                        <div className="font-medium">{dept?.name}</div>
+                        <div className="text-xs mt-1">
+                          {dept?.status === 1 ? "Available" : "Inactive"}
                         </div>
                       </div>
                     </label>
-                  ))}
+                    )}
+                  )}
                 </div>
                 {formik.touched.department && formik.errors.department && (
                   <div className="text-red-500 text-sm mt-1">{formik.errors.department}</div>

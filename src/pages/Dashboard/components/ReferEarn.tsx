@@ -5,7 +5,7 @@ interface ReferEarnProps {
 }
 
 const ReferEarn: React.FC<ReferEarnProps> = ({ referralLink }) => {
-  const defaultReferralLink = "https://demo.newcmsdesign.com/referral/abc123";
+  const defaultReferralLink = "https://demo.Testing.com/referral/abc123";
   const displayLink = referralLink || defaultReferralLink;
 
   const handleCopyLink = () => {

@@ -1,20 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { ShimmerLoader } from '../../components/ui';
 import { COLORS } from '../../constants/colors';
 import { apiRequest } from '../../services/api';
-import {
-  ALL_TICKETS,
-  SHOW_ALL_SPECIFIC_COMMENT,
-  // NEW_COMMENTS
-} from '../../../api/api-variable';
+import {  ALL_TICKETS,  SHOW_ALL_SPECIFIC_COMMENT, } from '../../../api/api-variable';
 import { useAuth } from '@/context';
-import { Card } from '@/components';
+
 import { ChatInterface } from './components';
+import TicketList from './components/TicketList';
 
 // Types based on your actual API response
 interface SupportTicket {
@@ -53,7 +50,7 @@ const Support: React.FC = () => {
 
         headers: { Authorization: `Bearer ${token}` },
       }).then((response: any) => {
-        // setIsLoading(false);
+        setLoading(false);
         setTickets(response.data || []);
         console.log('Tickets:', response);
       })
@@ -62,9 +59,7 @@ const Support: React.FC = () => {
         });
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   useEffect(() => {
@@ -99,27 +94,6 @@ const Support: React.FC = () => {
   }, [selectedTicket]);
 
   // Sending of messages is handled inside ChatInterface component
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority?.toLowerCase()) {
-      case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'open':
-        return <AlertCircle className="w-4 h-4 text-green-500" />;
-      case 'closed':
-        return <CheckCircle className="w-4 h-4 text-gray-500" />;
-      default:
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-    }
-  };
 
   const selectedTicketData = tickets.find(ticket => ticket.id === selectedTicket);
 
@@ -156,54 +130,12 @@ const Support: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Side - Ticket List */}
-        <div className="lg:col-span-1">
-          <Card title="Support Tickets" subtitle="Your recent support requests">
-            <div className="space-y-3">
-              {tickets.length > 0 ? (
-                tickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    onClick={() => setSelectedTicket(ticket.id)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                      selectedTicket === ticket.id
-                        ? `border-${COLORS.PRIMARY} bg-blue-50`
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-2">
-                          {getStatusIcon(ticket.status)}
-                          <h3 className={`font-medium text-${COLORS.SECONDARY} truncate`}>
-                            {ticket.subject}
-                          </h3>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(ticket.priority)}`}>
-                            {ticket.priority}
-                          </span>
-                        </div>
-                        <p className={`text-sm text-${COLORS.SECONDARY_TEXT} mb-2`}>
-                          {ticket.department}
-                        </p>
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>Created {new Date(ticket.created_on).toLocaleDateString()}</span>
-                          <span>Status: {ticket.status}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
-                  <p className="text-gray-500">
-                    You haven't created any support tickets yet.
-                  </p>
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
+        <TicketList 
+          tickets={tickets}
+          selectedTicket={selectedTicket}
+          onTicketSelect={setSelectedTicket}
+          loading={loading}
+        />
 
         {/* Right Side - Chat Interface */}
         <div className="lg:col-span-2">
