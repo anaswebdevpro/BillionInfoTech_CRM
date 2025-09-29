@@ -45,6 +45,39 @@ const isImageUrl = (url: string) => {
   return /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url);
 };
 
+// Utility function to limit text length
+const limitText = (text: string, limit: number) => {
+  if (text.length <= limit) return text;
+  return text.substring(0, limit) + "...";
+};
+
+// ReadMore component for expandable text
+interface ReadMoreProps {
+  text: string;
+  limit?: number;
+  className?: string;
+}
+
+const ReadMore: React.FC<ReadMoreProps> = ({ text, limit = 150, className = "" }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  if (text.length <= limit) {
+    return <span className={className}>{text}</span>;
+  }
+  
+  return (
+    <span className={className}>
+      {isExpanded ? text : limitText(text, limit)}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`ml-1 text-blue-500 hover:text-blue-700 underline text-xs font-medium`}
+      >
+        {isExpanded ? "Read less" : "Read more"}
+      </button>
+    </span>
+  );
+};
+
 const formatDateTime = (input?: string | Date) => {
   if (!input) return "";
   try {
@@ -330,7 +363,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
                             } ${isOptimistic ? "opacity-70" : ""}`}
                           >
                             <div className="whitespace-pre-wrap text-sm">
-                              {m.message}
+                              <ReadMore text={m.message} limit={150} />
                             </div>
                             {m.attachment && (
                               <div className="mt-2">
