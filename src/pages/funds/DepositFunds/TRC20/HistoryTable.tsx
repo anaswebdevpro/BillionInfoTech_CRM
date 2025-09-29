@@ -15,7 +15,7 @@ import { useDebounce } from '@/Hook/useDebounce';
 interface DepositRequest {
   no: number;
   amount: number;
-  hash: string;
+  transaction_id: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   created_on: string;
 }
@@ -179,7 +179,7 @@ const HistoryTable: React.FC = () => {
                   <tr className={`border-b border-${COLORS.BORDER}`}>
                     <th className="text-left py-3 px-4">Sr.No.</th>
                     <th className="text-left py-3 px-4">Amount</th>
-                    <th className="text-left py-3 px-4">Hash</th>
+                    <th className="text-left py-3 px-4">transaction_id</th>
                     <th className="text-left py-3 px-4">Status</th>
                     <th className="text-left py-3 px-4">Date</th>
                   </tr>
@@ -189,7 +189,7 @@ const HistoryTable: React.FC = () => {
                     <tr key={index} className={`border-b border-${COLORS.BORDER} hover:bg-gray-50`}>
                       <td className="py-3 px-4">{currentPage * entriesPerPage + index + 1}</td>
                       <td className="py-3 px-4 font-medium">₹{item.amount.toLocaleString()}</td>
-                      <td className="py-3 px-4 font-mono text-sm">{item.hash}</td>
+                      <td className="py-3 px-4 font-mono text-sm">{item.transaction_id || (item.transaction_id === null ? 'null' : 'N/A')}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
                           {item.status}

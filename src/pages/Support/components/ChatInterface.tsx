@@ -28,7 +28,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
   const fetchAllComments = () => {
     apiRequest({
       endpoint: `${SHOW_ALL_SPECIFIC_COMMENT}/${ticket?.id}`,
-      method: "POST",
+      method: "POST", 
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response: any) => {
