@@ -52,13 +52,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               isUser ? `text-${COLORS.PRIMARY_BG_LIGHT}` : `text-${COLORS.SECONDARY_TEXT}`
             }`}
           >
-            {message.user_name || (isUser ? "" : "Support")}
+            {message.user_name || (isUser ? "" : "")}
             {isOptimistic && " (Sending...)"}
           </span>
         </div>
       </div>
-      <span className={`text-xs text-${COLORS.GRAY} mt-1 ${isUser ? "text-right" : "text-left"}`}>
+      <span className={`text-xs text-${COLORS.GRAY} mt-1  ${isUser ? "text-right" : "text-left"}`}>
         {formatDateTime(message.created_on ?? undefined)}
+        {/* {isUser ? "You" : "Support"} */}
       </span>
     </div>
   );
