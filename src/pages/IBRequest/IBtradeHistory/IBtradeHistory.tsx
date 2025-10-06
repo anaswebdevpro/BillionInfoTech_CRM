@@ -271,7 +271,7 @@ const IBtradeHistory = () => {
           </div>
 
           {/* Small Stats Grid */}
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <div className={`px-4 py-3 bg-green-50 border border-green-200 rounded-lg`}>
               <div className="text-center">
                 <div className="text-lg font-bold text-green-600">{openPositions.length}</div>
@@ -290,7 +290,7 @@ const IBtradeHistory = () => {
                 <div className="text-xs text-blue-600 font-medium">Total</div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </Card>
 

@@ -80,7 +80,10 @@ export interface InternalTransferResponse {
 }
 
 export interface LiveAccount {
+  name: string;
   account_number: number;
+  symbol: string;
+  leverage: string;
   slug: string;
 }
 
@@ -133,9 +136,9 @@ export interface IBRequest {
   experience?: string;
 }
 
-// Dashboard stats type
-export interface DashboardStats {
-   version: string;
+// Dashboard data type (used by API response)
+export interface DashboardData {
+  version: string;
   name: string;
   description: string;
   wallet_balance: string;
@@ -144,9 +147,8 @@ export interface DashboardStats {
   recent_trades: RecentTrade[];
   recent_transactions: RecentTransaction[];
   stats: Stats;
-
-
 }
+
 export interface RecentTrade {
   account_number: number;
   category: string;
@@ -185,7 +187,8 @@ export interface Stats {
   commission: string;
   deposits: string;
   withdrawals: string;
-  wallet_balance: string;
+  eta_drawals: string;
+  wallet_balance?: string;
 }
 
 // Position type

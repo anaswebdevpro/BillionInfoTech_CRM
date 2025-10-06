@@ -1,68 +1,7 @@
 import React from 'react';
 import { TrendingUp, DollarSign, Activity, Users } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-
-// Local interface matching Dashboard component's DashboardData
-interface LiveAccount {
-  name: string;
-  account_number: number;
-  symbol: string;
-  leverage: string;
-  slug: string;
-}
-
-interface RecentTrade {
-  account_number: number;
-  category: string;
-  close_price: number;
-  closed_on: string;
-  created_on: string;
-  execution_id: number;
-  id: number;
-  is_distributed: number;
-  is_haze: number;
-  open_price: number;
-  order_id: number;
-  platform_id: number;
-  profit: number;
-  profit_update: number;
-  sent_to_meta: number;
-  side: string;
-  status: number;
-  stop_loss: number;
-  symbol: string;
-  take_profit: number;
-  user_id: number;
-  volume: number;
-  zero_profit: number;
-}
-
-interface RecentTransaction {
-  txn_type: string;
-  type: string;
-  amount: number;
-  remarks: string;
-  created_on: string;
-}
-
-interface Stats {
-  commission: string;
-  deposits: string;
-  withdrawals: string;
-  eta_drawals: string;
-}
-
-interface DashboardData {
-  version: string;
-  name: string;
-  description: string;
-  wallet_balance: string;
-  referral_link: string;
-  live_accounts: LiveAccount[];
-  recent_trades: RecentTrade[];
-  recent_transactions: RecentTransaction[];
-  stats: Stats;
-}
+import type { DashboardData } from '../../../types';
 
 interface StatsGridProps {
   dashboardData: DashboardData;

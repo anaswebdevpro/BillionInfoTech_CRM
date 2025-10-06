@@ -1,33 +1,22 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import Card from '../../../components/ui/Card';
-
-interface Transaction {
-  id: string;
-  userId: string;
-  type: string;
-  amount: number;
-  currency: string;
-  method?: string;
-  status: string;
-  date: string;
-  fromAccount?: string;
-  toAccount?: string;
-}
+import type { DashboardData, RecentTransaction } from '../../../types';
 
 interface RecentTransactionsProps {
-  recentTransactions: Transaction[];
-  loading?: boolean;
+  dashboardData: DashboardData | null;
 }
 
-const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransactions }) => {
+const RecentTransactions: React.FC<RecentTransactionsProps> = ({ dashboardData }) => {
+  const recentTransactions = dashboardData?.recent_transactions || [];
+  
   return (
     <Card title="Recent Transactions" subtitle="Latest account activity">
       <div className="space-y-1 overflow-y-scroll max-h-[300px]">
         {recentTransactions.length > 0 ? (
-          recentTransactions.map((transaction) => (
+          recentTransactions.map((transaction: RecentTransaction, index: number) => (
             <div
-              key={transaction.id}
+              key={index}
               className="flex items-center justify-between py-2 border-1 border-gray-200 rounded-lg hover:bg-gray-100 hover:shadow-lg p-2 transition-all duration-200"
             >
               <div className="flex items-center">
@@ -49,7 +38,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransacti
                     {transaction.type}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {transaction.method}
+                    {transaction.txn_type}
                   </p>
                 </div>
               </div>
@@ -64,14 +53,8 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ recentTransacti
                   {transaction.type === "credit" ? "+" : "-"}$
                   {transaction.amount.toLocaleString()}
                 </p>
-                <p
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    transaction.status === "Completed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {transaction.status}
+                <p className="text-xs text-gray-500 mt-1">
+                  {new Date(transaction.created_on).toLocaleDateString()}
                 </p>
               </div>
             </div>
