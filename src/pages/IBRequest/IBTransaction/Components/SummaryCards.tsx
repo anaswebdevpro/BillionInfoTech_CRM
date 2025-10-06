@@ -24,7 +24,7 @@ const SummaryCards: React.FC = () => {
         .then((response: any) => {
           setLoading(false);
           setData(response);
-          console.log("chai pilo ", response);
+          // console.log("check the response", response);
         })
         .catch((error: any) => {
           console.error("Login failed:", error);

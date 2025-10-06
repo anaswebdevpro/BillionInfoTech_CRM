@@ -43,16 +43,13 @@ const PartnerCommissionsTable: React.FC = () => {
       try {
         const requestBody = {
           start: page * length,
-          length: length,
-          search: search, // Simple string for Partner Commissions API
+          length,
+          search, 
         };
 
-        //   console.log('Partner Commissions Request:', {
-        //     endpoint: IB_TRANSACTION,
-        //     requestBody,
-        //     token: token ? 'Present' : 'Missing'
-        //   }
-        // );
+        console.log("Partner Commissions Request:", {
+          requestBody,
+        });
 
         const response = await apiRequest({
           endpoint: IB_TRANSACTION,
@@ -110,12 +107,7 @@ const PartnerCommissionsTable: React.FC = () => {
   }, [fetchData]);
 
   // Trigger search when debounced search value changes
-  useEffect(() => {
-    if (debouncedSearchValue !== searchValue) {
-      // Only trigger if this is actually a debounced update
-      fetchData(0, debouncedSearchValue, entriesPerPage);
-    }
-  }, [debouncedSearchValue, fetchData, entriesPerPage, searchValue]);
+ 
 
   // Format cell values
   const formatCellValue = (
@@ -237,7 +229,7 @@ const PartnerCommissionsTable: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-scroll overflow-y-scroll   max-h-220 rounded-lg border border-gray-200">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
