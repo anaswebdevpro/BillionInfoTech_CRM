@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import logo from '../../assets/nav-logo.png'; // Add logo import
-import { useAuth } from '../../context/AuthContext/AuthContext';
-import { 
-  X, 
-  LayoutDashboard, 
-  TrendingUp, 
-  CreditCard, 
-  
-  
-  Users, 
-  Shield, 
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import logo from "../../assets/nav-logo.png"; // Add logo import
+import { useAuth } from "../../context/AuthContext/AuthContext";
+import {
+  X,
+  LayoutDashboard,
+  TrendingUp,
+  CreditCard,
+  Users,
+  // Shield,
   LogOut,
   ChevronDown,
   ChevronRight,
@@ -23,9 +21,9 @@ import {
   GitBranch,
   Building,
   BarChart3,
-  FileText
-} from 'lucide-react';
-import { COLORS } from '../../constants/colors';
+  FileText,
+} from "lucide-react";
+import { COLORS } from "../../constants/colors";
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -51,8 +49,8 @@ const NavLinkItem: React.FC<{
   isSubItem?: boolean;
 }> = ({ item, onClose, isSubItem = false }) => {
   const { name, href, icon: Icon } = item;
-  const fontClass = isSubItem ? 'font-medium' : 'font-semibold';
-  const iconSize = isSubItem ? 'h-4 w-4' : 'h-5 w-5';
+  const fontClass = isSubItem ? "font-medium" : "font-semibold";
+  const iconSize = isSubItem ? "h-4 w-4" : "h-5 w-5";
 
   return (
     <NavLink
@@ -61,7 +59,7 @@ const NavLinkItem: React.FC<{
       className={({ isActive }) =>
         `group flex gap-x-3 rounded-md p-2 text-sm leading-6 ${fontClass} transition-colors ${
           isActive
-            ? 'bg-green-50 text-green-700'
+            ? "bg-green-50 text-green-700"
             : `text-${COLORS.SECONDARY_TEXT} hover:text-green-700 hover:bg-green-50`
         }`
       }
@@ -70,7 +68,9 @@ const NavLinkItem: React.FC<{
         <>
           <Icon
             className={`${iconSize} shrink-0 ${
-              isActive ? 'text-green-700' : 'text-gray-400 group-hover:text-green-700'
+              isActive
+                ? "text-green-700"
+                : "text-gray-400 group-hover:text-green-700"
             }`}
           />
           {name}
@@ -126,42 +126,78 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const navigation: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
-      name: 'Accounts',
+      name: "Accounts",
       icon: TrendingUp,
       submenu: [
-        { name: 'My Accounts', href: '/dashboard/my-accounts', icon: ManageIcon },
-        { name: 'Manage Accounts', href: '/dashboard/manage-accounts', icon: ManageIcon },
+        {
+          name: "My Accounts",
+          href: "/dashboard/my-accounts",
+          icon: ManageIcon,
+        },
+        {
+          name: "Manage Accounts",
+          href: "/dashboard/manage-accounts",
+          icon: ManageIcon,
+        },
         // { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
-      ]
+      ],
     },
-   
-    { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
 
     {
-  name: 'IB MENU',
-  icon: Users,
-  submenu: [
-    { name: 'Set Commission', href: '/dashboard/set-commission', icon: DollarSign },
-    { name: 'Accordion', href: '/dashboard/accordian', icon: List },
-    { name: 'Request Tree', href: '/dashboard/request-tree', icon: GitBranch },
-    { name: 'Trade History', href: '/dashboard/trade-history', icon: TrendingUp },
-    { name: 'Transaction', href: '/dashboard/transaction', icon: CreditCard },
-    { name: 'Business', href: '/dashboard/business', icon: Building },
-    { name: 'Sub IB Summary', href: '/dashboard/sub-ib-summary', icon: BarChart3 },
-    { name: 'Commission Report', href: '/dashboard/commission-report', icon: FileText }
-  ]
-},
-    { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
-    { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
+      name: "Bonus & Promotion",
+      href: "/dashboard/bonus-promotion",
+      icon: Gift,
+    },
+
+    {
+      name: "IB MENU",
+      icon: Users,
+      submenu: [
+        {
+          name: "Set Commission",
+          href: "/dashboard/set-commission",
+          icon: DollarSign,
+        },
+        { name: "Accordion", href: "/dashboard/accordian", icon: List },
+        {
+          name: "Request Tree",
+          href: "/dashboard/request-tree",
+          icon: GitBranch,
+        },
+        {
+          name: "Trade History",
+          href: "/dashboard/trade-history",
+          icon: TrendingUp,
+        },
+        {
+          name: "Transaction",
+          href: "/dashboard/transaction",
+          icon: CreditCard,
+        },
+        { name: "Business", href: "/dashboard/business", icon: Building },
+        {
+          name: "Sub IB Summary",
+          href: "/dashboard/sub-ib-summary",
+          icon: BarChart3,
+        },
+        {
+          name: "Commission Report",
+          href: "/dashboard/commission-report",
+          icon: FileText,
+        },
+      ],
+    },
+    { name: "Support", href: "/dashboard/support", icon: MessageCircle },
+    // { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];
 
   const toggleSubmenu = (menuName: string) => {
     const lowerMenuName = menuName.toLowerCase();
-    setExpandedMenus(prev =>
+    setExpandedMenus((prev) =>
       prev.includes(lowerMenuName)
-        ? prev.filter(name => name !== lowerMenuName)
+        ? prev.filter((name) => name !== lowerMenuName)
         : [...prev, lowerMenuName]
     );
   };
@@ -182,13 +218,18 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
         <div
           className="fixed inset-y-0 left-0 z-50 w-64"
           style={{
-            background: 'linear-gradient(349deg, rgba(12, 247, 114, 1) 0%, rgba(87, 199, 133, 1) 26%, rgba(255, 240, 240, 1) 100%)'
+            background:
+              "linear-gradient(349deg, rgba(12, 247, 114, 1) 0%, rgba(87, 199, 133, 1) 26%, rgba(255, 240, 240, 1) 100%)",
           }}
         >
           <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
             {/* Header with close button */}
             <div className="flex h-16 shrink-0 items-center justify-between">
-              <img src={logo} alt="Billion InfoTech" className="h-12 w-auto object-contain" />
+              <img
+                src={logo}
+                alt="Billion InfoTech"
+                className="h-12 w-auto object-contain"
+              />
               <button
                 type="button"
                 className={`-m-2.5 p-2.5 text-${COLORS.SECONDARY_TEXT}`}
@@ -237,7 +278,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                       <button
                         onClick={() => {
                           logout();
-                          navigate('/login');
+                          navigate("/login");
                           onClose();
                         }}
                         className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-red-700 hover:bg-red-50`}

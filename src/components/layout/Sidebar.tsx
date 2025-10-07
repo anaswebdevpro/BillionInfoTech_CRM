@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/nav-logo.png'; // Adjust the path as necessary
 import {  LayoutDashboard,  TrendingUp,  CreditCard,   ArrowRightLeft,  Users,
-  Shield,  Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, History,} from 'lucide-react';
+   Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, History,} from 'lucide-react';
 import { COLORS, GRADIENTS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 
@@ -137,7 +137,7 @@ const Sidebar: React.FC = () => {
 },
    
     { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
-    { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
+    // { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];
 
   const toggleSubmenu = (menuName: string) => {
