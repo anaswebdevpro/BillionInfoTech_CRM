@@ -22,6 +22,7 @@ import {
   Building,
   BarChart3,
   FileText,
+  User,
 } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 
@@ -272,6 +273,17 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                       >
                         <Settings className="h-5 w-5 shrink-0 text-gray-400 group-hover:text-green-700" />
                         Settings
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                      href="profile"
+                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`}
+                      >
+                        <User
+                          className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`}
+                        />
+                        Profile
                       </a>
                     </li>
                     <li>

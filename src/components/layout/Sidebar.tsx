@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import logo from '../../assets/nav-logo.png'; // Adjust the path as necessary
-import {  LayoutDashboard,  TrendingUp,  CreditCard,   ArrowRightLeft,  Users,
-   Settings,  LogOut,  ChevronDown,  ChevronRight,  Settings as ManageIcon, MessageCircle, Gift,  FileText,  BarChart3,  Building,  GitBranch,  List,  DollarSign, Wallet, ArrowUpCircle, ArrowDownCircle, History,} from 'lucide-react';
-import { COLORS, GRADIENTS } from '../../constants/colors';
-import { useAuth } from '../../context/AuthContext/AuthContext';
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import logo from "../../assets/nav-logo.png"; // Adjust the path as necessary
+import {
+  LayoutDashboard,
+  TrendingUp,
+  CreditCard,
+  ArrowRightLeft,
+  Users,
+  Settings,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Settings as ManageIcon,
+  MessageCircle,
+  Gift,
+  FileText,
+  BarChart3,
+  Building,
+  GitBranch,
+  List,
+  DollarSign,
+  Wallet,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  History,
+  User,
+} from "lucide-react";
+import { COLORS, GRADIENTS } from "../../constants/colors";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 interface NavigationItem {
   name: string;
@@ -24,8 +47,8 @@ const NavLinkItem: React.FC<{
   isSubItem?: boolean;
 }> = ({ item, isSubItem = false }) => {
   const { name, href, icon: Icon } = item;
-  const fontClass = isSubItem ? 'font-medium' : 'font-semibold';
-  const iconSize = isSubItem ? 'h-4 w-4' : 'h-5 w-5';
+  const fontClass = isSubItem ? "font-medium" : "font-semibold";
+  const iconSize = isSubItem ? "h-4 w-4" : "h-5 w-5";
 
   return (
     <NavLink
@@ -42,7 +65,9 @@ const NavLinkItem: React.FC<{
         <>
           <Icon
             className={`${iconSize} shrink-0 ${
-              isActive ? `text-${COLORS.PRIMARY_TEXT}` : `text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`
+              isActive
+                ? `text-${COLORS.PRIMARY_TEXT}`
+                : `text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`
             }`}
           />
           {name}
@@ -66,7 +91,9 @@ const SubMenuItemComponent: React.FC<{
         onClick={() => toggleSubmenu(name)}
         className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`}
       >
-        <Icon className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`} />
+        <Icon
+          className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`}
+        />
         {name}
         {isExpanded ? (
           <ChevronDown className={`ml-auto h-4 w-4 text-${COLORS.GRAY}`} />
@@ -97,54 +124,106 @@ const Sidebar: React.FC = () => {
   const { logout } = useAuth();
 
   const navigation: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
-      name: 'Accounts',
+      name: "Accounts",
       icon: TrendingUp,
       submenu: [
-        { name: 'My Accounts', href: '/dashboard/my-accounts', icon: ManageIcon },
-        { name: 'Manage Accounts', href: '/dashboard/manage-accounts', icon: ManageIcon },
+        {
+          name: "My Accounts",
+          href: "/dashboard/my-accounts",
+          icon: ManageIcon,
+        },
+        {
+          name: "Manage Accounts",
+          href: "/dashboard/manage-accounts",
+          icon: ManageIcon,
+        },
         // { name: 'Live Accounts', href: '/dashboard/live-accounts', icon: TrendingUp },
-      ]
+      ],
     },
-  
+
     {
-      name: 'Funds',
+      name: "Funds",
       icon: Wallet,
       submenu: [
-        { name: 'Deposit Funds', href: '/dashboard/funds/deposit', icon: ArrowUpCircle },
-        { name: 'Withdraw Funds', href: '/dashboard/funds/withdraw', icon: ArrowDownCircle },
-        { name: 'Internal Transfer', href: '/dashboard/funds/transfer', icon: ArrowRightLeft },
-        { name: 'Transaction History', href: '/dashboard/funds/history', icon: History },
-      ]
+        {
+          name: "Deposit Funds",
+          href: "/dashboard/funds/deposit",
+          icon: ArrowUpCircle,
+        },
+        {
+          name: "Withdraw Funds",
+          href: "/dashboard/funds/withdraw",
+          icon: ArrowDownCircle,
+        },
+        {
+          name: "Internal Transfer",
+          href: "/dashboard/funds/transfer",
+          icon: ArrowRightLeft,
+        },
+        {
+          name: "Transaction History",
+          href: "/dashboard/funds/history",
+          icon: History,
+        },
+      ],
     },
-    { name: 'Bonus & Promotion', href: '/dashboard/bonus-promotion', icon: Gift },
+    {
+      name: "Bonus & Promotion",
+      href: "/dashboard/bonus-promotion",
+      icon: Gift,
+    },
     // { name: 'IB Request', href: '/dashboard/ib-request', icon: Users },
 
-     {
-  name: 'IB MENU',
-  icon: Users,
-  submenu: [
-    { name: 'Set Commission', href: '/dashboard/set-commission', icon: DollarSign },
-    { name: 'Accordion', href: '/dashboard/accordian', icon: List },
-    { name: 'Request Tree', href: '/dashboard/request-tree', icon: GitBranch },
-    { name: 'Trade History', href: '/dashboard/trade-history', icon: TrendingUp },
-    { name: 'Transaction', href: '/dashboard/transaction', icon: CreditCard },
-    { name: 'Business', href: '/dashboard/business', icon: Building },
-    { name: 'Sub IB Summary', href: '/dashboard/sub-ib-summary', icon: BarChart3 },
-    { name: 'Commission Report', href: '/dashboard/commission-report', icon: FileText }
-  ]
-},
-   
-    { name: 'Support', href: '/dashboard/support', icon: MessageCircle },
+    {
+      name: "IB MENU",
+      icon: Users,
+      submenu: [
+        {
+          name: "Set Commission",
+          href: "/dashboard/set-commission",
+          icon: DollarSign,
+        },
+        { name: "Accordion", href: "/dashboard/accordian", icon: List },
+        {
+          name: "Request Tree",
+          href: "/dashboard/request-tree",
+          icon: GitBranch,
+        },
+        {
+          name: "Trade History",
+          href: "/dashboard/trade-history",
+          icon: TrendingUp,
+        },
+        {
+          name: "Transaction",
+          href: "/dashboard/transaction",
+          icon: CreditCard,
+        },
+        { name: "Business", href: "/dashboard/business", icon: Building },
+        {
+          name: "Sub IB Summary",
+          href: "/dashboard/sub-ib-summary",
+          icon: BarChart3,
+        },
+        {
+          name: "Commission Report",
+          href: "/dashboard/commission-report",
+          icon: FileText,
+        },
+      ],
+    },
+
+    { name: "Support", href: "/dashboard/support", icon: MessageCircle },
     // { name: '2FA Settings', href: '/dashboard/2fa', icon: Shield },
   ];
 
   const toggleSubmenu = (menuName: string) => {
     const lowerMenuName = menuName.toLowerCase();
-    setExpandedMenus(prev =>
+    setExpandedMenus((prev) =>
       prev.includes(lowerMenuName)
-        ? prev.filter(name => name !== lowerMenuName)
+        ? prev.filter((name) => name !== lowerMenuName)
         : [...prev, lowerMenuName]
     );
   };
@@ -194,19 +273,34 @@ const Sidebar: React.FC = () => {
                   href="#"
                   className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`}
                 >
-                  <Settings className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`} />
+                  <Settings
+                    className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`}
+                  />
                   Settings
+                </a>
+              </li>
+              <li>
+                <a
+                  href="profile"
+                  className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`}
+                >
+                  <User
+                    className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-${COLORS.PRIMARY_TEXT}`}
+                  />
+                  Profile
                 </a>
               </li>
               <li>
                 <button
                   onClick={() => {
                     logout();
-                    navigate('/login');
+                    navigate("/login");
                   }}
                   className={`group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-red-700 hover:bg-red-50`}
                 >
-                  <LogOut className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-red-700`} />
+                  <LogOut
+                    className={`h-5 w-5 shrink-0 text-${COLORS.GRAY} group-hover:text-red-700`}
+                  />
                   Sign out
                 </button>
               </li>
