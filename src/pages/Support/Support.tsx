@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import  { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
-import Button from '../../components/ui/Button';
-import { ShimmerLoader } from '../../components/ui';
-import { COLORS } from '../../constants/colors';
-import { apiRequest } from '../../services/api';
-import {  ALL_TICKETS,  SHOW_ALL_SPECIFIC_COMMENT, } from '../../../api/api-variable';
-import { useAuth } from '@/context';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
+import Button from "../../components/ui/Button";
+import { ShimmerLoader } from "../../components/ui";
+import { COLORS } from "../../constants/colors";
+import { apiRequest } from "../../services/api";
+import {
+  ALL_TICKETS,
+  SHOW_ALL_SPECIFIC_COMMENT,
+} from "../../../api/api-variable";
+import { useAuth } from "@/context";
 
-import { ChatInterface } from './components';
-import TicketList from './components/TicketList';
+import { ChatInterface, TicketList } from "./components";
 
 // Types based on your actual API response
 interface SupportTicket {
@@ -23,20 +25,14 @@ interface SupportTicket {
   created_on: string;
 }
 
-
-
 const Support: React.FC = () => {
-  
   const navigate = useNavigate();
   const { token } = useAuth();
-
-
 
   // Simplified state management
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
- 
-  
+
   // message input now handled inside ChatInterface
   const [loading, setLoading] = useState(true);
 
@@ -46,20 +42,21 @@ const Support: React.FC = () => {
     try {
       apiRequest({
         endpoint: ALL_TICKETS,
-        method: 'POST',
+        method: "POST",
 
         headers: { Authorization: `Bearer ${token}` },
-      }).then((response: any) => {
-        setLoading(false);
-        setTickets(response.data || []);
-        console.log('Tickets:', response);
       })
+        .then((response: any) => {
+          setLoading(false);
+          setTickets(response.data || []);
+          console.log("Tickets:", response);
+        })
         .catch((error: any) => {
-          console.error('Failed to fetch tickets:', error);
+          console.error("Failed to fetch tickets:", error);
         });
     } catch (error) {
-      console.error('Failed to fetch tickets:', error);
-    } 
+      console.error("Failed to fetch tickets:", error);
+    }
   };
 
   useEffect(() => {
@@ -72,17 +69,18 @@ const Support: React.FC = () => {
     try {
       apiRequest({
         endpoint: `${SHOW_ALL_SPECIFIC_COMMENT}/${ticketId}`,
-        method: 'POST',
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-      }).then((response: any) => {
-        // setMessages(response.ticket?.comments || []);
-        console.log('Messages:', response);
       })
+        .then((response: any) => {
+          // setMessages(response.ticket?.comments || []);
+          console.log("Messages:", response);
+        })
         .catch((error: any) => {
-          console.error('Failed to fetch messages:', error);
+          console.error("Failed to fetch messages:", error);
         });
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
+      console.error("Failed to fetch messages:", error);
     } finally {
       setLoading(false);
     }
@@ -95,8 +93,9 @@ const Support: React.FC = () => {
 
   // Sending of messages is handled inside ChatInterface component
 
-  const selectedTicketData = tickets.find(ticket => ticket.id === selectedTicket);
-
+  const selectedTicketData = tickets.find(
+    (ticket) => ticket.id === selectedTicket
+  );
 
   if (loading) {
     return (
@@ -115,11 +114,15 @@ const Support: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>Support Center</h1>
-          <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>Get help from our expert support team</p>
+          <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>
+            Support Center
+          </h1>
+          <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>
+            Get help from our expert support team
+          </p>
         </div>
         <Button
-          onClick={() => navigate('/dashboard/support/create-ticket')}
+          onClick={() => navigate("/dashboard/support/create-ticket")}
           className="flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -130,7 +133,7 @@ const Support: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Side - Ticket List */}
-        <TicketList 
+        <TicketList
           tickets={tickets}
           selectedTicket={selectedTicket}
           onTicketSelect={setSelectedTicket}
@@ -139,7 +142,7 @@ const Support: React.FC = () => {
 
         {/* Right Side - Chat Interface */}
         <div className="lg:col-span-2">
-         <ChatInterface ticket={selectedTicketData} />
+          <ChatInterface ticket={selectedTicketData} />
         </div>
       </div>
     </div>
@@ -147,12 +150,3 @@ const Support: React.FC = () => {
 };
 
 export default Support;
-
-                                                      
-
-
-
-
-
-
-

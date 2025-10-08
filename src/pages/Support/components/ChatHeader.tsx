@@ -1,7 +1,6 @@
-import React from 'react';
-import { COLORS } from '../../../constants/colors';
-import { TicketPayload } from './types';
-import { formatDateTime } from './utils';
+import React from "react";
+import { COLORS } from "../../../constants/colors";
+import { TicketPayload, formatDateTime } from "./index";
 
 interface ChatHeaderProps {
   ticket?: TicketPayload | null;
@@ -9,7 +8,9 @@ interface ChatHeaderProps {
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ ticket }) => {
   return (
-    <div className={`flex items-center justify-between p-2 border-b border-${COLORS.BORDER}`}>
+    <div
+      className={`flex items-center justify-between p-2 border-b border-${COLORS.BORDER}`}
+    >
       <div>
         <h3 className={`font-semibold text-${COLORS.SECONDARY}`}>
           {ticket?.subject || "Support Ticket"}

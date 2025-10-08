@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { limitText } from './utils';
+import React, { useState } from "react";
+import { limitText } from "./index";
 
 interface ReadMoreProps {
   text: string;
@@ -7,13 +7,17 @@ interface ReadMoreProps {
   className?: string;
 }
 
-const ReadMore: React.FC<ReadMoreProps> = ({ text, limit = 150, className = "" }) => {
+const ReadMore: React.FC<ReadMoreProps> = ({
+  text,
+  limit = 150,
+  className = "",
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   if (text.length <= limit) {
     return <span className={className}>{text}</span>;
   }
-  
+
   return (
     <span className={className}>
       {isExpanded ? text : limitText(text, limit)}

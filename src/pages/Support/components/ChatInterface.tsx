@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import Card from "../../../components/ui/Card";
 import { apiRequest } from "@/services";
 import { useAuth } from "@/context";
-import {  NEW_COMMENTS,  SHOW_ALL_SPECIFIC_COMMENT,} from "../../../../api/api-variable";
+import {
+  NEW_COMMENTS,
+  SHOW_ALL_SPECIFIC_COMMENT,
+} from "../../../../api/api-variable";
 import { CommentItem, ChatInterfaceProps } from "./types";
-import ChatHeader from "./ChatHeader";
-import MessageList from "./MessageList";
-import MessageInput from "./MessageInput";
-
+import { ChatHeader, MessageList, MessageInput } from "./index";
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
   const { token } = useAuth();
@@ -23,12 +23,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
     setMessages(ticket?.comments ? [...ticket.comments] : []);
   }, [ticket?.comments]);
 
-
-
   const fetchAllComments = () => {
     apiRequest({
       endpoint: `${SHOW_ALL_SPECIFIC_COMMENT}/${ticket?.id}`,
-      method: "POST", 
+      method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response: any) => {
@@ -42,12 +40,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
   useEffect(() => {
     fetchAllComments();
   }, [ticket?.id]);
-  
+
   const handleSend = (messageText: string, file: File | null) => {
     if (!messageText.trim() && !file) return;
-    
+
     setSending(true);
-    
+
     // Create optimistic message with current system time
     const currentSystemTime = new Date();
     const optimisticMessage: CommentItem = {
@@ -58,16 +56,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
       user_name: "You",
       created_on: currentSystemTime.toISOString(), // Use exact system time
     };
-    
+
     console.log("🕐 Using system time:", currentSystemTime.toLocaleString());
-    
+
     // Add optimistic message immediately
-    setMessages(prev => [...prev, optimisticMessage]);
-    
+    setMessages((prev) => [...prev, optimisticMessage]);
+
     const formdata = new FormData();
     formdata.append("message", messageText);
     formdata.append("attachment", file || "");
-    
+
     apiRequest({
       endpoint: `${NEW_COMMENTS}/${ticket?.id}`,
       method: "POST",
@@ -79,35 +77,42 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ ticket }) => {
     })
       .then((response: any) => {
         console.log("Send response:", response);
-        
+
         if (response?.response === true) {
           // Check if server response contains our message
           const serverMessages = response?.ticket?.comments || [];
-          const hasNewMessage = serverMessages.some((msg: any) => 
-            msg.message === messageText && 
-            msg.user_type?.toLowerCase() === 'user'
+          const hasNewMessage = serverMessages.some(
+            (msg: any) =>
+              msg.message === messageText &&
+              msg.user_type?.toLowerCase() === "user"
           );
-          
+
           if (hasNewMessage) {
             // Server has our message, replace optimistic with real data
             setMessages(serverMessages);
           } else {
             // Server doesn't have our message yet, keep optimistic and fetch
             setTimeout(() => {
-              setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+              setMessages((prev) =>
+                prev.filter((msg) => msg.id !== optimisticMessage.id)
+              );
               fetchAllComments();
             }, 1000); // Wait 1 second then fetch
           }
         } else {
           // If send failed, remove the optimistic message
-          setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+          setMessages((prev) =>
+            prev.filter((msg) => msg.id !== optimisticMessage.id)
+          );
           console.error("Failed to send message");
         }
       })
       .catch((error: any) => {
         console.error("Failed to send message:", error);
         // Remove optimistic message on error
-        setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== optimisticMessage.id)
+        );
       })
       .finally(() => {
         setSending(false);

@@ -1,8 +1,6 @@
-import React from 'react';
-import { COLORS } from '../../../constants/colors';
-import { CommentItem } from './types';
-import { isImageUrl, formatDateTime } from './utils';
-import ReadMore from './ReadMore';
+import React from "react";
+import { COLORS } from "../../../constants/colors";
+import { CommentItem, isImageUrl, formatDateTime, ReadMore } from "./index";
 
 interface MessageBubbleProps {
   message: CommentItem;
@@ -10,7 +8,8 @@ interface MessageBubbleProps {
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isUser = (message.user_type || "").toLowerCase() === "user";
-  const isOptimistic = typeof message.id === 'string' && message.id.startsWith('temp-');
+  const isOptimistic =
+    typeof message.id === "string" && message.id.startsWith("temp-");
 
   return (
     <div
@@ -49,7 +48,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         <div className="flex items-center justify-between mt-1">
           <span
             className={`text-xs ${
-              isUser ? `text-${COLORS.PRIMARY_BG_LIGHT}` : `text-${COLORS.SECONDARY_TEXT}`
+              isUser
+                ? `text-${COLORS.PRIMARY_BG_LIGHT}`
+                : `text-${COLORS.SECONDARY_TEXT}`
             }`}
           >
             {message.user_name || (isUser ? "" : "")}
@@ -57,7 +58,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           </span>
         </div>
       </div>
-      <span className={`text-xs text-${COLORS.GRAY} mt-1  ${isUser ? "text-right" : "text-left"}`}>
+      <span
+        className={`text-xs text-${COLORS.GRAY} mt-1  ${
+          isUser ? "text-right" : "text-left"
+        }`}
+      >
         {formatDateTime(message.created_on ?? undefined)}
         {/* {isUser ? "You" : "Support"} */}
       </span>
