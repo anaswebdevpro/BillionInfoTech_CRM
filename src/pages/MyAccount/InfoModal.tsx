@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
@@ -24,11 +24,33 @@ interface InfoModalProps {
 }
 
 const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, data }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // 🧩 Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !data) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        ref={modalRef} // 👈 reference for outside click detection
+        className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="bg-green-600 text-white px-6 py-4 rounded-t-lg flex items-center justify-between">
           <h2 className="text-xl font-semibold">All Accounts</h2>
@@ -103,11 +125,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, data }) => {
 
         {/* Footer */}
         <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="px-6"
-          >
+          <Button variant="outline" onClick={onClose} className="px-6">
             Close
           </Button>
         </div>
