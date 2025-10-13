@@ -1,13 +1,13 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext/AuthContext';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext/AuthContext";
 
 interface PublicRouteProps {
   children: React.ReactNode;
 }
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -19,9 +19,17 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
     );
   }
 
-  // Redirect to dashboard if already authenticated
+  // Redirect to appropriate dashboard if already authenticated
   if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/dashboard';
+    // If user is admin and trying to access admin login, send to admin dashboard
+    const isAdmin = user?.user_type === "admin";
+    const attempted = location.pathname || "";
+
+    if (isAdmin && attempted.includes("/afxadmin")) {
+      return <Navigate to="/afxadmin/dashboard" replace />;
+    }
+
+    const from = location.state?.from?.pathname || "/dashboard";
     return <Navigate to={from} replace />;
   }
 

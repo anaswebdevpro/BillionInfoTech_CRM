@@ -54,6 +54,8 @@ export interface ExtendedUser {
   updated_on: string | null;
   withdrawal_status: number;
   zip_code: string | null;
+  // user_type indicates role like 'admin' or 'user' returned from the API
+  user_type?: string;
 }
 
 // Account type for user accounts
@@ -176,8 +178,8 @@ export interface RecentTrade {
 }
 
 export interface RecentTransaction {
-  txn_type: string;   // e.g., 'external-transfer' or 'level-income'
-  type: string;       // 'debit' | 'credit'
+  txn_type: string; // e.g., 'external-transfer' or 'level-income'
+  type: string; // 'debit' | 'credit'
   amount: number;
   remarks: string;
   created_on: string;
@@ -202,7 +204,6 @@ export interface Position {
   volume: number;
   id: string;
 }
-
 
 //ib form data type
 export interface IBFormData {
@@ -233,7 +234,6 @@ export interface FundTransferFormData {
   transferDate: string;
 }
 
-
 export interface KYCFormData {
   file: File | null;
   documentType: string;
@@ -242,7 +242,7 @@ export interface KYCFormData {
   uploadDate: string;
 }
 
-export interface KYCDocument{
+export interface KYCDocument {
   id: string;
   userId: string | number;
   documentType: string;
@@ -252,13 +252,12 @@ export interface KYCDocument{
   status: string;
 }
 
-
 export interface SignupFormData {
   email: string;
   password: string;
   confirmPassword: string;
   name: string;
-  twoFactorEnabled ?: boolean;
+  twoFactorEnabled?: boolean;
   agreeToTerms: boolean;
 }
 
@@ -266,8 +265,6 @@ export interface LoginFormData {
   email: string;
   password: string;
 }
-
-
 
 export interface AuthContextType {
   user: ExtendedUser | null;
@@ -321,8 +318,6 @@ export interface BankAccount {
   createdAt: string;
 }
 
-
-
 export interface DepositFormData {
   accountId: string;
   amount: number;
@@ -335,7 +330,6 @@ export interface OutletContext {
   isAuthenticated: boolean;
   handleLogin: (token: string) => void;
   handleSignup: (token: string) => void;
-
 }
 
 // Support Ticket types
@@ -345,9 +339,9 @@ export interface SupportTicket {
   userId: string | number;
   department: string;
   subject: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: "low" | "medium" | "high" | "urgent";
   description: string;
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  status: "open" | "in-progress" | "resolved" | "closed";
   createdAt: string;
   updatedAt: string;
   attachments?: string[];
@@ -356,7 +350,7 @@ export interface SupportTicket {
 export interface CreateSupportTicketFormData {
   department: string;
   subject: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: "low" | "medium" | "high" | "urgent";
   description: string;
 }
 

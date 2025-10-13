@@ -1,28 +1,31 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import App from '../App';
-import LoginPageWrapper from '../components/LoginPageWrapper';
-import SignupPageWrapper from '../components/SignupPageWrapper';
-import DashboardLayoutWrapper from '../components/DashboardLayoutWrapper';
-import ProtectedRoute from '../components/ProtectedRoute';
-import PublicRoute from '../components/PublicRoute';
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import App from "../App";
+import LoginPageWrapper from "../components/LoginPageWrapper";
+import SignupPageWrapper from "../components/SignupPageWrapper";
+import DashboardLayoutWrapper from "../components/DashboardLayoutWrapper";
+import ProtectedRoute from "../components/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
 
-import Dashboard from '../pages/Dashboard/Dashboard';
-import LiveAccounts from '../pages/LiveAccount/LiveAccounts';
-import TradingAccountCreation from '../pages/createTradingAccount/TradingAccountCreation';
+import Dashboard from "../pages/Dashboard/Dashboard";
+import LiveAccounts from "../pages/LiveAccount/LiveAccounts";
+import TradingAccountCreation from "../pages/createTradingAccount/TradingAccountCreation";
 
+import {
+  DepositFunds,
+  WithdrawFunds,
+  InternalTransfer,
+  TransactionHistory,
+} from "../pages/funds";
+import BankTransfer from "../pages/funds/DepositFunds/BankTransfer";
 
-
-import { DepositFunds, WithdrawFunds,  InternalTransfer, TransactionHistory } from '../pages/funds';
-import BankTransfer from '../pages/funds/DepositFunds/BankTransfer';
-
-import TwoFactorAuth from '../pages/TwoFactorAuth/TwoFactorAuth';
-import MyAccounts from '../pages/MyAccount/MyAccount';
-import ManageAccounts from '../pages/ManageAccounts/ManageAccounts';
-import Profile from '../pages/profile/Profile';
-import Support from '../pages/Support/Support';
-import CreateTicket from '../pages/createTicket/CreateTicket';
-import BonusPromotion from '../pages/Bonus_promotion/BonusPromotion';
-import NotFound from '../pages/NotFound/NotFound';
+import TwoFactorAuth from "../pages/TwoFactorAuth/TwoFactorAuth";
+import MyAccounts from "../pages/MyAccount/MyAccount";
+import ManageAccounts from "../pages/ManageAccounts/ManageAccounts";
+import Profile from "../pages/profile/Profile";
+import Support from "../pages/Support/Support";
+import CreateTicket from "../pages/createTicket/CreateTicket";
+import BonusPromotion from "../pages/Bonus_promotion/BonusPromotion";
+import NotFound from "../pages/NotFound/NotFound";
 
 // Import Admin Pages
 import {
@@ -42,24 +45,31 @@ import {
   AdminBonusPromotion,
   AdminPromotionalBanners,
   AdminManageFranchise,
-  AdminSalesManagers
-} from '../pages/admin';
+  AdminSalesManagers,
+} from "../pages/admin";
 
 // Admin Layout Wrapper Component
-import AdminLayoutWrapper from '../components/AdminLayoutWrapper';
-
+import AdminLayoutWrapper from "../components/AdminLayoutWrapper";
 
 //import iBmodule pages
 import {
-  SetCommission, IBAccordian, IBRequestTree, IBtradeHistory, IBtransaction, IBBusiness, MYSubIBSummnary, CommissionReport
+  SetCommission,
+  IBAccordian,
+  IBRequestTree,
+  IBtradeHistory,
+  IBtransaction,
+  IBBusiness,
+  MYSubIBSummnary,
+  CommissionReport,
 } from "../pages/IBRequest/index";
-import SetCommissionForm from '../pages/IBRequest/SetCommission/SetCommissionForm';
-import TRC20 from '../pages/funds/DepositFunds/TRC20';
-import BEP20 from '../pages/funds/DepositFunds/BEP20';
+import SetCommissionForm from "../pages/IBRequest/SetCommission/SetCommissionForm";
+import TRC20 from "../pages/funds/DepositFunds/TRC20";
+import BEP20 from "../pages/funds/DepositFunds/BEP20";
+import AdminLoginPage from "@/pages/admin/login/AdminLogin";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     children: [
       {
@@ -67,7 +77,7 @@ export const router = createBrowserRouter([
         element: <Navigate to="/login" replace />,
       },
       {
-        path: 'login',
+        path: "login",
         element: (
           <PublicRoute>
             <LoginPageWrapper />
@@ -75,7 +85,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'signup',
+        path: "signup",
         element: (
           <PublicRoute>
             <SignupPageWrapper />
@@ -83,7 +93,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard',
+        path: "dashboard",
         element: (
           <ProtectedRoute>
             <DashboardLayoutWrapper />
@@ -95,116 +105,117 @@ export const router = createBrowserRouter([
             element: <Dashboard />,
           },
           {
-            path: 'live-accounts',
+            path: "live-accounts",
             element: <LiveAccounts />,
           },
           {
-            path: 'my-accounts',
+            path: "my-accounts",
             element: <MyAccounts />,
           },
           {
-            path: 'manage-accounts',
+            path: "manage-accounts",
             element: <ManageAccounts />,
           },
           {
-            path: 'profile',
+            path: "profile",
             element: <Profile />,
           },
           {
-            path: 'trading-account',
+            path: "trading-account",
             element: <TradingAccountCreation />,
-          },                          
+          },
           // Funds Routes
           {
-            path: 'funds/deposit',
+            path: "funds/deposit",
             element: <DepositFunds />,
           },
           {
-            path: 'funds/deposit/bank-transfer',
+            path: "funds/deposit/bank-transfer",
             element: <BankTransfer />,
           },
           {
-            path: 'funds/deposit/usdt-trc20',
+            path: "funds/deposit/usdt-trc20",
             element: <TRC20 />,
           },
           {
-            path: 'funds/deposit/usdt-bep20',
+            path: "funds/deposit/usdt-bep20",
             element: <BEP20 />,
           },
 
           {
-            path: 'funds/withdraw',
+            path: "funds/withdraw",
             element: <WithdrawFunds />,
           },
           {
-            path: 'funds/transfer',
+            path: "funds/transfer",
             element: <InternalTransfer />,
           },
           {
-            path: 'funds/history',
+            path: "funds/history",
             element: <TransactionHistory />,
           },
-           {
-            path: 'set-commission',
+          {
+            path: "set-commission",
             element: <SetCommission />,
           },
           {
-            path: 'set-commission-form',
+            path: "set-commission-form",
             element: <SetCommissionForm />,
           },
           {
-            path: 'accordian',
+            path: "accordian",
             element: <IBAccordian />,
           },
           {
-            path: 'request-tree',
+            path: "request-tree",
             element: <IBRequestTree />,
           },
           {
-            path: 'trade-history',
+            path: "trade-history",
             element: <IBtradeHistory />,
           },
           {
-            path: 'transaction',
+            path: "transaction",
             element: <IBtransaction />,
           },
           {
-            path: 'business',
+            path: "business",
             element: <IBBusiness />,
           },
           {
-            path: 'sub-ib-summary',
+            path: "sub-ib-summary",
             element: <MYSubIBSummnary />,
           },
           {
-            path: 'commission-report',
+            path: "commission-report",
             element: <CommissionReport />,
           },
 
-
-
-
           {
-            path: '2fa',
+            path: "2fa",
             element: <TwoFactorAuth />,
           },
           {
-            path: 'support',
+            path: "support",
             element: <Support />,
           },
           {
-            path: 'support/create-ticket',
+            path: "support/create-ticket",
             element: <CreateTicket />,
           },
           {
-            path: 'bonus-promotion',
+            path: "bonus-promotion",
             element: <BonusPromotion />,
           },
         ],
       },
       // Admin Routes - Separate top-level section
       {
-        path: 'admin',
+        path: "afxadmin/login",
+        element: <AdminLoginPage />,
+      },
+      {
+        path: "afxadmin",
         element: (
           <ProtectedRoute>
             <AdminLayoutWrapper />
@@ -213,18 +224,18 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="/admin/dashboard" replace />,
+            element: <Navigate to="/afxadmin/dashboard" replace />,
           },
           {
-            path: 'dashboard',
+            path: "dashboard",
             element: <AdminDashboard />,
           },
           {
-            path: 'support',
+            path: "support",
             element: <AdminSupport />,
           },
           {
-            path: 'users',
+            path: "users",
             element: <AdminUsers />,
           },
           // {
@@ -232,62 +243,62 @@ export const router = createBrowserRouter([
           //   element: <AdminAccounts />,
           // },
           {
-            path: 'transactions',
+            path: "transactions",
             element: <AdminTransactions />,
           },
           {
-            path: 'kyc',
+            path: "kyc",
             element: <AdminKYC />,
           },
           {
-            path: 'reports',
+            path: "reports",
             element: <AdminReports />,
           },
           {
-            path: 'settings',
+            path: "settings",
             element: <AdminSettings />,
           },
           {
-            path: 'clients-leads',
+            path: "clients-leads",
             element: <AdminClientsLeads />,
           },
           {
-            path: 'leads',
+            path: "leads",
             element: <AdminLeads />,
           },
           {
-            path: 'financial',
+            path: "financial",
             element: <AdminFinancial />,
           },
           {
-            path: 'ib-partners',
+            path: "ib-partners",
             element: <AdminIBPartners />,
           },
           {
-            path: 'configurations',
+            path: "configurations",
             element: <AdminConfigurations />,
           },
           {
-            path: 'bonus-promotion',
+            path: "bonus-promotion",
             element: <AdminBonusPromotion />,
           },
           {
-            path: 'promotional-banners',
+            path: "promotional-banners",
             element: <AdminPromotionalBanners />,
           },
           {
-            path: 'manage-franchise',
+            path: "manage-franchise",
             element: <AdminManageFranchise />,
           },
           {
-            path: 'sales-managers',
+            path: "sales-managers",
             element: <AdminSalesManagers />,
           },
         ],
       },
       // 404 Not Found Route - Catch all unmatched routes
       {
-        path: '*',
+        path: "*",
         element: <NotFound />,
       },
     ],
