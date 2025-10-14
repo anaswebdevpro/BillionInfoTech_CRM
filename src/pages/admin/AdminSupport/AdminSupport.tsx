@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-import { COLORS } from '../../constants/colors';
+import React, { useState, useEffect } from "react";
+import Card from "../../../components/ui/Card";
+import Button from "../../../components/ui/Button";
+import { COLORS } from "../../../constants/colors";
 
-import { 
-  MessageCircle, 
-  Clock, 
-  Send, 
+import {
+  MessageCircle,
+  Clock,
+  Send,
   Filter,
   CheckCircle,
   AlertCircle,
@@ -24,16 +24,16 @@ import {
   Plus,
   Download,
   Calendar,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 
 // Types for admin support functionality
 interface SupportTicket {
   id: string;
   userId: string;
   subject: string;
-  status: 'open' | 'in-progress' | 'closed' | 'urgent';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: "open" | "in-progress" | "closed" | "urgent";
+  priority: "low" | "medium" | "high" | "urgent";
   departmentId: string;
   assignedAgent?: string;
   lastActivity: string;
@@ -47,7 +47,7 @@ interface Department {
   id: string;
   name: string;
   description: string;
-  status: 'online' | 'offline';
+  status: "online" | "offline";
   responseTime: string;
   icon: React.ComponentType<{ className?: string }>;
   ticketCount: number;
@@ -59,11 +59,11 @@ interface SupportMessage {
   id: string;
   ticketId: string;
   userId: string;
-  sender: 'user' | 'agent';
+  sender: "user" | "agent";
   agentName?: string;
   message: string;
   timestamp: string;
-  status: 'sent' | 'delivered' | 'read';
+  status: "sent" | "delivered" | "read";
   attachments?: string[];
 }
 
@@ -85,28 +85,30 @@ interface SupportStats {
 const AdminSupport: React.FC = () => {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(
+    null
+  );
   const [ticketMessages, setTicketMessages] = useState<SupportMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterDepartment, setFilterDepartment] = useState('all');
-  const [filterPriority, setFilterPriority] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [newMessage, setNewMessage] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterDepartment, setFilterDepartment] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [agentName] = useState('Admin Support Agent');
+  const [agentName] = useState("Admin Support Agent");
   const [supportStats, setSupportStats] = useState<SupportStats>({
     totalTickets: 0,
     openTickets: 0,
     inProgressTickets: 0,
     closedToday: 0,
-    avgResponseTime: '2.5 hours',
+    avgResponseTime: "2.5 hours",
     customerSatisfaction: 4.2,
     totalAgents: 8,
     onlineAgents: 6,
     todayTickets: 0,
     resolvedToday: 0,
-    avgResolutionTime: '4.2 hours',
-    escalatedTickets: 0
+    avgResolutionTime: "4.2 hours",
+    escalatedTickets: 0,
   });
 
   useEffect(() => {
@@ -124,189 +126,196 @@ const AdminSupport: React.FC = () => {
       // Enhanced mock data with more tickets
       const mockTickets: SupportTicket[] = [
         {
-          id: 'TKT-001',
-          userId: '1',
-          subject: 'Cannot access trading platform',
-          status: 'open',
-          priority: 'high',
-          departmentId: '1',
-          assignedAgent: 'Sarah Johnson',
+          id: "TKT-001",
+          userId: "1",
+          subject: "Cannot access trading platform",
+          status: "open",
+          priority: "high",
+          departmentId: "1",
+          assignedAgent: "Sarah Johnson",
           lastActivity: new Date(Date.now() - 1800000).toISOString(),
           createdAt: new Date(Date.now() - 3600000).toISOString(),
-          userEmail: 'john.doe@email.com',
-          userName: 'John Doe',
-          category: 'Technical'
+          userEmail: "john.doe@email.com",
+          userName: "John Doe",
+          category: "Technical",
         },
         {
-          id: 'TKT-002',
-          userId: '2',
-          subject: 'Account verification pending',
-          status: 'in-progress',
-          priority: 'medium',
-          departmentId: '2',
-          assignedAgent: 'Mike Chen',
+          id: "TKT-002",
+          userId: "2",
+          subject: "Account verification pending",
+          status: "in-progress",
+          priority: "medium",
+          departmentId: "2",
+          assignedAgent: "Mike Chen",
           lastActivity: new Date(Date.now() - 3600000).toISOString(),
           createdAt: new Date(Date.now() - 86400000).toISOString(),
-          userEmail: 'jane.smith@email.com',
-          userName: 'Jane Smith',
-          category: 'Account'
+          userEmail: "jane.smith@email.com",
+          userName: "Jane Smith",
+          category: "Account",
         },
         {
-          id: 'TKT-003',
-          userId: '3',
-          subject: 'Withdrawal not processed',
-          status: 'closed',
-          priority: 'urgent',
-          departmentId: '4',
-          assignedAgent: 'Jessica Wong',
+          id: "TKT-003",
+          userId: "3",
+          subject: "Withdrawal not processed",
+          status: "closed",
+          priority: "urgent",
+          departmentId: "4",
+          assignedAgent: "Jessica Wong",
           lastActivity: new Date(Date.now() - 86400000).toISOString(),
           createdAt: new Date(Date.now() - 172800000).toISOString(),
-          userEmail: 'alex.brown@email.com',
-          userName: 'Alex Brown',
-          category: 'Financial'
+          userEmail: "alex.brown@email.com",
+          userName: "Alex Brown",
+          category: "Financial",
         },
         {
-          id: 'TKT-004',
-          userId: '4',
-          subject: 'Trading platform errors',
-          status: 'open',
-          priority: 'high',
-          departmentId: '3',
+          id: "TKT-004",
+          userId: "4",
+          subject: "Trading platform errors",
+          status: "open",
+          priority: "high",
+          departmentId: "3",
           lastActivity: new Date(Date.now() - 7200000).toISOString(),
           createdAt: new Date(Date.now() - 7200000).toISOString(),
-          userEmail: 'emma.wilson@email.com',
-          userName: 'Emma Wilson',
-          category: 'Technical'
+          userEmail: "emma.wilson@email.com",
+          userName: "Emma Wilson",
+          category: "Technical",
         },
         {
-          id: 'TKT-005',
-          userId: '5',
-          subject: 'KYC document upload issue',
-          status: 'in-progress',
-          priority: 'low',
-          departmentId: '5',
-          assignedAgent: 'David Lee',
+          id: "TKT-005",
+          userId: "5",
+          subject: "KYC document upload issue",
+          status: "in-progress",
+          priority: "low",
+          departmentId: "5",
+          assignedAgent: "David Lee",
           lastActivity: new Date(Date.now() - 14400000).toISOString(),
           createdAt: new Date(Date.now() - 259200000).toISOString(),
-          userEmail: 'robert.davis@email.com',
-          userName: 'Robert Davis',
-          category: 'Documentation'
+          userEmail: "robert.davis@email.com",
+          userName: "Robert Davis",
+          category: "Documentation",
         },
         {
-          id: 'TKT-006',
-          userId: '6',
-          subject: 'Unable to reset password',
-          status: 'open',
-          priority: 'medium',
-          departmentId: '1',
+          id: "TKT-006",
+          userId: "6",
+          subject: "Unable to reset password",
+          status: "open",
+          priority: "medium",
+          departmentId: "1",
           lastActivity: new Date(Date.now() - 5400000).toISOString(),
           createdAt: new Date(Date.now() - 5400000).toISOString(),
-          userEmail: 'michael.clark@email.com',
-          userName: 'Michael Clark',
-          category: 'Account'
+          userEmail: "michael.clark@email.com",
+          userName: "Michael Clark",
+          category: "Account",
         },
         {
-          id: 'TKT-007',
-          userId: '7',
-          subject: 'Deposit not reflected in account',
-          status: 'urgent',
-          priority: 'urgent',
-          departmentId: '4',
-          assignedAgent: 'Sarah Johnson',
+          id: "TKT-007",
+          userId: "7",
+          subject: "Deposit not reflected in account",
+          status: "urgent",
+          priority: "urgent",
+          departmentId: "4",
+          assignedAgent: "Sarah Johnson",
           lastActivity: new Date(Date.now() - 900000).toISOString(),
           createdAt: new Date(Date.now() - 1800000).toISOString(),
-          userEmail: 'lisa.martinez@email.com',
-          userName: 'Lisa Martinez',
-          category: 'Financial'
-        }
+          userEmail: "lisa.martinez@email.com",
+          userName: "Lisa Martinez",
+          category: "Financial",
+        },
       ];
-      
+
       const mockDepartments: Department[] = [
-        { 
-          id: '1', 
-          name: 'Technical Support',
-          description: 'Technical assistance and troubleshooting',
-          status: 'online',
-          responseTime: '< 2 hours',
+        {
+          id: "1",
+          name: "Technical Support",
+          description: "Technical assistance and troubleshooting",
+          status: "online",
+          responseTime: "< 2 hours",
           icon: SettingsIcon,
           ticketCount: 18,
-          avgResponseTime: '1.5 hours',
-          agents: 4
+          avgResponseTime: "1.5 hours",
+          agents: 4,
         },
-        { 
-          id: '2', 
-          name: 'Account Management',
-          description: 'Account-related inquiries',
-          status: 'online',
-          responseTime: '< 1 hour',
+        {
+          id: "2",
+          name: "Account Management",
+          description: "Account-related inquiries",
+          status: "online",
+          responseTime: "< 1 hour",
           icon: Users,
           ticketCount: 25,
-          avgResponseTime: '45 minutes',
-          agents: 3
+          avgResponseTime: "45 minutes",
+          agents: 3,
         },
-        { 
-          id: '3', 
-          name: 'Trading Support',
-          description: 'Trading platform assistance',
-          status: 'online',
-          responseTime: '< 30 minutes',
+        {
+          id: "3",
+          name: "Trading Support",
+          description: "Trading platform assistance",
+          status: "online",
+          responseTime: "< 30 minutes",
           icon: HeadphonesIcon,
           ticketCount: 12,
-          avgResponseTime: '20 minutes',
-          agents: 2
+          avgResponseTime: "20 minutes",
+          agents: 2,
         },
-        { 
-          id: '4', 
-          name: 'Financial Services',
-          description: 'Payment and withdrawal support',
-          status: 'online',
-          responseTime: '< 4 hours',
+        {
+          id: "4",
+          name: "Financial Services",
+          description: "Payment and withdrawal support",
+          status: "online",
+          responseTime: "< 4 hours",
           icon: CreditCard,
           ticketCount: 15,
-          avgResponseTime: '3.2 hours',
-          agents: 3
+          avgResponseTime: "3.2 hours",
+          agents: 3,
         },
-        { 
-          id: '5', 
-          name: 'Documentation',
-          description: 'KYC and compliance support',
-          status: 'offline',
-          responseTime: '< 24 hours',
+        {
+          id: "5",
+          name: "Documentation",
+          description: "KYC and compliance support",
+          status: "offline",
+          responseTime: "< 24 hours",
           icon: FileText,
           ticketCount: 8,
-          avgResponseTime: '18 hours',
-          agents: 2
-        }
+          avgResponseTime: "18 hours",
+          agents: 2,
+        },
       ];
-      
+
       setTickets(mockTickets);
       setDepartments(mockDepartments);
-      
+
       // Update stats
       setSupportStats({
         totalTickets: mockTickets.length,
-        openTickets: mockTickets.filter(t => t.status === 'open').length,
-        inProgressTickets: mockTickets.filter(t => t.status === 'in-progress').length,
-        closedToday: mockTickets.filter(t => 
-          t.status === 'closed' && 
-          new Date(t.lastActivity).toDateString() === new Date().toDateString()
+        openTickets: mockTickets.filter((t) => t.status === "open").length,
+        inProgressTickets: mockTickets.filter((t) => t.status === "in-progress")
+          .length,
+        closedToday: mockTickets.filter(
+          (t) =>
+            t.status === "closed" &&
+            new Date(t.lastActivity).toDateString() ===
+              new Date().toDateString()
         ).length,
-        avgResponseTime: '2.5 hours',
+        avgResponseTime: "2.5 hours",
         customerSatisfaction: 4.2,
         totalAgents: 14,
         onlineAgents: 12,
-        todayTickets: mockTickets.filter(t => 
-          new Date(t.createdAt).toDateString() === new Date().toDateString()
+        todayTickets: mockTickets.filter(
+          (t) =>
+            new Date(t.createdAt).toDateString() === new Date().toDateString()
         ).length,
-        resolvedToday: mockTickets.filter(t => 
-          t.status === 'closed' && 
-          new Date(t.lastActivity).toDateString() === new Date().toDateString()
+        resolvedToday: mockTickets.filter(
+          (t) =>
+            t.status === "closed" &&
+            new Date(t.lastActivity).toDateString() ===
+              new Date().toDateString()
         ).length,
-        avgResolutionTime: '4.2 hours',
-        escalatedTickets: mockTickets.filter(t => t.priority === 'urgent').length
+        avgResolutionTime: "4.2 hours",
+        escalatedTickets: mockTickets.filter((t) => t.priority === "urgent")
+          .length,
       });
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -317,50 +326,56 @@ const AdminSupport: React.FC = () => {
       // Enhanced mock messages data
       const mockMessages: SupportMessage[] = [
         {
-          id: '1',
+          id: "1",
           ticketId: ticketId,
-          userId: '1',
-          sender: 'user',
-          message: 'Hi, I\'m having trouble accessing the trading platform. It keeps showing a login error.',
+          userId: "1",
+          sender: "user",
+          message:
+            "Hi, I'm having trouble accessing the trading platform. It keeps showing a login error.",
           timestamp: new Date(Date.now() - 3600000).toISOString(),
-          status: 'delivered'
+          status: "delivered",
         },
         {
-          id: '2',
+          id: "2",
           ticketId: ticketId,
-          userId: '1',
-          sender: 'agent',
-          agentName: 'Sarah Johnson',
-          message: 'Hello! I\'m sorry to hear you\'re experiencing login issues. Can you please tell me what browser you\'re using and if you\'ve tried clearing your cache?',
+          userId: "1",
+          sender: "agent",
+          agentName: "Sarah Johnson",
+          message:
+            "Hello! I'm sorry to hear you're experiencing login issues. Can you please tell me what browser you're using and if you've tried clearing your cache?",
           timestamp: new Date(Date.now() - 3000000).toISOString(),
-          status: 'delivered'
+          status: "delivered",
         },
         {
-          id: '3',
+          id: "3",
           ticketId: ticketId,
-          userId: '1',
-          sender: 'user',
-          message: 'I\'m using Chrome. Let me try clearing the cache now.',
+          userId: "1",
+          sender: "user",
+          message: "I'm using Chrome. Let me try clearing the cache now.",
           timestamp: new Date(Date.now() - 2400000).toISOString(),
-          status: 'delivered'
+          status: "delivered",
         },
         {
-          id: '4',
+          id: "4",
           ticketId: ticketId,
-          userId: '1',
-          sender: 'agent',
-          agentName: 'Sarah Johnson',
-          message: 'Great! Please also try disabling any browser extensions temporarily. If the issue persists, I can generate a fresh login token for you.',
+          userId: "1",
+          sender: "agent",
+          agentName: "Sarah Johnson",
+          message:
+            "Great! Please also try disabling any browser extensions temporarily. If the issue persists, I can generate a fresh login token for you.",
           timestamp: new Date(Date.now() - 1800000).toISOString(),
-          status: 'delivered'
-        }
+          status: "delivered",
+        },
       ];
-      
-      setTicketMessages(mockMessages.sort((a: SupportMessage, b: SupportMessage) => 
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      ));
+
+      setTicketMessages(
+        mockMessages.sort(
+          (a: SupportMessage, b: SupportMessage) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        )
+      );
     } catch (error) {
-      console.error('Error fetching ticket messages:', error);
+      console.error("Error fetching ticket messages:", error);
     }
   };
 
@@ -372,89 +387,105 @@ const AdminSupport: React.FC = () => {
       ticketId: selectedTicket.id,
       userId: selectedTicket.userId,
       departmentId: selectedTicket.departmentId,
-      sender: 'agent',
+      sender: "agent",
       agentName: agentName,
       message: newMessage.trim(),
       timestamp: new Date().toISOString(),
-      status: 'delivered'
+      status: "delivered",
     };
 
     try {
-      console.log('Sending message:', messageData);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Sending message:", messageData);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setNewMessage('');
+      setNewMessage("");
       fetchTicketMessages(selectedTicket.id);
       fetchData();
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   };
 
   const updateTicketStatus = async (ticketId: string, status: string) => {
     try {
-      console.log('Updating ticket status:', ticketId, status);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Updating ticket status:", ticketId, status);
+      await new Promise((resolve) => setTimeout(resolve, 500));
       fetchData();
     } catch (error) {
-      console.error('Error updating ticket status:', error);
+      console.error("Error updating ticket status:", error);
     }
   };
 
   const assignTicket = async (ticketId: string, agent: string) => {
     try {
-      console.log('Assigning ticket:', ticketId, 'to', agent);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Assigning ticket:", ticketId, "to", agent);
+      await new Promise((resolve) => setTimeout(resolve, 500));
       fetchData();
     } catch (error) {
-      console.error('Error assigning ticket:', error);
+      console.error("Error assigning ticket:", error);
     }
   };
 
-  const filteredTickets = tickets.filter(ticket => {
-    const statusMatch = filterStatus === 'all' || ticket.status === filterStatus;
-    const departmentMatch = filterDepartment === 'all' || ticket.departmentId === filterDepartment;
-    const priorityMatch = filterPriority === 'all' || ticket.priority === filterPriority;
-    const searchMatch = searchQuery === '' || 
+  const filteredTickets = tickets.filter((ticket) => {
+    const statusMatch =
+      filterStatus === "all" || ticket.status === filterStatus;
+    const departmentMatch =
+      filterDepartment === "all" || ticket.departmentId === filterDepartment;
+    const priorityMatch =
+      filterPriority === "all" || ticket.priority === filterPriority;
+    const searchMatch =
+      searchQuery === "" ||
       ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.id.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     return statusMatch && departmentMatch && priorityMatch && searchMatch;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`;
-      case 'in-progress': return 'text-yellow-600 bg-yellow-100';
-      case 'closed': return `text-${COLORS.GRAY} bg-gray-100`;
-      case 'urgent': return 'text-red-600 bg-red-100';
-      default: return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`;
+      case "open":
+        return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`;
+      case "in-progress":
+        return "text-yellow-600 bg-yellow-100";
+      case "closed":
+        return `text-${COLORS.GRAY} bg-gray-100`;
+      case "urgent":
+        return "text-red-600 bg-red-100";
+      default:
+        return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT}`;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-100 border-red-200';
-      case 'high': return 'text-orange-600 bg-orange-100 border-orange-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
-      case 'low': return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT} border-${COLORS.PRIMARY_BG}`;
-      default: return `text-${COLORS.GRAY} bg-gray-100 border-gray-200`;
+      case "urgent":
+        return "text-red-600 bg-red-100 border-red-200";
+      case "high":
+        return "text-orange-600 bg-orange-100 border-orange-200";
+      case "medium":
+        return "text-yellow-600 bg-yellow-100 border-yellow-200";
+      case "low":
+        return `text-${COLORS.PRIMARY} bg-${COLORS.PRIMARY_BG_LIGHT} border-${COLORS.PRIMARY_BG}`;
+      default:
+        return `text-${COLORS.GRAY} bg-gray-100 border-gray-200`;
     }
   };
 
   const getDepartmentName = (departmentId?: string) => {
-    if (!departmentId) return 'No Department';
-    const department = departments.find(d => d.id === departmentId);
-    return department ? department.name : 'Unknown Department';
+    if (!departmentId) return "No Department";
+    const department = departments.find((d) => d.id === departmentId);
+    return department ? department.name : "Unknown Department";
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 border-${COLORS.PRIMARY} mx-auto mb-4`}></div>
+          <div
+            className={`animate-spin rounded-full h-8 w-8 border-b-2 border-${COLORS.PRIMARY} mx-auto mb-4`}
+          ></div>
           <p className="text-gray-600">Loading admin support dashboard...</p>
         </div>
       </div>
@@ -466,8 +497,12 @@ const AdminSupport: React.FC = () => {
       {/* Enhanced Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>Admin Support Center</h1>
-          <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>Comprehensive customer support management and analytics</p>
+          <h1 className={`text-3xl font-bold text-${COLORS.SECONDARY}`}>
+            Admin Support Center
+          </h1>
+          <p className={`mt-2 text-${COLORS.SECONDARY_TEXT}`}>
+            Comprehensive customer support management and analytics
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button
@@ -484,7 +519,9 @@ const AdminSupport: React.FC = () => {
             <Calendar className="h-4 w-4 mr-2" />
             Schedule
           </Button>
-          <Button className={`bg-${COLORS.PRIMARY} hover:bg-${COLORS.PRIMARY_BG}`}>
+          <Button
+            className={`bg-${COLORS.PRIMARY} hover:bg-${COLORS.PRIMARY_BG}`}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Create Ticket
           </Button>
@@ -493,14 +530,20 @@ const AdminSupport: React.FC = () => {
 
       {/* Enhanced Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className={`p-6 hover:shadow-lg transition-all duration-200 border-l-4 border-l-${COLORS.PRIMARY}`}>
+        <Card
+          className={`p-6 hover:shadow-lg transition-all duration-200 border-l-4 border-l-${COLORS.PRIMARY}`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Tickets</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{supportStats.totalTickets}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">
+                {supportStats.totalTickets}
+              </p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                <span className="text-xs text-green-600">+{supportStats.todayTickets} today</span>
+                <span className="text-xs text-green-600">
+                  +{supportStats.todayTickets} today
+                </span>
               </div>
             </div>
             <div className={`p-3 bg-${COLORS.PRIMARY_BG_LIGHT} rounded-full`}>
@@ -513,10 +556,14 @@ const AdminSupport: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Open Tickets</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{supportStats.openTickets}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">
+                {supportStats.openTickets}
+              </p>
               <div className="flex items-center mt-2">
                 <AlertCircle className="h-4 w-4 text-yellow-600 mr-1" />
-                <span className="text-xs text-yellow-600">Requires attention</span>
+                <span className="text-xs text-yellow-600">
+                  Requires attention
+                </span>
               </div>
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
@@ -529,7 +576,9 @@ const AdminSupport: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">In Progress</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{supportStats.inProgressTickets}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">
+                {supportStats.inProgressTickets}
+              </p>
               <div className="flex items-center mt-2">
                 <Clock className="h-4 w-4 text-orange-600 mr-1" />
                 <span className="text-xs text-orange-600">Being resolved</span>
@@ -544,8 +593,12 @@ const AdminSupport: React.FC = () => {
         <Card className="p-6 hover:shadow-lg transition-all duration-200 border-l-4 border-l-green-500">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Resolved Today</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{supportStats.resolvedToday}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Resolved Today
+              </p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">
+                {supportStats.resolvedToday}
+              </p>
               <div className="flex items-center mt-2">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
                 <span className="text-xs text-green-600">Great progress!</span>
@@ -563,67 +616,110 @@ const AdminSupport: React.FC = () => {
         <Card className="p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <Zap className="h-5 w-5 text-blue-600 mr-2" />
-            <span className="text-sm font-medium text-gray-600">Avg Response</span>
+            <span className="text-sm font-medium text-gray-600">
+              Avg Response
+            </span>
           </div>
-          <p className="text-xl font-bold text-blue-600">{supportStats.avgResponseTime}</p>
+          <p className="text-xl font-bold text-blue-600">
+            {supportStats.avgResponseTime}
+          </p>
         </Card>
-        
+
         <Card className="p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <Star className="h-5 w-5 text-yellow-600 mr-2" />
-            <span className="text-sm font-medium text-gray-600">Satisfaction</span>
+            <span className="text-sm font-medium text-gray-600">
+              Satisfaction
+            </span>
           </div>
-          <p className="text-xl font-bold text-yellow-600">{supportStats.customerSatisfaction}/5.0</p>
+          <p className="text-xl font-bold text-yellow-600">
+            {supportStats.customerSatisfaction}/5.0
+          </p>
         </Card>
-        
+
         <Card className="p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <UserCheck className="h-5 w-5 text-green-600 mr-2" />
-            <span className="text-sm font-medium text-gray-600">Online Agents</span>
+            <span className="text-sm font-medium text-gray-600">
+              Online Agents
+            </span>
           </div>
-          <p className="text-xl font-bold text-green-600">{supportStats.onlineAgents}/{supportStats.totalAgents}</p>
+          <p className="text-xl font-bold text-green-600">
+            {supportStats.onlineAgents}/{supportStats.totalAgents}
+          </p>
         </Card>
-        
+
         <Card className="p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
             <span className="text-sm font-medium text-gray-600">Escalated</span>
           </div>
-          <p className="text-xl font-bold text-red-600">{supportStats.escalatedTickets}</p>
+          <p className="text-xl font-bold text-red-600">
+            {supportStats.escalatedTickets}
+          </p>
         </Card>
       </div>
 
       {/* Departments Overview */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Department Performance</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Department Performance
+          </h3>
           <BarChart3 className="h-5 w-5 text-gray-400" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {departments.map((dept) => {
             const IconComponent = dept.icon;
             return (
-              <div key={dept.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+              <div
+                key={dept.id}
+                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${dept.status === 'online' ? 'bg-green-100' : 'bg-gray-100'}`}>
-                    <IconComponent className={`h-5 w-5 ${dept.status === 'online' ? 'text-green-600' : 'text-gray-400'}`} />
+                  <div
+                    className={`p-2 rounded-lg ${
+                      dept.status === "online" ? "bg-green-100" : "bg-gray-100"
+                    }`}
+                  >
+                    <IconComponent
+                      className={`h-5 w-5 ${
+                        dept.status === "online"
+                          ? "text-green-600"
+                          : "text-gray-400"
+                      }`}
+                    />
                   </div>
-                  <div className={`w-2 h-2 rounded-full ${dept.status === 'online' ? 'bg-green-400' : 'bg-gray-400'}`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      dept.status === "online" ? "bg-green-400" : "bg-gray-400"
+                    }`}
+                  />
                 </div>
-                <h4 className="font-medium text-sm text-gray-900 mb-1">{dept.name}</h4>
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{dept.description}</p>
+                <h4 className="font-medium text-sm text-gray-900 mb-1">
+                  {dept.name}
+                </h4>
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                  {dept.description}
+                </p>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-600">Tickets</span>
-                    <span className="text-xs font-medium text-gray-900">{dept.ticketCount}</span>
+                    <span className="text-xs font-medium text-gray-900">
+                      {dept.ticketCount}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-600">Agents</span>
-                    <span className="text-xs font-medium text-gray-900">{dept.agents}</span>
+                    <span className="text-xs font-medium text-gray-900">
+                      {dept.agents}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-600">Response</span>
-                    <span className="text-xs font-medium text-gray-900">{dept.avgResponseTime}</span>
+                    <span className="text-xs font-medium text-gray-900">
+                      {dept.avgResponseTime}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -656,10 +752,10 @@ const AdminSupport: React.FC = () => {
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <select 
-                value={filterStatus} 
+              <select
+                value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
@@ -669,9 +765,9 @@ const AdminSupport: React.FC = () => {
                 <option value="closed">Closed</option>
                 <option value="urgent">Urgent</option>
               </select>
-              
-              <select 
-                value={filterPriority} 
+
+              <select
+                value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
@@ -681,28 +777,30 @@ const AdminSupport: React.FC = () => {
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
               </select>
-              
-              <select 
-                value={filterDepartment} 
+
+              <select
+                value={filterDepartment}
                 onChange={(e) => setFilterDepartment(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 <option value="all">All Departments</option>
-                {departments.map(dept => (
-                  <option key={dept.id} value={dept.id}>{dept.name}</option>
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {filteredTickets.map(ticket => (
-              <button 
+            {filteredTickets.map((ticket) => (
+              <button
                 key={ticket.id}
                 className={`w-full text-left p-4 border rounded-lg transition-all ${
-                  selectedTicket?.id === ticket.id 
-                    ? 'border-red-500 bg-red-50 shadow-sm' 
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  selectedTicket?.id === ticket.id
+                    ? "border-red-500 bg-red-50 shadow-sm"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
                 onClick={() => setSelectedTicket(ticket)}
               >
@@ -716,15 +814,23 @@ const AdminSupport: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex flex-col items-end space-y-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                      {ticket.status.toUpperCase().replace('-', ' ')}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        ticket.status
+                      )}`}
+                    >
+                      {ticket.status.toUpperCase().replace("-", " ")}
                     </span>
-                    <span className={`px-2 py-1 rounded border text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
+                    <span
+                      className={`px-2 py-1 rounded border text-xs font-medium ${getPriorityColor(
+                        ticket.priority
+                      )}`}
+                    >
                       {ticket.priority.toUpperCase()}
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">
                     {ticket.id}
@@ -733,16 +839,17 @@ const AdminSupport: React.FC = () => {
                     {getDepartmentName(ticket.departmentId)}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-600">
                     Created: {new Date(ticket.createdAt).toLocaleDateString()}
                   </span>
                   <span className="text-xs text-gray-600">
-                    Updated: {new Date(ticket.lastActivity).toLocaleDateString()}
+                    Updated:{" "}
+                    {new Date(ticket.lastActivity).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 {ticket.assignedAgent && (
                   <div className="text-xs text-red-700 mt-2 bg-red-100 px-2 py-1 rounded flex items-center">
                     <UserCheck className="h-3 w-3 mr-1" />
@@ -768,30 +875,48 @@ const AdminSupport: React.FC = () => {
               <div className="border-b border-gray-200 pb-4 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">{selectedTicket.subject}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      {selectedTicket.subject}
+                    </h3>
                     <p className="text-sm text-gray-600">
                       {selectedTicket.userName} • {selectedTicket.userEmail}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {selectedTicket.id} • {getDepartmentName(selectedTicket.departmentId)} • {selectedTicket.category}
+                      {selectedTicket.id} •{" "}
+                      {getDepartmentName(selectedTicket.departmentId)} •{" "}
+                      {selectedTicket.category}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedTicket.status)}`}>
-                      {selectedTicket.status.toUpperCase().replace('-', ' ')}
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                        selectedTicket.status
+                      )}`}
+                    >
+                      {selectedTicket.status.toUpperCase().replace("-", " ")}
                     </span>
-                    <span className={`px-3 py-1 rounded border text-sm font-medium ${getPriorityColor(selectedTicket.priority)}`}>
+                    <span
+                      className={`px-3 py-1 rounded border text-sm font-medium ${getPriorityColor(
+                        selectedTicket.priority
+                      )}`}
+                    >
                       {selectedTicket.priority.toUpperCase()}
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Enhanced Action Buttons */}
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
                     size="sm"
-                    variant={selectedTicket.status === 'in-progress' ? 'primary' : 'outline'}
-                    onClick={() => updateTicketStatus(selectedTicket.id, 'in-progress')}
+                    variant={
+                      selectedTicket.status === "in-progress"
+                        ? "primary"
+                        : "outline"
+                    }
+                    onClick={() =>
+                      updateTicketStatus(selectedTicket.id, "in-progress")
+                    }
                     className="text-xs"
                   >
                     <Clock className="h-3 w-3 mr-1" />
@@ -799,8 +924,12 @@ const AdminSupport: React.FC = () => {
                   </Button>
                   <Button
                     size="sm"
-                    variant={selectedTicket.status === 'closed' ? 'primary' : 'outline'}
-                    onClick={() => updateTicketStatus(selectedTicket.id, 'closed')}
+                    variant={
+                      selectedTicket.status === "closed" ? "primary" : "outline"
+                    }
+                    onClick={() =>
+                      updateTicketStatus(selectedTicket.id, "closed")
+                    }
                     className="text-xs"
                   >
                     <CheckCircle className="h-3 w-3 mr-1" />
@@ -826,7 +955,7 @@ const AdminSupport: React.FC = () => {
                     Escalate
                   </Button>
                 </div>
-                
+
                 {selectedTicket.assignedAgent && (
                   <div className="text-sm text-red-700 mt-3 flex items-center">
                     <UserCheck className="h-4 w-4 mr-2" />
@@ -837,27 +966,44 @@ const AdminSupport: React.FC = () => {
 
               {/* Messages */}
               <div className="h-80 overflow-y-auto mb-4 space-y-4">
-                {ticketMessages.map(message => (
-                  <div key={message.id} className={`flex ${message.sender === 'agent' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                      message.sender === 'agent' 
-                        ? 'bg-red-600 text-white' 
-                        : 'bg-gray-100 text-gray-900'
-                    }`}>
-                      {message.sender === 'agent' && message.agentName && (
-                        <div className={`text-xs font-medium mb-1 ${
-                          message.sender === 'agent' ? 'text-red-100' : 'text-red-700'
-                        }`}>
+                {ticketMessages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      message.sender === "agent"
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+                        message.sender === "agent"
+                          ? "bg-red-600 text-white"
+                          : "bg-gray-100 text-gray-900"
+                      }`}
+                    >
+                      {message.sender === "agent" && message.agentName && (
+                        <div
+                          className={`text-xs font-medium mb-1 ${
+                            message.sender === "agent"
+                              ? "text-red-100"
+                              : "text-red-700"
+                          }`}
+                        >
                           {message.agentName}
                         </div>
                       )}
                       <p className="text-sm">{message.message}</p>
-                      <div className={`text-xs mt-2 ${
-                        message.sender === 'agent' ? 'text-red-100' : 'text-gray-500'
-                      }`}>
-                        {new Date(message.timestamp).toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
+                      <div
+                        className={`text-xs mt-2 ${
+                          message.sender === "agent"
+                            ? "text-red-100"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {new Date(message.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </div>
                     </div>
@@ -872,7 +1018,7 @@ const AdminSupport: React.FC = () => {
               </div>
 
               {/* Message Input */}
-              {selectedTicket.status !== 'closed' && (
+              {selectedTicket.status !== "closed" && (
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex items-end space-x-3">
                     <div className="flex-1">
@@ -880,13 +1026,17 @@ const AdminSupport: React.FC = () => {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your response..."
-                        onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" &&
+                          !e.shiftKey &&
+                          (e.preventDefault(), sendMessage())
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                         rows={2}
                       />
                     </div>
-                    <Button 
-                      onClick={sendMessage} 
+                    <Button
+                      onClick={sendMessage}
                       disabled={!newMessage.trim()}
                       className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
                     >
@@ -905,7 +1055,8 @@ const AdminSupport: React.FC = () => {
                   Select a ticket to view conversation
                 </h3>
                 <p className="text-gray-600">
-                  Choose a ticket from the list to start managing the conversation
+                  Choose a ticket from the list to start managing the
+                  conversation
                 </p>
               </div>
             </div>

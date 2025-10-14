@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState,  useEffect } from "react";
-import { COLORS } from "../../constants/colors";
-import Card from "../../components/ui/Card";
-import { ShimmerLoader } from "../../components/ui";
+import React, { useState, useEffect } from "react";
+import { COLORS } from "../../../constants/colors";
+import Card from "../../../components/ui/Card";
+import { ShimmerLoader } from "../../../components/ui";
 import { useSnackbar } from "notistack";
-import useAdminAuth from "../../Hook/useAdminAuth";
+import useAdminAuth from "../../../Hook/useAdminAuth";
 import { apiRequest } from "@/services";
-import { ADMIN_DASHBOARD_DATA } from "../../../api/api-variable";
+import { ADMIN_DASHBOARD_DATA } from "../../../../api/api-variable";
 import {
   Users,
   UserCheck,
@@ -20,12 +20,13 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import RecentTransactions from "./RecentTransactions";
 
 // using raw API `stats` object directly; no local typed mapping
 
 const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  
+
   const [rawStats, setRawStats] = useState<unknown | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -40,13 +41,11 @@ const AdminDashboard: React.FC = () => {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => {
-       
         const resp: any = response;
         const stats = resp?.data?.stats ?? resp?.stats ?? resp;
         setRawStats(stats ?? null);
       })
       .catch((error) => {
-       
         const err: any = error;
         console.error("Failed to fetch dashboard data:", err);
         const errorMessage =
@@ -81,8 +80,7 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  // rawStats exists here — narrow to a local any for property access
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const stats: any = rawStats;
 
   return (
@@ -349,8 +347,10 @@ const AdminDashboard: React.FC = () => {
               <CreditCard className="h-6 w-6 text-blue-600" />
             </div>
           </div>
+          
         </Card>
-      </div>
+      </div> 
+    <RecentTransactions />
     </div>
   );
 };

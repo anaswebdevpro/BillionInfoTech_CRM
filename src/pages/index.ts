@@ -1,5 +1,5 @@
 // Main Pages Exports
-export { default as AdminSupport } from './admin/AdminSupport';
+export { default as AdminSupport } from './admin/AdminSupport/AdminSupport';
 export { default as CreateTicket } from './createTicket/CreateTicket';
 export { default as Dashboard } from './Dashboard/Dashboard';
 // export { default as Deposits } from './Deposite/Deposits';

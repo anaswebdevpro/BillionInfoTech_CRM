@@ -1,6 +1,6 @@
 import React from 'react';
 import { Building, MapPin, Users, TrendingUp, Plus, Search, Filter, Eye, Edit, Trash2, Globe } from 'lucide-react';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../../../constants/colors';
 
 const AdminManageFranchise: React.FC = () => {
   const franchiseData = [

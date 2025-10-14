@@ -70,4 +70,5 @@ export const GET_WITHDRAWAL_HISTORY = "/get-withdrawal-history";
 // Admin Api
 export const ADMIN_LOGIN = "/admin/login";
 export const ADMIN_DASHBOARD_DATA ="/admin/dashboard-stats";
+export const ADMIN_RECENT_TRANSACTION ="/admin/recent-transaction";
 

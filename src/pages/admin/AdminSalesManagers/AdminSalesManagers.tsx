@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, Target, TrendingUp, Award, Plus, Search, Filter, Eye, Edit, Trash2, User } from 'lucide-react';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../../../constants/colors';
 
 const AdminSalesManagers: React.FC = () => {
   const managersData = [
