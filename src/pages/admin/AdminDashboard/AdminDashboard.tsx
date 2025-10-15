@@ -79,15 +79,15 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [rawStats, setRawStats] = useState<unknown | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { token } = useAdminAuth();
+  const { adminToken } = useAdminAuth();
 
   const fetchDashboardData = useCallback(() => {
-    if (!token) return;
+    if (!adminToken) return;
     setLoading(true);
     apiRequest({
       endpoint: ADMIN_DASHBOARD_DATA,
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${adminToken}` },
     })
       .then((response) => {
         const resp: any = response;
@@ -106,7 +106,7 @@ const AdminDashboard: React.FC = () => {
         enqueueSnackbar(errorMessage, { variant: "error" });
       })
       .finally(() => setLoading(false));
-  }, [token, enqueueSnackbar]);
+  }, [adminToken, enqueueSnackbar]);
 
   useEffect(() => {
     fetchDashboardData();

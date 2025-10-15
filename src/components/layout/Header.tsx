@@ -1,9 +1,24 @@
-import React from 'react';
-import { Menu, Bell, User } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { COLORS } from '../../constants/colors';
-import type { ExtendedUser } from '../../types';
+import React from "react";
+import { Menu, Bell, User } from "lucide-react";
+import { useAuth } from "../../context/AuthContext/AuthContext";
+import { COLORS } from "../../constants/colors";
+import type { ExtendedUser } from "../../types";
+import useAdminAuth from "@/Hook/useAdminAuth";
+
+interface AdminData {
+  id: number;
+  name: string;
+  email: string;
+  role_id: number;
+  status: number;
+  type: string;
+  user_type: string;
+  profile_picture?: string;
+  franchise_id?: number | null;
+  institute_id?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
 
 interface HeaderProps {
   title: string;
@@ -12,27 +27,34 @@ interface HeaderProps {
 }
 
 const ProfileButton: React.FC<{
-  user: ExtendedUser | null;
+  user: ExtendedUser | AdminData | null;
   isAdmin: boolean;
-  onClick: () => void;
-}> = ({ user, isAdmin, onClick }) => {
-  const profileImageBorder = isAdmin ? 'border-red-600' : `border-${COLORS.PRIMARY}`;
-  const textColor = isAdmin ? 'text-red-800' : `text-${COLORS.SECONDARY}`;
+}> = ({ user, isAdmin }) => {
+  const profileImageBorder = isAdmin
+    ? "border-red-600"
+    : `border-${COLORS.PRIMARY}`;
+  const textColor = isAdmin ? "text-red-800" : `text-${COLORS.SECONDARY}`;
+
+  // Handle different data structures for user vs admin
+  const displayName = isAdmin
+    ? (user as AdminData)?.name || "Admin" // Admin has 'name' field
+    : `${(user as ExtendedUser)?.first_name || ""} ${
+        (user as ExtendedUser)?.last_name || ""
+      }`.trim() || "User"; // User has first_name & last_name
 
   return (
     <button
       type="button"
       className="-m-1.5 flex items-center p-1.5 hover:bg-gray-50 rounded-lg transition-colors"
-      onClick={onClick}
     >
-        
       <span className="sr-only">Open user menu</span>
-      <div className={`h-8 w-8 rounded-full overflow-hidden flex items-center justify-center border-1 ${profileImageBorder}`}>
-    
+      <div
+        className={`h-8 w-8 rounded-full overflow-hidden flex items-center justify-center border-2 ${profileImageBorder}`}
+      >
         {user?.profile_picture ? (
           <img
-          src={`https://amf.billioninfotech.com/${user?.profile_picture}`}
-            alt={user?.first_name+' '+user?.last_name || 'Profile'}
+            src={`https://amf.billioninfotech.com/${user?.profile_picture}`}
+            alt={displayName}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -41,7 +63,7 @@ const ProfileButton: React.FC<{
       </div>
       <span className="hidden lg:flex lg:items-center">
         <span className={`ml-2 text-sm font-semibold leading-6 ${textColor}`}>
-          {user?.first_name+' '+user?.last_name || 'User'}
+          {displayName}
         </span>
       </span>
     </button>
@@ -52,23 +74,33 @@ const ProfileButton: React.FC<{
  * Header component for the dashboard
  * Contains page title, notifications, and user menu
  */
-const Header: React.FC<HeaderProps> = ({ title, onMobileMenuClick, isAdmin = false }) => {
+const Header: React.FC<HeaderProps> = ({
+  title,
+  onMobileMenuClick,
+  isAdmin = false,
+}) => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { adminData } = useAdminAuth();
 
+  // Use adminData if in admin mode, otherwise use regular user
+  const currentUser = isAdmin ? adminData : user;
 
-  const handleProfileClick = () => {
-    navigate('/dashboard/profile');
-  };
-
-  const headerClasses = isAdmin ? 'border-red-200 bg-white' : `border-${COLORS.BORDER} bg-${COLORS.WHITE}`;
-  const mobileMenuButtonClasses = isAdmin ? 'text-red-600' : `text-${COLORS.SECONDARY_TEXT}`;
-  const separatorClasses = isAdmin ? 'bg-red-200' : `bg-${COLORS.BORDER}`;
-  const titleClasses = isAdmin ? 'text-red-800' : `text-${COLORS.SECONDARY}`;
-  const lgSeparatorClasses = isAdmin ? 'lg:bg-red-200' : `lg:bg-${COLORS.BORDER}`;
+  const headerClasses = isAdmin
+    ? "border-red-200 bg-white"
+    : `border-${COLORS.BORDER} bg-${COLORS.WHITE}`;
+  const mobileMenuButtonClasses = isAdmin
+    ? "text-red-600"
+    : `text-${COLORS.SECONDARY_TEXT}`;
+  const separatorClasses = isAdmin ? "bg-red-200" : `bg-${COLORS.BORDER}`;
+  const titleClasses = isAdmin ? "text-red-800" : `text-${COLORS.SECONDARY}`;
+  const lgSeparatorClasses = isAdmin
+    ? "lg:bg-red-200"
+    : `lg:bg-${COLORS.BORDER}`;
 
   return (
-    <div className={`sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b ${headerClasses} px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8`}>
+    <div
+      className={`sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b ${headerClasses} px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8`}
+    >
       {/* Mobile menu button */}
       <button
         type="button"
@@ -84,14 +116,12 @@ const Header: React.FC<HeaderProps> = ({ title, onMobileMenuClick, isAdmin = fal
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
         <div className="flex flex-1 items-center">
-          <h1 className={`text-xl font-semibold ${titleClasses}`}>
-            {title}
-          </h1>
-          {isAdmin && (
+          <h1 className={`text-xl font-semibold ${titleClasses}`}>{title}</h1>
+          {/* {isAdmin && (
             <span className="ml-3 px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-              Admin Panel
+              Admin Panels
             </span>
-          )}
+          )} */}
         </div>
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
@@ -105,11 +135,13 @@ const Header: React.FC<HeaderProps> = ({ title, onMobileMenuClick, isAdmin = fal
           </button>
 
           {/* Separator */}
-          <div className={`hidden lg:block lg:h-6 lg:w-px ${lgSeparatorClasses}`} />
+          <div
+            className={`hidden lg:block lg:h-6 lg:w-px ${lgSeparatorClasses}`}
+          />
 
           {/* Profile dropdown */}
           <div className="relative">
-            <ProfileButton user={user} isAdmin={isAdmin} onClick={handleProfileClick} />
+            <ProfileButton user={currentUser} isAdmin={isAdmin} />
           </div>
         </div>
       </div>

@@ -59,8 +59,8 @@ const AdminLoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
           data: payload,
         })
           .then((response: any) => {
-           
-            const adminData = response?.data?.data ?? response?.data ?? response;
+            const adminData =
+              response?.data?.data ?? response?.data ?? response;
 
             const user = adminData?.user;
             const user_type = adminData?.user_type;
@@ -70,20 +70,18 @@ const AdminLoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup }) => {
             if (!user_type) {
               setIsLoading(false);
               formik.setFieldError("password", "Invalid user type");
-              
+
               return;
             }
 
             if (user && token) {
-            
               const persistedUser = { ...user, user_type, type: user_type };
-              localStorage.setItem("user", JSON.stringify(persistedUser));
-              localStorage.setItem("token", token);
+              localStorage.setItem("adminData", JSON.stringify(persistedUser));
+              localStorage.setItem("adminToken", token);
 
               login(persistedUser, token);
               setIsLoading(false);
               navigate("/afxadmin/dashboard");
-              
             }
 
             setIsLoading(false);

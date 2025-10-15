@@ -27,7 +27,7 @@ interface ApiResponse {
 }
 
 const RecentTransactions = () => {
-  const { token } = useAdminAuth();
+  const { adminToken } = useAdminAuth();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,19 +43,19 @@ const RecentTransactions = () => {
       length = entriesPerPage
     ) => {
       setIsLoading(true);
-      setError(null); 
+      setError(null);
       try {
         const requestBody = {
           start: page * length,
           length,
-          search
+          search,
         };
         console.log("Request Body:", requestBody);
 
         apiRequest({
           endpoint: ADMIN_RECENT_TRANSACTION,
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${adminToken}` },
           data: requestBody,
         })
           .then((response: unknown) => {
@@ -99,7 +99,7 @@ const RecentTransactions = () => {
         setIsLoading(false);
       }
     },
-    [token, currentPage, debouncedSearchValue, entriesPerPage]
+    [adminToken, currentPage, debouncedSearchValue, entriesPerPage]
   );
 
   useEffect(() => {
