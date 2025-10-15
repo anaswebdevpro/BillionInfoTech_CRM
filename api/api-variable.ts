@@ -73,4 +73,5 @@ export const ADMIN_DASHBOARD_DATA ="/admin/dashboard-stats";
 export const ADMIN_RECENT_TRANSACTION ="/admin/recent-transaction";
 export const ADMIN_GET_ALL_CLIENT ="/admin/get-all-clients"
 export const ADMIN_GET_ALL_KYC ="/admin/get-key-requests"
+export const ADMIN_ADD_NEW_CLIENT ="/admin/add-new-client"
 

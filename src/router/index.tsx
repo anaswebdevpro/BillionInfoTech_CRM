@@ -39,14 +39,51 @@ import {
   AdminSettings,
   AdminClientsLeads,
   AdminLeads,
-  AdminFinancial,
-  AdminIBPartners,
-  AdminConfigurations,
   AdminBonusPromotion,
   AdminPromotionalBanners,
-  AdminManageFranchise,
   AdminSalesManagers,
 } from "../pages/admin";
+
+// Import Financial Pages
+import {
+  AdminFinancial,
+  DepositRequests,
+  AllDeposits,
+  DepositHistory,
+  GatewayTxns,
+  WithdrawalRequests,
+  WithdrawalHistory,
+  Transfers,
+  IBCommission,
+  ClientWiseIBCommission,
+  AllTransactions,
+} from "../pages/admin/AdminFinancial";
+
+// Import IB Partners Pages
+import {
+  AdminIBPartners,
+  PartnerRequests,
+  IBs,
+} from "../pages/admin/AdminIBPartners";
+
+// Import Configurations Pages
+import {
+  AdminConfigurations,
+  BankSettings,
+  ManageGroups,
+  GroupSettings,
+  TradingSymbols,
+  TradingCategories,
+  ManageSubadmins,
+  AllAdmins,
+} from "../pages/admin/AdminConfigurations";
+
+// Import Manage Franchise Pages
+import {
+  AdminManageFranchise,
+  Countries,
+  Cities,
+} from "../pages/admin/AdminManageFranchise";
 
 // Admin Layout Wrapper Component
 import AdminLayoutWrapper from "../components/AdminLayoutWrapper";
@@ -271,12 +308,88 @@ export const router = createBrowserRouter([
             element: <AdminFinancial />,
           },
           {
+            path: "financial/deposit-requests",
+            element: <DepositRequests />,
+          },
+          {
+            path: "financial/all-deposits",
+            element: <AllDeposits />,
+          },
+          {
+            path: "financial/deposit-history",
+            element: <DepositHistory />,
+          },
+          {
+            path: "financial/gateway-txns",
+            element: <GatewayTxns />,
+          },
+          {
+            path: "financial/withdrawal-requests",
+            element: <WithdrawalRequests />,
+          },
+          {
+            path: "financial/withdrawal-history",
+            element: <WithdrawalHistory />,
+          },
+          {
+            path: "financial/transfers",
+            element: <Transfers />,
+          },
+          {
+            path: "financial/ib-commission",
+            element: <IBCommission />,
+          },
+          {
+            path: "financial/client-wise-ib-commission",
+            element: <ClientWiseIBCommission />,
+          },
+          {
+            path: "financial/all-transactions",
+            element: <AllTransactions />,
+          },
+          {
             path: "ib-partners",
             element: <AdminIBPartners />,
           },
           {
+            path: "ib-partners/partner-requests",
+            element: <PartnerRequests />,
+          },
+          {
+            path: "ib-partners/ibs",
+            element: <IBs />,
+          },
+          {
             path: "configurations",
             element: <AdminConfigurations />,
+          },
+          {
+            path: "configurations/bank-settings",
+            element: <BankSettings />,
+          },
+          {
+            path: "configurations/manage-groups",
+            element: <ManageGroups />,
+          },
+          {
+            path: "configurations/group-settings",
+            element: <GroupSettings />,
+          },
+          {
+            path: "configurations/trading-symbols",
+            element: <TradingSymbols />,
+          },
+          {
+            path: "configurations/trading-categories",
+            element: <TradingCategories />,
+          },
+          {
+            path: "configurations/manage-subadmins",
+            element: <ManageSubadmins />,
+          },
+          {
+            path: "configurations/all-admins",
+            element: <AllAdmins />,
           },
           {
             path: "bonus-promotion",
@@ -289,6 +402,14 @@ export const router = createBrowserRouter([
           {
             path: "manage-franchise",
             element: <AdminManageFranchise />,
+          },
+          {
+            path: "manage-franchise/countries",
+            element: <Countries />,
+          },
+          {
+            path: "manage-franchise/cities",
+            element: <Cities />,
           },
           {
             path: "sales-managers",
