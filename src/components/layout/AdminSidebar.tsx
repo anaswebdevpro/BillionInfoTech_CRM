@@ -142,11 +142,24 @@ const AdminSidebar: React.FC = () => {
   const navigation: NavigationItem[] = [
     { name: "Dashboard", href: "/afxadmin/dashboard", icon: LayoutDashboard },
     {
-      name: "Support",
-      href: "/afxadmin/support",
-      icon: MessageCircle,
-      badge: "12",
+      name: "Client Management",
+      icon: Users,
+      submenu: [
+        {
+          name: "Clients & Leads",
+          href: "/afxadmin/clients-leads",
+          icon: Target,
+        },
+        { name: "Leads Management", href: "/afxadmin/leads", icon: Target },
+        {
+          name: "KYC Management",
+          href: "/afxadmin/kyc",
+          icon: FileText,
+          badge: "15",
+        },
+      ],
     },
+   
     {
       name: "Transactions",
       icon: DollarSign,
@@ -197,24 +210,7 @@ const AdminSidebar: React.FC = () => {
         { name: "System Logs", href: "/afxadmin/reports/logs", icon: Database },
       ],
     },
-    {
-      name: "Client Management",
-      icon: Users,
-      submenu: [
-        {
-          name: "Clients & Leads",
-          href: "/afxadmin/clients-leads",
-          icon: Target,
-        },
-        { name: "Leads Management", href: "/afxadmin/leads", icon: Target },
-        {
-          name: "KYC Management",
-          href: "/afxadmin/kyc",
-          icon: FileText,
-          badge: "15",
-        },
-      ],
-    },
+    
     {
       name: "Configurations",
       href: "/afxadmin/configurations",
@@ -242,6 +238,12 @@ const AdminSidebar: React.FC = () => {
       icon: Building,
     },
     { name: "Sales Managers", href: "/afxadmin/sales-managers", icon: UserCog },
+     {
+      name: "Support",
+      href: "/afxadmin/support",
+      icon: MessageCircle,
+      badge: "12",
+    },
   ];
 
   const toggleSubmenu = (menuName: string) => {

@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { X, ChevronDown, ChevronRight } from "lucide-react";
+import { X, ChevronDown, ChevronRight, UserCog, Target, Briefcase, Gift, Building } from "lucide-react";
 import logo from "../../assets/admin.png";
 import { COLORS, GRADIENTS } from "../../constants/colors";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import {
   LayoutDashboard,
   Users,
-  CreditCard,
+  // CreditCard,
   FileText,
   BarChart3,
   Settings,
   LogOut,
   MessageCircle,
-  Shield,
-  UserCheck,
+  // Shield,
+  // UserCheck,
   DollarSign,
   TrendingUp,
   AlertTriangle,
   Database,
-  Bell,
+  // Bell,
 } from "lucide-react";
 
 interface AdminMobileSidebarProps {
@@ -146,47 +146,27 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const navigate = useNavigate();
   const { logout } = useAuth();
-
   const navigation: NavigationItem[] = [
     { name: "Dashboard", href: "/afxadmin/dashboard", icon: LayoutDashboard },
     {
-      name: "Support",
-      href: "/afxadmin/support",
-      icon: MessageCircle,
-      badge: "12",
-    },
-    {
-      name: "User Management",
+      name: "Client Management",
       icon: Users,
       submenu: [
-        { name: "All Users", href: "/afxadmin/users", icon: Users },
         {
-          name: "User Verification",
-          href: "/afxadmin/users/verification",
-          icon: UserCheck,
-          badge: "8",
+          name: "Clients & Leads",
+          href: "/afxadmin/clients-leads",
+          icon: Target,
         },
-        { name: "User Roles", href: "/afxadmin/users/roles", icon: Shield },
-      ],
-    },
-    {
-      name: "Account Management",
-      icon: CreditCard,
-      submenu: [
-        { name: "All Accounts", href: "/afxadmin/accounts", icon: CreditCard },
+        { name: "Leads Management", href: "/afxadmin/leads", icon: Target },
         {
-          name: "Account Approval",
-          href: "/afxadmin/accounts/approval",
-          icon: UserCheck,
-          badge: "5",
-        },
-        {
-          name: "Account Types",
-          href: "/afxadmin/accounts/types",
-          icon: Settings,
+          name: "KYC Management",
+          href: "/afxadmin/kyc",
+          icon: FileText,
+          badge: "15",
         },
       ],
     },
+   
     {
       name: "Transactions",
       icon: DollarSign,
@@ -212,13 +192,13 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
           href: "/afxadmin/transactions/withdrawals",
           icon: TrendingUp,
         },
+        {
+          name: "Financial Management",
+          href: "/afxadmin/financial",
+          icon: DollarSign,
+        },
+        { name: "IB Partners", href: "/afxadmin/ib-partners", icon: Briefcase },
       ],
-    },
-    {
-      name: "KYC Management",
-      href: "/afxadmin/kyc",
-      icon: FileText,
-      badge: "15",
     },
     {
       name: "Reports & Analytics",
@@ -237,13 +217,42 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
         { name: "System Logs", href: "/afxadmin/reports/logs", icon: Database },
       ],
     },
+    
     {
-      name: "Notifications",
-      href: "/admin/notifications",
-      icon: Bell,
-      badge: "7",
+      name: "Configurations",
+      href: "/afxadmin/configurations",
+      icon: Settings,
+    },
+    {
+      name: "Marketing",
+      icon: Gift,
+      submenu: [
+        {
+          name: "Bonus & Promotion",
+          href: "/afxadmin/bonus-promotion",
+          icon: Gift,
+        },
+        {
+          name: "Promotional Banners",
+          href: "/afxadmin/promotional-banners",
+          icon: Settings,
+        },
+      ],
+    },
+    {
+      name: "Manage Franchise",
+      href: "/afxadmin/manage-franchise",
+      icon: Building ,
+    },
+    { name: "Sales Managers", href: "/afxadmin/sales-managers", icon: UserCog },
+     {
+      name: "Support",
+      href: "/afxadmin/support",
+      icon: MessageCircle,
+      badge: "12",
     },
   ];
+  
 
   const toggleSubmenu = (menuName: string) => {
     const lowerMenuName = menuName.toLowerCase();

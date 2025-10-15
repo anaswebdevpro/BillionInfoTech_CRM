@@ -31,7 +31,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     // If authenticated but not an admin, deny access
     if (!user || user?.user_type !== "admin") {
-      return <Navigate to="/login" state={{ from: location }} replace />;
+      return <Navigate to="/afxadmin/login" state={{ from: location }} replace />;
     }
   }
 
