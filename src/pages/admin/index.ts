@@ -10,7 +10,10 @@ export { default as AdminSettings } from './AdminSettings/AdminSettings';
 
 // New Admin Pages
 export { default as AdminClientsLeads } from './AdminClientsLeads/AdminClientsLeads';
-export { default as AdminLeads } from './AdminLeads/AdminLeads';
+export { default as AdminTradingAccounts } from './AdminTradingAccounts/AdminTradingAccounts';
+export { default as AdminTradingHistory } from './AdminTradingHistory/AdminTradingHistory';
+
+// export { default as AdminLeads } from './AdminTradingAccounts/AdminTradingAccounts';
 export { default as AdminFinancial } from './AdminFinancial/AdminFinancial';
 export { default as AdminIBPartners } from './AdminIBPartners/AdminIBPartners';
 export { default as AdminConfigurations } from './AdminConfigurations/AdminConfigurations';
@@ -18,3 +21,4 @@ export { default as AdminBonusPromotion } from './AdminBonusPromotion/AdminBonus
 export { default as AdminPromotionalBanners } from './AdminPromotionalBanners/AdminPromotionalBanners';
 export { default as AdminManageFranchise } from './AdminManageFranchise/AdminManageFranchise';
 export { default as AdminSalesManagers } from './AdminSalesManagers/AdminSalesManagers';
+

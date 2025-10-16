@@ -216,17 +216,27 @@ const AdminSidebar: React.FC = () => {
       icon: Users,
       submenu: [
         {
-          name: "Clients & Leads",
+          name: "All Clients ",
           href: "/afxadmin/clients-leads",
           icon: Target,
         },
-        { name: "Leads Management", href: "/afxadmin/leads", icon: Target },
         {
           name: "KYC Management",
           href: "/afxadmin/kyc",
-          icon: FileText,
+          icon: UserCog,
           badge: "15",
         },
+         {
+          name: "Trading History",
+          href: "/afxadmin/trading-history",
+          icon: Target,
+        },
+         {
+          name: "Trading Accounts",
+          href: "/afxadmin/all-accounts",
+          icon: Target,
+        },
+        
       ],
     },
     {

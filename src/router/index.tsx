@@ -38,10 +38,12 @@ import {
   AdminReports,
   AdminSettings,
   AdminClientsLeads,
-  AdminLeads,
+
   AdminBonusPromotion,
   AdminPromotionalBanners,
   AdminSalesManagers,
+  AdminTradingAccounts,
+  AdminTradingHistory,
 } from "../pages/admin";
 
 // Import Financial Pages
@@ -283,6 +285,18 @@ export const router = createBrowserRouter([
             path: "transactions",
             element: <AdminTransactions />,
           },
+           {
+            path: "clients-leads",
+            element: <AdminClientsLeads />,
+          },
+          {
+            path: "all-accounts",
+            element: <AdminTradingAccounts />,
+          },
+            {
+            path: "trading-history",
+            element: <AdminTradingHistory />,
+          },
           {
             path: "kyc",
             element: <AdminKYC />,
@@ -295,14 +309,11 @@ export const router = createBrowserRouter([
             path: "settings",
             element: <AdminSettings />,
           },
-          {
-            path: "clients-leads",
-            element: <AdminClientsLeads />,
-          },
-          {
-            path: "leads",
-            element: <AdminLeads />,
-          },
+         
+          // {
+          //   path: "leads",
+          //   element: <AdminLeads />,
+          // },
           {
             path: "financial",
             element: <AdminFinancial />,
