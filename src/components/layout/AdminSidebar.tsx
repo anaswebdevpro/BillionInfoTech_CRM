@@ -381,10 +381,10 @@ const AdminSidebar: React.FC = () => {
         },
       ],
     },
-    {
-      name: "Marketing",
-      icon: Gift,
-      submenu: [
+    // {
+    //   name: "Marketing",
+    //   icon: Gift,
+    //   submenu: [
         {
           name: "Bonus & Promotion",
           href: "/afxadmin/bonus-promotion",
@@ -395,8 +395,8 @@ const AdminSidebar: React.FC = () => {
           href: "/afxadmin/promotional-banners",
           icon: Image,
         },
-      ],
-    },
+    //   ],
+    // },
     {
       name: "Manage Franchise",
       icon: Building,

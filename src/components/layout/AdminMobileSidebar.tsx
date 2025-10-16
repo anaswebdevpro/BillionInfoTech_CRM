@@ -9,6 +9,7 @@ import {
   Briefcase,
   Gift,
   Building,
+  Image,
 } from "lucide-react";
 import logo from "../../assets/admin.png";
 import { COLORS, GRADIENTS } from "../../constants/colors";
@@ -240,17 +241,27 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
       icon: Users,
       submenu: [
         {
-          name: "Clients & Leads",
+          name: "All Clients ",
           href: "/afxadmin/clients-leads",
           icon: Target,
         },
-        { name: "Leads Management", href: "/afxadmin/leads", icon: Target },
         {
           name: "KYC Management",
           href: "/afxadmin/kyc",
-          icon: FileText,
+          icon: UserCog,
           badge: "15",
         },
+         {
+          name: "Trading History",
+          href: "/afxadmin/trading-history",
+          icon: Target,
+        },
+         {
+          name: "Trading Accounts",
+          href: "/afxadmin/all-accounts",
+          icon: Target,
+        },
+        
       ],
     },
     {
@@ -395,10 +406,10 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
         },
       ],
     },
-    {
-      name: "Marketing",
-      icon: Gift,
-      submenu: [
+    // {
+    //   name: "Marketing",
+    //   icon: Gift,
+    //   submenu: [
         {
           name: "Bonus & Promotion",
           href: "/afxadmin/bonus-promotion",
@@ -407,10 +418,10 @@ const AdminMobileSidebar: React.FC<AdminMobileSidebarProps> = ({
         {
           name: "Promotional Banners",
           href: "/afxadmin/promotional-banners",
-          icon: Settings,
+          icon: Image
         },
-      ],
-    },
+    //   ],
+    // },
     {
       name: "Manage Franchise",
       icon: Building,
