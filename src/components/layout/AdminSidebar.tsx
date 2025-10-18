@@ -104,7 +104,7 @@ const NestedSubMenuItem: React.FC<{
   toggleSubmenu: (name: string) => void;
   isSubmenuExpanded: (name: string) => boolean;
 }> = ({ item, toggleSubmenu, isSubmenuExpanded }) => {
-  const { name, icon: Icon, submenu, badge } = item;
+  const { name, icon: Icon, submenu } = item;
   const isExpanded = isSubmenuExpanded(name);
 
   if (!submenu) {
@@ -127,13 +127,8 @@ const NestedSubMenuItem: React.FC<{
           className={`h-4 w-4 shrink-0 text-${COLORS.SECONDARY_TEXT} group-hover:text-${COLORS.PRIMARY_TEXT}`}
         />
         <span className="flex-1 text-left whitespace-nowrap">{name}</span>
-        {badge && (
-          <span
-            className={`bg-${COLORS.PRIMARY} text-${COLORS.WHITE} text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] text-center`}
-          >
-            {badge}
-          </span>
-        )}
+       
+     
         {isExpanded ? (
           <ChevronDown className={`h-4 w-4 text-${COLORS.SECONDARY_TEXT}`} />
         ) : (
@@ -224,7 +219,7 @@ const AdminSidebar: React.FC = () => {
           name: "KYC Management",
           href: "/afxadmin/kyc",
           icon: UserCog,
-          badge: "15",
+         
         },
          {
           name: "Trading History",
@@ -418,7 +413,7 @@ const AdminSidebar: React.FC = () => {
       name: "Support",
       href: "/afxadmin/support",
       icon: MessageCircle,
-      badge: "12",
+      
     },
   ];
 

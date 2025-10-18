@@ -71,9 +71,13 @@ export const GET_WITHDRAWAL_HISTORY = "/get-withdrawal-history";
 export const ADMIN_LOGIN = "/admin/login";
 export const ADMIN_DASHBOARD_DATA ="/admin/dashboard-stats";
 export const ADMIN_RECENT_TRANSACTION ="/admin/recent-transaction";
+
+//client management
 export const ADMIN_GET_ALL_CLIENT ="/admin/get-all-clients"
 export const ADMIN_GET_ALL_KYC ="/admin/get-key-requests"
 export const ADMIN_ADD_NEW_CLIENT ="/admin/add-new-client"
 export const ADMIN_ALL_TRADING_ACCOUNTS ="/admin/get-all-accounts";
 
-
+// admin support system 
+export const ADMIN_VIEW_ALL_TICKETS="/admin/view-all-tickets"
+export const ADMIN_FETCH_ALL_MESSAGES ="/admin/view-ticket"
