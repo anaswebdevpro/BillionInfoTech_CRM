@@ -82,4 +82,5 @@ export const ADMIN_ALL_TRADING_ACCOUNTS ="/admin/get-all-accounts";
 export const ADMIN_VIEW_ALL_TICKETS="/admin/view-all-tickets"
 export const ADMIN_FETCH_ALL_MESSAGES ="/admin/view-ticket"
 export const ADMIN_NEW_COMMENTS = "/admin/new-comment/";
-export const ADMIN_CLOSED_TICKET = "/admin/closed-ticket/";
+export const ADMIN_CLOSED_TICKET = "/admin/closed-ticket";
+export const ADMIN_FETCH_TICKET_STATS = "/admin/fetch-ticket-stats";

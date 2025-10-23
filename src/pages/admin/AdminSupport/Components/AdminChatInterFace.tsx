@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, MessageCircle, X } from "lucide-react";
+import { Send, Paperclip,  X } from "lucide-react";
 import { Card } from "@/components";
 import { COLORS } from "@/constants/colors";
 import { apiRequest } from "@/services";
@@ -165,6 +165,7 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
     new Set()
   );
   const [hasLocalUpdate, setHasLocalUpdate] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
 
   // Refs
   const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -323,7 +324,6 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
   // Handle close ticket
   const handleCloseTicket = () => {
     if (!ticketId) return;
-    if (!confirm("Are you sure you want to close this ticket?")) return;
 
     apiRequest({
       endpoint: `${ADMIN_CLOSED_TICKET}/${ticketId}`,
@@ -333,7 +333,7 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
       .then((response: any) => {
         console.log("Ticket closed:", response);
         if (response?.response === true) {
-          alert("Ticket closed successfully");
+          setShowCloseModal(false);
           if (onMessageSent) {
             onMessageSent(); // Refresh data
           }
@@ -416,7 +416,7 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
             </div>
             {ticketInfo?.status === 1 && (
               <button
-                onClick={handleCloseTicket}
+                onClick={() => setShowCloseModal(true)}
                 className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
               >
                 Close Ticket
@@ -437,11 +437,14 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
         >
           {localMessages.length === 0 ? (
             <div
-              className={`text-center py-8 text-${COLORS.SECONDARY_TEXT} bg-white/80 rounded-lg`}
+              className={`text-center py-8 text-${COLORS.SECONDARY_TEXT} bg-white/80 rounded-lg  my-42`}
             >
-              <MessageCircle className="mx-auto mb-2 h-12 w-12 text-gray-400" />
+              {/* <MessageCircle className="mx-auto mb-2 h-12 w-12 text-gray-400" /> */}
               <p>No messages yet</p>
-              <p className="text-sm">Start the conversation below</p>
+              <p className="text-sm">
+                Select the ticket to view the conversation
+              </p>
+              {/* <MessageCircle className="mx-auto mb-2 h-12 w-12 text-gray-400" /> */}
             </div>
           ) : (
             sortedDates.map((dateKey) => {
@@ -605,7 +608,7 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
 
             <button
               onClick={handleSend}
-              disabled={sending || (!messageText.trim() && !file)}
+              disabled={!ticketId || sending || (!messageText.trim() && !file)}
               className={`px-4 py-2 bg-${COLORS.PRIMARY} text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2`}
             >
               <Send className="w-4 h-4" />
@@ -614,6 +617,35 @@ const AdminChatInterFace: React.FC<AdminChatInterfaceProp> = ({
           </div>
         </div>
       </Card>
+
+      {/* ==================== CLOSE TICKET MODAL ==================== */}
+      {showCloseModal && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              Close Ticket
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to close this ticket? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowCloseModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCloseTicket}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Yes, Close Ticket
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

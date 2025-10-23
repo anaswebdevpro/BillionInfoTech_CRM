@@ -114,74 +114,6 @@ const AdminSupport = () => {
       {/* header grids  */}
       <HeaderState />
 
-      {/* Departments Overview */}
-      {/* <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Department Performance
-          </h3>
-          <BarChart3 className="h-5 w-5 text-gray-400" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {departments.map((dept) => {
-            const IconComponent = dept.icon;
-            return (
-              <div
-                key={dept.id}
-                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div
-                    className={`p-2 rounded-lg ${
-                      dept.status === "online" ? "bg-green-100" : "bg-gray-100"
-                    }`}
-                  >
-                    <IconComponent
-                      className={`h-5 w-5 ${
-                        dept.status === "online"
-                          ? "text-green-600"
-                          : "text-gray-400"
-                      }`}
-                    />
-                  </div>
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      dept.status === "online" ? "bg-green-400" : "bg-gray-400"
-                    }`}
-                  />
-                </div>
-                <h4 className="font-medium text-sm text-gray-900 mb-1">
-                  {dept.name}
-                </h4>
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                  {dept.description}
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-600">Tickets</span>
-                    <span className="text-xs font-medium text-gray-900">
-                      {dept.ticketCount}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-600">Agents</span>
-                    <span className="text-xs font-medium text-gray-900">
-                      {dept.agents}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-600">Response</span>
-                    <span className="text-xs font-medium text-gray-900">
-                      {dept.avgResponseTime}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card> */}
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-3">
         {/* Left Side - Ticket List */}
@@ -196,20 +128,14 @@ const AdminSupport = () => {
 
         {/* Right Side - Chat Interface */}
         <div className="lg:col-span-2">
-          {selectedTicket ? (
-            <AdminChatInterFace
-              messages={messages}
-              ticketId={selectedTicket}
-              ticketInfo={ticketInfo}
-              onMessageSent={() => fetchMessages(selectedTicket)}
-            />
-          ) : (
-            <div className="bg-white min-h-[500px] rounded-lg shadow p-8 text-center flex flex-col items-center justify-center">
-              <p className="text-gray-500">
-                Select a ticket to view the conversation
-              </p>
-            </div>
-          )}
+          <AdminChatInterFace
+            messages={selectedTicket ? messages : []}
+            ticketId={selectedTicket}
+            ticketInfo={selectedTicket ? ticketInfo : undefined}
+            onMessageSent={() =>
+              selectedTicket && fetchMessages(selectedTicket)
+            }
+          />
         </div>
       </div>
     </>

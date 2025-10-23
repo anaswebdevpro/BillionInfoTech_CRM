@@ -363,7 +363,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   );
 
   return (
-    <div className="bg-white max-w-full">
+    <div className="bg-white max-w-full max-h-[calc(100vh-200px)] flex flex-col">
       <style>{`
         @keyframes fadeInSlide {
           from {
@@ -430,7 +430,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         >
           {localMessages.length === 0 ? (
             <div
-              className={`text-center py-8 text-${COLORS.SECONDARY_TEXT} bg-white/80 rounded-lg`}
+              className={`text-center py-8 text-${COLORS.SECONDARY_TEXT} bg-white/80 rounded-lg my-42`}
             >
               <MessageCircle className="mx-auto mb-2 h-12 w-12 text-gray-400" />
               <p>No messages yet</p>
@@ -600,7 +600,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             <button
               onClick={handleSend}
-              disabled={sending || (!messageText.trim() && !file)}
+              disabled={!ticket?.id || sending || (!messageText.trim() && !file)}
               className={`px-4 py-2 bg-${COLORS.PRIMARY} text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2`}
             >
               <Send className="w-4 h-4" />
