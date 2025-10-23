@@ -29,6 +29,7 @@ const AdminSupport = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
+  const [ticketInfo, setTicketInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchTickets = () => {
@@ -68,6 +69,7 @@ const AdminSupport = () => {
       })
         .then((response: any) => {
           setMessages(response.threads || []);
+          setTicketInfo(response.ticketInfo || null);
           console.log("Messages:", response);
         })
         .catch((error: any) => {
@@ -86,11 +88,6 @@ const AdminSupport = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTicket]);
 
-  // Sending of messages is handled inside ChatInterface component
-
-  // const selectedTicketData = tickets.find(
-  //   (ticket) => ticket.id === selectedTicket
-  // );
   return (
     <>
       {/* Header */}
@@ -186,9 +183,9 @@ const AdminSupport = () => {
       </Card> */}
 
       {/* Main Content Grid */}
-      <div className="border-3 mt-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-3">
         {/* Left Side - Ticket List */}
-        <div>
+        <div className="lg:col-span-1">
           <AllTickets
             tickets={tickets}
             selectedTicket={selectedTicket}
@@ -199,7 +196,20 @@ const AdminSupport = () => {
 
         {/* Right Side - Chat Interface */}
         <div className="lg:col-span-2">
-          <AdminChatInterFace messages={messages} />
+          {selectedTicket ? (
+            <AdminChatInterFace
+              messages={messages}
+              ticketId={selectedTicket}
+              ticketInfo={ticketInfo}
+              onMessageSent={() => fetchMessages(selectedTicket)}
+            />
+          ) : (
+            <div className="bg-white min-h-[500px] rounded-lg shadow p-8 text-center flex flex-col items-center justify-center">
+              <p className="text-gray-500">
+                Select a ticket to view the conversation
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>

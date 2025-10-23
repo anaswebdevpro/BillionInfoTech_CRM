@@ -16,6 +16,15 @@ import { useAuth } from "@/context";
 import { ChatInterface, TicketList } from "./components";
 
 // Types based on your actual API response
+interface CommentItem {
+  id: number | string;
+  message: string;
+  attachment: string | null;
+  user_type: string;
+  user_name?: string;
+  created_on?: string | null;
+}
+
 interface SupportTicket {
   id: number;
   subject: string;
@@ -23,6 +32,7 @@ interface SupportTicket {
   priority: string;
   department: string;
   created_on: string;
+  comments?: CommentItem[];
 }
 
 const Support: React.FC = () => {
@@ -32,12 +42,15 @@ const Support: React.FC = () => {
   // Simplified state management
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
+  const [selectedTicketWithComments, setSelectedTicketWithComments] =
+    useState<SupportTicket | null>(null);
 
   // message input now handled inside ChatInterface
   const [loading, setLoading] = useState(true);
+  // const [messagesLoading, setMessagesLoading] = useState(false);
 
   // Fetch tickets from API using the shared pattern
-  const fetchTickets = () => {
+  function fetchTickets() {
     setLoading(true);
     try {
       apiRequest({
@@ -57,7 +70,7 @@ const Support: React.FC = () => {
     } catch (error) {
       console.error("Failed to fetch tickets:", error);
     }
-  };
+  }
 
   useEffect(() => {
     fetchTickets();
@@ -65,7 +78,7 @@ const Support: React.FC = () => {
 
   // Fetch messages for selected ticket using same pattern
   const fetchMessages = (ticketId: number) => {
-    setLoading(true);
+    // setMessagesLoading(true);
     try {
       apiRequest({
         endpoint: `${SHOW_ALL_SPECIFIC_COMMENT}/${ticketId}`,
@@ -73,29 +86,37 @@ const Support: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((response: any) => {
-          // setMessages(response.ticket?.comments || []);
           console.log("Messages:", response);
+
+          // Update the selected ticket with comments from the response
+          const ticketData = tickets.find((t) => t.id === ticketId);
+          if (ticketData && response.ticket) {
+            setSelectedTicketWithComments({
+              ...ticketData,
+              comments: response.ticket.comments || [],
+            });
+          }
+          // setMessagesLoading(false);
         })
         .catch((error: any) => {
           console.error("Failed to fetch messages:", error);
+          // setMessagesLoading(false);
         });
     } catch (error) {
       console.error("Failed to fetch messages:", error);
-    } finally {
-      setLoading(false);
+      // setMessagesLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!selectedTicket) return;
+    if (!selectedTicket) {
+      setSelectedTicketWithComments(null);
+      return;
+    }
     fetchMessages(selectedTicket);
   }, [selectedTicket]);
 
   // Sending of messages is handled inside ChatInterface component
-
-  const selectedTicketData = tickets.find(
-    (ticket) => ticket.id === selectedTicket
-  );
 
   if (loading) {
     return (
@@ -142,7 +163,14 @@ const Support: React.FC = () => {
 
         {/* Right Side - Chat Interface */}
         <div className="lg:col-span-2">
-          <ChatInterface ticket={selectedTicketData} />
+          <ChatInterface
+            ticket={selectedTicketWithComments}
+            onMessageSent={() => {
+              if (selectedTicket) {
+                fetchMessages(selectedTicket);
+              }
+            }}
+          />
         </div>
       </div>
     </div>
