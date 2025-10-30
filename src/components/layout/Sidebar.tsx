@@ -281,7 +281,7 @@ const Sidebar: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="profile"
+                  href="/dashboard/profile"
                   className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-${COLORS.SECONDARY_TEXT} hover:text-${COLORS.PRIMARY_TEXT} hover:bg-${COLORS.PRIMARY_BG_LIGHT}`}
                 >
                   <User

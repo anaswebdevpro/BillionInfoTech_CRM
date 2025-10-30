@@ -1,27 +1,22 @@
-import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import SignupPage from '../pages/SignupPage/SignupPage';
-
-interface OutletContext {
-  isAuthenticated: boolean;
-  handleLogin: (token: string) => void;
-  handleSignup: (token: string) => void;
-  handleLogout: () => void;
-}
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import SignupPage from "../pages/SignupPage/SignupPage";
 
 const SignupPageWrapper: React.FC = () => {
-  const { handleSignup } = useOutletContext<OutletContext>();
   const navigate = useNavigate();
 
+  const handleSignup = () => {
+    // Token is already saved in localStorage by SignupPage
+    // Just navigate to dashboard
+    navigate("/dashboard");
+  };
+
   const onSwitchToLogin = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
-    <SignupPage 
-      onSignup={handleSignup} 
-      onSwitchToLogin={onSwitchToLogin}
-    />
+    <SignupPage onSignup={handleSignup} onSwitchToLogin={onSwitchToLogin} />
   );
 };
 
